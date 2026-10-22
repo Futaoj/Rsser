@@ -1,0 +1,90 @@
+CREATE VIRTUAL TABLE IF NOT EXISTS post_search USING FTS5(
+  id TEXT NOT NULL PRIMARY KEY,
+  title TEXT NOT NULL,
+  description TEXT NOT NULL,
+  link TEXT NOT NULL,
+  tokenize="trigram"
+);
+
+CREATE TRIGGER IF NOT EXISTS
+post_search_fts_BEFORE_DELETE
+BEFORE DELETE ON post
+WHEN (SELECT COUNT(*) FROM post WHERE id = old.id) = 1
+BEGIN DELETE FROM post_search WHERE id = old.id;
+END;
+
+CREATE TRIGGER IF NOT EXISTS
+post_search_fts_AFTER_UPDATE
+AFTER UPDATE ON post
+BEGIN UPDATE OR IGNORE post_search SET title = new.title, description = new.description WHERE id = new.id;
+END;
+
+CREATE TRIGGER IF NOT EXISTS
+post_search_fts_AFTER_INSERT
+AFTER INSERT ON post
+BEGIN
+  INSERT INTO post_search(id, title, description, link)
+  SELECT new.id, new.title, new.description, new.link
+  WHERE NOT EXISTS (SELECT 1 FROM post_search WHERE id = new.id);
+END;
+
+countSearchResults:
+SELECT COUNT(*) FROM (
+  SELECT DISTINCT p.id, p.sourceId
+  FROM post_search ps
+  INNER JOIN post p ON p.id = ps.id
+  INNER JOIN feed f ON p.sourceId = f.id
+  WHERE ps.post_search MATCH :searchQuery 
+    AND f.isDeleted = 0 
+    AND (p.flags & 4) == 0
+    AND (:isSourceIdsEmpty OR p.sourceId IN :sourceIds)
+    AND (:onlyBookmarked = 0 OR (p.flags & 1) != 0)
+    AND (
+      :onlyUnread = 0 
+      OR (p.flags & 2) == 0 
+      OR p.id IN :sessionPostIds
+    )
+);
+
+search:
+SELECT
+  post.id,
+  sourceId,
+  post_search.title,
+  post_search.description,
+  post.imageUrl,
+  post.audioUrl,
+  post.postDate,
+  post.createdAt,
+  post.link,
+  post.commentsLink,
+  post.flags,
+  feed.name AS feedName,
+  feed.icon AS feedIcon,
+  feed.homepageLink AS feedHomepageLink,
+  feed.alwaysFetchSourceArticle,
+  feed.showFeedFavIcon,
+  pc.feedContentReadingTime AS feedContentReadingTime,
+  pc.articleContentReadingTime AS articleContentReadingTime,
+  post.seedColor AS seedColor,
+  post.audioProgress AS audioProgress,
+  post.audioDuration AS audioDuration
+FROM post_search
+INNER JOIN post ON post.id == post_search.id
+INNER JOIN feed ON post.sourceId == feed.id
+LEFT JOIN postContent pc ON post.id == pc.id
+WHERE post_search MATCH :searchQuery 
+  AND feed.isDeleted = 0 
+  AND (post.flags & 4) == 0
+  AND (:isSourceIdsEmpty OR post.sourceId IN :sourceIds)
+  AND (:onlyBookmarked = 0 OR (post.flags & 1) != 0)
+  AND (
+    :onlyUnread = 0 
+    OR (post.flags & 2) == 0 
+    OR post.id IN :sessionPostIds
+  )
+GROUP BY post.id, post.sourceId
+ORDER BY
+  CASE WHEN :sortOrder = 'oldest' THEN post.postDate END ASC,
+  CASE WHEN :sortOrder = 'newest' THEN post.postDate END DESC
+LIMIT :limit OFFSET :offset;

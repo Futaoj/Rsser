@@ -1,0 +1,346 @@
+/*
+ * Copyright 2026 Sasikanth Miriyampalli
+ *
+ * Licensed under the GPL, Version 3.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.gnu.org/licenses/gpl-3.0.en.html
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+package dev.sasikanth.rss.reader.components
+
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeightIn
+import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ButtonElevation
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import dev.sasikanth.rss.reader.ui.AppTheme
+import dev.sasikanth.rss.reader.ui.LocalTranslucentStyles
+
+@Composable
+fun Button(
+  onClick: () -> Unit,
+  modifier: Modifier = Modifier,
+  enabled: Boolean = true,
+  shape: Shape = MaterialTheme.shapes.medium,
+  colors: ButtonColors =
+    ButtonDefaults.buttonColors(
+      containerColor = AppTheme.colorScheme.primary,
+      contentColor = AppTheme.colorScheme.onPrimary,
+      disabledContainerColor = AppTheme.colorScheme.onSurface.copy(alpha = 0.12f),
+      disabledContentColor = AppTheme.colorScheme.onSurface.copy(alpha = 0.38f),
+    ),
+  elevation: ButtonElevation? = null,
+  content: @Composable RowScope.() -> Unit,
+) {
+  androidx.compose.material3.Button(
+    modifier = modifier,
+    onClick = onClick,
+    colors = colors,
+    shape = shape,
+    enabled = enabled,
+    elevation = elevation,
+    content = content,
+  )
+}
+
+@Composable
+fun TranslucentButton(
+  text: String,
+  modifier: Modifier = Modifier,
+  leadingIcon: ImageVector? = null,
+  trailingIcon: ImageVector? = null,
+  onClick: () -> Unit,
+) {
+  val translucentStyle = LocalTranslucentStyles.current
+
+  Box(
+    modifier =
+      modifier
+        .requiredHeightIn(min = 40.dp)
+        .clip(MaterialTheme.shapes.small)
+        .background(translucentStyle.default.background, MaterialTheme.shapes.small)
+        .clickable { onClick() },
+    contentAlignment = Alignment.Center,
+  ) {
+    val startPadding = if (leadingIcon == null) 20.dp else 16.dp
+    val endPadding = if (trailingIcon == null) 20.dp else 16.dp
+
+    Row(
+      modifier = Modifier.padding(start = startPadding, end = endPadding),
+      verticalAlignment = Alignment.CenterVertically,
+    ) {
+      if (leadingIcon != null) {
+        Icon(
+          modifier = Modifier.requiredSize(20.dp),
+          imageVector = leadingIcon,
+          contentDescription = null,
+          tint = AppTheme.colorScheme.onSurface,
+        )
+
+        Spacer(Modifier.width(8.dp))
+      }
+
+      AnimatedContent(
+        targetState = text,
+        contentAlignment = Alignment.Center,
+        transitionSpec = {
+          (fadeIn(animationSpec = spring(stiffness = Spring.StiffnessMedium)) +
+              slideInVertically(animationSpec = spring(stiffness = Spring.StiffnessMedium)) { -it })
+            .togetherWith(
+              fadeOut(animationSpec = spring(stiffness = Spring.StiffnessMedium)) +
+                slideOutVertically(animationSpec = spring(stiffness = Spring.StiffnessMedium)) {
+                  it
+                }
+            )
+        },
+        label = "ButtonText($text)",
+      ) { text ->
+        Text(
+          text = text,
+          style = MaterialTheme.typography.labelLarge,
+          maxLines = 1,
+          overflow = TextOverflow.MiddleEllipsis,
+          color = AppTheme.colorScheme.onSurface,
+        )
+      }
+
+      if (trailingIcon != null) {
+        Spacer(Modifier.width(8.dp))
+
+        Icon(
+          modifier = Modifier.requiredSize(20.dp),
+          imageVector = trailingIcon,
+          contentDescription = null,
+          tint = AppTheme.colorScheme.onSurface,
+        )
+      }
+    }
+  }
+}
+
+@Composable
+fun InverseButton(
+  text: String,
+  modifier: Modifier = Modifier,
+  icon: ImageVector? = null,
+  onClick: () -> Unit,
+) {
+  Box(
+    modifier =
+      modifier
+        .requiredHeightIn(min = 40.dp)
+        .clip(MaterialTheme.shapes.small)
+        .background(AppTheme.colorScheme.inverseSurface, MaterialTheme.shapes.small)
+        .clickable { onClick() },
+    contentAlignment = Alignment.Center,
+  ) {
+    Row(
+      modifier = Modifier.padding(start = 20.dp, end = 16.dp),
+      verticalAlignment = Alignment.CenterVertically,
+    ) {
+      Text(
+        text = text,
+        style = MaterialTheme.typography.labelLarge,
+        maxLines = 1,
+        overflow = TextOverflow.MiddleEllipsis,
+        color = AppTheme.colorScheme.inverseOnSurface,
+      )
+
+      if (icon != null) {
+        Spacer(Modifier.width(8.dp))
+
+        Icon(
+          modifier = Modifier.requiredSize(20.dp),
+          imageVector = icon,
+          contentDescription = null,
+          tint = AppTheme.colorScheme.inverseOnSurface,
+        )
+      }
+    }
+  }
+}
+
+@Composable
+fun FilledIconButton(
+  icon: ImageVector,
+  contentDescription: String?,
+  modifier: Modifier = Modifier,
+  enabled: Boolean = true,
+  containerColor: Color = AppTheme.colorScheme.surface,
+  iconTint: Color = AppTheme.colorScheme.onSurface,
+  size: IconButtonSize = IconButtonSize.Default,
+  blendMode: BlendMode = if (AppTheme.isDark) BlendMode.Screen else BlendMode.Multiply,
+  onClick: () -> Unit,
+) {
+  val interactionSource = remember { MutableInteractionSource() }
+
+  Box(
+    modifier =
+      Modifier.semantics { role = Role.Button }
+        .requiredSize(size.containerSize)
+        .graphicsLayer { this.blendMode = blendMode }
+        .clip(MaterialTheme.shapes.extraLarge)
+        .background(containerColor)
+        .clickable(
+          interactionSource = interactionSource,
+          indication = ripple(color = AppTheme.colorScheme.secondary),
+          enabled = enabled,
+          onClick = onClick,
+        )
+        .then(modifier),
+    contentAlignment = Alignment.Center,
+  ) {
+    Icon(
+      modifier = Modifier.requiredSize(size.iconSize),
+      imageVector = icon,
+      contentDescription = contentDescription,
+      tint = iconTint,
+    )
+  }
+}
+
+@Composable
+fun IconButton(
+  icon: ImageVector,
+  contentDescription: String?,
+  modifier: Modifier = Modifier,
+  enabled: Boolean = true,
+  size: IconButtonSize = IconButtonSize.Default,
+  tint: Color = AppTheme.colorScheme.onSurfaceVariant,
+  onClick: () -> Unit,
+) {
+  val interactionSource = remember { MutableInteractionSource() }
+
+  Box(
+    modifier =
+      Modifier.semantics { role = Role.Button }
+        .requiredSize(size.containerSize)
+        .clip(MaterialTheme.shapes.small)
+        .clickable(
+          interactionSource = interactionSource,
+          indication = ripple(color = tint),
+          enabled = enabled,
+          onClick = onClick,
+        )
+        .then(modifier),
+    contentAlignment = Alignment.Center,
+  ) {
+    Icon(
+      modifier = Modifier.requiredSize(size.iconSize),
+      imageVector = icon,
+      contentDescription = contentDescription,
+      tint = tint,
+    )
+  }
+}
+
+@Composable
+fun CircularIconButton(
+  icon: ImageVector,
+  label: String,
+  modifier: Modifier = Modifier,
+  enabled: Boolean = true,
+  backgroundColor: Color? = null,
+  borderColor: Color? = null,
+  contentColor: Color? = null,
+  onClick: () -> Unit,
+) {
+  val animatedAlpha by animateFloatAsState(if (enabled) 1.0f else 0.12f)
+  val translucentStyle = LocalTranslucentStyles.current
+  val primaryColor = AppTheme.colorScheme.primary
+  val interactionSource = remember { MutableInteractionSource() }
+
+  Box(
+    modifier =
+      modifier
+        .requiredSize(40.dp)
+        .clip(MaterialTheme.shapes.small)
+        .clickable(
+          enabled = enabled,
+          indication = ripple(color = { contentColor ?: primaryColor }),
+          interactionSource = interactionSource,
+        ) {
+          onClick()
+        }
+        .background(
+          backgroundColor ?: translucentStyle.default.background,
+          MaterialTheme.shapes.small,
+        )
+        .then(
+          if (borderColor == null) {
+            Modifier
+          } else {
+            Modifier.border(width = 1.dp, color = borderColor, shape = MaterialTheme.shapes.small)
+          }
+        )
+        .semantics {
+          contentDescription = label
+          role = Role.Button
+        }
+        .graphicsLayer { alpha = animatedAlpha },
+    contentAlignment = Alignment.Center,
+  ) {
+    Icon(
+      modifier = Modifier.requiredSize(20.dp),
+      imageVector = icon,
+      contentDescription = null,
+      tint = contentColor ?: AppTheme.colorScheme.onSurface,
+    )
+  }
+}
+
+enum class IconButtonSize(val containerSize: Dp, val iconSize: Dp) {
+  Small(containerSize = 32.dp, iconSize = 16.dp),
+  Default(containerSize = 48.dp, iconSize = 20.dp),
+  Large(containerSize = 56.dp, iconSize = 24.dp),
+}

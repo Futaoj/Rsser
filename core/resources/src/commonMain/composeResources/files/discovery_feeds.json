@@ -1,0 +1,73 @@
+[
+  {
+    "name": "科技与数码",
+    "feeds": [
+      {
+        "name": "IT之家",
+        "link": "https://www.ithome.com/rss/",
+        "description": "关注科技资讯、数码产品、软件与互联网动态。",
+        "homepageLink": "https://www.ithome.com/",
+        "icon": "https://www.ithome.com/favicon.ico",
+        "useFeedIcon": false
+      },
+      {
+        "name": "爱范儿",
+        "link": "https://www.ifanr.com/feed/",
+        "description": "关注消费科技、智能设备与数字生活。",
+        "homepageLink": "https://www.ifanr.com/",
+        "icon": "https://www.ifanr.com/favicon.ico",
+        "useFeedIcon": false
+      },
+      {
+        "name": "少数派",
+        "link": "https://sspai.com/feed",
+        "description": "分享数字生活方式、效率工具与实用技巧。",
+        "homepageLink": "https://sspai.com/",
+        "icon": "https://sspai.com/favicon.ico",
+        "useFeedIcon": false
+      }
+    ]
+  },
+  {
+    "name": "科学前沿",
+    "feeds": [
+      {
+        "name": "科学网 · 全部新闻",
+        "link": "https://www.sciencenet.cn/xml/news-0.aspx?news=0",
+        "description": "科学网发布的国内外科学新闻与科技资讯。",
+        "homepageLink": "https://www.sciencenet.cn/",
+        "icon": "https://www.sciencenet.cn/favicon.ico",
+        "useFeedIcon": false
+      },
+      {
+        "name": "科学网 · 首页要闻",
+        "link": "https://www.sciencenet.cn/xml/news-0.aspx?di=0",
+        "description": "关注科学网精选的科学与科技领域要闻。",
+        "homepageLink": "https://www.sciencenet.cn/",
+        "icon": "https://www.sciencenet.cn/favicon.ico",
+        "useFeedIcon": false
+      },
+      {
+        "name": "科学网 · 国际快讯",
+        "link": "https://www.sciencenet.cn/xml/news-0.aspx?di=7",
+        "description": "科学网发布的国际科技与科学动态。",
+        "homepageLink": "https://www.sciencenet.cn/",
+        "icon": "https://www.sciencenet.cn/favicon.ico",
+        "useFeedIcon": false
+      }
+    ]
+  },
+  {
+    "name": "科学博客",
+    "feeds": [
+      {
+        "name": "科学网博客",
+        "link": "https://www.sciencenet.cn/xml/blog.aspx?di=0",
+        "description": "来自科研工作者与科学爱好者的中文博文。",
+        "homepageLink": "https://blog.sciencenet.cn/",
+        "icon": "https://blog.sciencenet.cn/favicon.ico",
+        "useFeedIcon": false
+      }
+    ]
+  }
+]

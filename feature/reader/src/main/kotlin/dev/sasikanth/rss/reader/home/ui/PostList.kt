@@ -1,0 +1,260 @@
+/*
+ * Copyright 2026 Sasikanth Miriyampalli
+ *
+ * Licensed under the GPL, Version 3.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.gnu.org/licenses/gpl-3.0.en.html
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+package dev.sasikanth.rss.reader.home.ui
+
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.VisibilityThreshold
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyItemScope
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.withFrameNanos
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastForEach
+import androidx.paging.compose.LazyPagingItems
+import dev.sasikanth.rss.reader.core.model.local.FeaturedPostItem
+import dev.sasikanth.rss.reader.core.model.local.PostsSortOrder
+import dev.sasikanth.rss.reader.core.model.local.PostsType
+import dev.sasikanth.rss.reader.core.model.local.ResolvedPost
+import dev.sasikanth.rss.reader.data.repository.HomeViewMode
+import dev.sasikanth.rss.reader.data.repository.MarkAsReadOn
+import dev.sasikanth.rss.reader.utils.PINNED_SOURCES_BOTTOM_BAR_HEIGHT
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+
+private const val FEATURED_ITEMS_KEY = "featured_items"
+private const val POST_ITEM_CONTENT_TYPE = "post_item"
+
+private data class VisibleWindow(
+  val firstIndex: Int,
+  val lastIndex: Int,
+  val firstKey: Any?,
+  val lastKey: Any?,
+  val firstVisibleItemIndex: Int,
+)
+
+@OptIn(FlowPreview::class)
+@Composable
+internal fun PostsList(
+  paddingValues: PaddingValues,
+  featuredPosts: ImmutableList<FeaturedPostItem>,
+  listState: LazyListState,
+  featuredPostsPagerState: PagerState,
+  homeViewMode: HomeViewMode,
+  postsType: PostsType,
+  postsSortOrder: PostsSortOrder,
+  activeSourceId: String?,
+  markAsReadOn: MarkAsReadOn,
+  posts: () -> LazyPagingItems<ResolvedPost>,
+  markFeaturedPostAsReadOnScroll: (String) -> Unit,
+  onVisiblePostsChanged: (visiblePosts: Map<String, Int>, firstVisibleItemIndex: Int) -> Unit,
+  onPostClicked: (post: ResolvedPost, postIndex: Int) -> Unit,
+  onFeaturedPostClicked: (post: ResolvedPost) -> Unit,
+  onPostBookmarkClick: (ResolvedPost) -> Unit,
+  onPostCommentsClick: (String) -> Unit,
+  onPostSourceClick: (String) -> Unit,
+  updateReadStatus: (String, Boolean) -> Unit,
+  modifier: Modifier = Modifier,
+  activeReaderPostId: String? = null,
+  selectedPostIndex: Int = -1,
+) {
+  val itemAnimationsEnabled =
+    rememberItemAnimationsEnabled(
+      featuredPosts.isNotEmpty(),
+      homeViewMode,
+      postsType,
+      postsSortOrder,
+      activeSourceId,
+    )
+
+  val topContentPadding =
+    if (featuredPosts.isEmpty()) {
+      paddingValues.calculateTopPadding()
+    } else {
+      0.dp
+    }
+
+  LaunchedEffect(listState, featuredPosts, featuredPostsPagerState) {
+    // Snapshot only the boundaries of the visible window; layoutInfo changes on every
+    // scrolled pixel, and mapping every visible item per frame allocates heavily. The
+    // full key -> index map is built only when the visible item set actually changes.
+    snapshotFlow {
+        val visibleItemsInfo = listState.layoutInfo.visibleItemsInfo
+        VisibleWindow(
+          firstIndex = visibleItemsInfo.firstOrNull()?.index ?: -1,
+          lastIndex = visibleItemsInfo.lastOrNull()?.index ?: -1,
+          firstKey = visibleItemsInfo.firstOrNull()?.key,
+          lastKey = visibleItemsInfo.lastOrNull()?.key,
+          firstVisibleItemIndex = listState.firstVisibleItemIndex,
+        )
+      }
+      .distinctUntilChanged()
+      .onEach { window ->
+        val currentPage = featuredPostsPagerState.currentPage
+        val visibleItemsInfo = listState.layoutInfo.visibleItemsInfo
+        val visibleItems =
+          buildMap(visibleItemsInfo.size) {
+            visibleItemsInfo.fastForEach { itemInfo ->
+              val keyString = itemInfo.key as? String
+              when {
+                keyString.isNullOrBlank() -> Unit
+                keyString == FEATURED_ITEMS_KEY -> {
+                  val post = featuredPosts.getOrNull(currentPage)
+                  post?.resolvedPost?.id?.let { put(it, itemInfo.index) }
+                }
+                else -> PostListKey.decodePostId(keyString)?.let { put(it, itemInfo.index) }
+              }
+            }
+          }
+        onVisiblePostsChanged(visibleItems, window.firstVisibleItemIndex)
+      }
+      .launchIn(this)
+  }
+
+  LazyColumn(
+    modifier = modifier,
+    state = listState,
+    contentPadding =
+      PaddingValues(
+        top = topContentPadding,
+        bottom = PINNED_SOURCES_BOTTOM_BAR_HEIGHT + 120.dp + paddingValues.calculateBottomPadding(),
+      ),
+  ) {
+    item(key = FEATURED_ITEMS_KEY, contentType = FEATURED_ITEMS_KEY) {
+      FeaturedSection(
+        paddingValues = paddingValues,
+        featuredPosts = featuredPosts,
+        pagerState = featuredPostsPagerState,
+        postsType = postsType,
+        markAsReadOn = markAsReadOn,
+        markFeaturedPostAsReadOnScroll = markFeaturedPostAsReadOnScroll,
+        onItemClick = { post, _ -> onFeaturedPostClicked(post) },
+        onPostBookmarkClick = onPostBookmarkClick,
+        onPostCommentsClick = onPostCommentsClick,
+        onPostSourceClick = onPostSourceClick,
+        updateReadStatus = updateReadStatus,
+      )
+    }
+
+    val posts = posts.invoke()
+    items(
+      count = posts.itemCount,
+      key = { index -> posts.peek(index)?.let(PostListKey::encode) ?: index },
+      contentType = { POST_ITEM_CONTENT_TYPE },
+    ) { index ->
+      val post = posts[index] ?: return@items
+      val highlighted = post.id == activeReaderPostId || index == selectedPostIndex
+      val itemModifier = if (itemAnimationsEnabled) animatePostItem() else Modifier
+
+      when (homeViewMode) {
+        HomeViewMode.Default -> {
+          PostListItem(
+            modifier = itemModifier,
+            item = post,
+            highlighted = highlighted,
+            onClick = { onPostClicked(post, index) },
+            onPostBookmarkClick = { onPostBookmarkClick(post) },
+            onPostCommentsClick = { onPostCommentsClick(post.commentsLink!!) },
+            onPostSourceClick = { onPostSourceClick(post.sourceId) },
+            updatePostReadStatus = { updatedReadStatus ->
+              updateReadStatus(post.id, updatedReadStatus)
+            },
+            reduceReadItemAlpha = true,
+          )
+        }
+        HomeViewMode.Simple -> {
+          SimplePostListItem(
+            modifier = itemModifier,
+            item = post,
+            highlighted = highlighted,
+            onClick = { onPostClicked(post, index) },
+            onPostBookmarkClick = { onPostBookmarkClick(post) },
+            onPostCommentsClick = { onPostCommentsClick(post.commentsLink!!) },
+            onPostSourceClick = { onPostSourceClick(post.sourceId) },
+            updatePostReadStatus = { updatedReadStatus ->
+              updateReadStatus(post.id, updatedReadStatus)
+            },
+            reduceReadItemAlpha = true,
+          )
+        }
+        HomeViewMode.Compact -> {
+          CompactPostListItem(
+            modifier = itemModifier,
+            item = post,
+            highlighted = highlighted,
+            onClick = { onPostClicked(post, index) },
+            onPostBookmarkClick = { onPostBookmarkClick(post) },
+            onPostCommentsClick = { onPostCommentsClick(post.commentsLink!!) },
+            updatePostReadStatus = { updatedReadStatus ->
+              updateReadStatus(post.id, updatedReadStatus)
+            },
+            reduceReadItemAlpha = true,
+          )
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Item add/remove animations are only meaningful while the list keeps its identity. Switching the
+ * source, view mode, filter or sort order swaps the whole backing list, and showing/hiding the
+ * featured section resizes item 0 and flips the list's top content padding — animating placement
+ * through any of those makes every post slide against a section that resizes instantly. The gate
+ * stays shut for the frame that lays the new structure out, then reopens.
+ */
+@Composable
+private fun rememberItemAnimationsEnabled(vararg structureInputs: Any?): Boolean {
+  val structureKey = remember(*structureInputs) { Any() }
+  var settledKey by remember { mutableStateOf<Any?>(null) }
+
+  LaunchedEffect(structureKey) {
+    withFrameNanos {}
+    settledKey = structureKey
+  }
+
+  return settledKey === structureKey
+}
+
+private fun LazyItemScope.animatePostItem(): Modifier =
+  Modifier.animateItem(
+    fadeInSpec = tween(durationMillis = FADE_IN_DURATION),
+    placementSpec =
+      spring(
+        stiffness = Spring.StiffnessMediumLow,
+        visibilityThreshold = IntOffset.VisibilityThreshold,
+      ),
+    fadeOutSpec = tween(durationMillis = FADE_OUT_DURATION),
+  )
+
+private const val FADE_IN_DURATION = 220
+private const val FADE_OUT_DURATION = 160

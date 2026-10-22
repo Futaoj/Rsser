@@ -1,0 +1,208 @@
+/*
+ * Copyright 2026 Sasikanth Miriyampalli
+ *
+ * Licensed under the GPL, Version 3.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.gnu.org/licenses/gpl-3.0.en.html
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+package dev.sasikanth.rss.reader.bookmarks.ui
+
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import dev.sasikanth.rss.reader.bookmarks.BookmarksEvent
+import dev.sasikanth.rss.reader.bookmarks.BookmarksState
+import dev.sasikanth.rss.reader.bookmarks.BookmarksViewModel
+import dev.sasikanth.rss.reader.components.NewArticlesScrollToTopButton
+import dev.sasikanth.rss.reader.components.SimpleTopAppBar
+import dev.sasikanth.rss.reader.core.model.local.ResolvedPost
+import dev.sasikanth.rss.reader.home.ui.PostListItem
+import dev.sasikanth.rss.reader.home.ui.PostMetadataConfig
+import dev.sasikanth.rss.reader.platform.LocalLinkHandler
+import dev.sasikanth.rss.reader.resources.icons.BookmarkStacks
+import dev.sasikanth.rss.reader.resources.icons.TwineIcons
+import dev.sasikanth.rss.reader.ui.AppTheme
+import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
+import twine.shared.generated.resources.Res
+import twine.shared.generated.resources.bookmarks
+import twine.shared.generated.resources.bookmarksPlaceholder
+
+@Composable
+internal fun BookmarksScreen(
+  bookmarksViewModel: BookmarksViewModel,
+  goBack: () -> Unit,
+  openPost: (postIndex: Int, post: ResolvedPost) -> Unit,
+  modifier: Modifier = Modifier,
+) {
+  val state by bookmarksViewModel.state.collectAsStateWithLifecycle()
+  val bookmarks = state.bookmarks.collectAsLazyPagingItems()
+
+  BookmarksContent(
+    bookmarks = bookmarks,
+    dispatch = bookmarksViewModel::dispatch,
+    goBack = goBack,
+    openPost = openPost,
+    modifier = modifier,
+  )
+}
+
+@Composable
+private fun BookmarksContent(
+  bookmarks: LazyPagingItems<ResolvedPost>,
+  dispatch: (BookmarksEvent) -> Unit,
+  goBack: () -> Unit,
+  openPost: (postIndex: Int, post: ResolvedPost) -> Unit,
+  modifier: Modifier = Modifier,
+) {
+  val listState = rememberLazyListState()
+  val coroutineScope = rememberCoroutineScope()
+  val showScrollToTop by
+    remember(bookmarks) {
+      derivedStateOf {
+        val hasContent = bookmarks.itemCount > 0
+        hasContent && listState.firstVisibleItemIndex > 0
+      }
+    }
+  val layoutDirection = LocalLayoutDirection.current
+  val linkHandler = LocalLinkHandler.current
+
+  Scaffold(
+    modifier = modifier,
+    topBar = {
+      SimpleTopAppBar(title = stringResource(Res.string.bookmarks), onBackClick = goBack)
+    },
+    content = { padding ->
+      if (bookmarks.itemCount > 0) {
+        Box(modifier = Modifier.fillMaxSize()) {
+          LazyColumn(
+            contentPadding =
+              PaddingValues(
+                bottom = padding.calculateBottomPadding() + 80.dp,
+                top = padding.calculateTopPadding(),
+              ),
+            state = listState,
+          ) {
+            items(count = bookmarks.itemCount) { index ->
+              val post = bookmarks[index]
+              if (post != null) {
+                PostListItem(
+                  item = post,
+                  onClick = { openPost(index, post) },
+                  onPostBookmarkClick = { dispatch(BookmarksEvent.OnPostBookmarkClick(post)) },
+                  onPostCommentsClick = {
+                    post.commentsLink?.let { coroutineScope.launch { linkHandler.openLink(it) } }
+                  },
+                  onPostSourceClick = {
+                    // no-op
+                  },
+                  updatePostReadStatus = { updatedReadStatus ->
+                    dispatch(BookmarksEvent.UpdatePostReadStatus(post.id, updatedReadStatus))
+                  },
+                  postMetadataConfig =
+                    PostMetadataConfig.DEFAULT.copy(
+                      showUnreadIndicator = false,
+                      showToggleReadUnreadOption = false,
+                      enablePostSource = false,
+                    ),
+                )
+                if (index != bookmarks.itemCount - 1) {
+                  HorizontalDivider(
+                    modifier = Modifier.fillParentMaxWidth().padding(horizontal = 24.dp),
+                    color = AppTheme.colorScheme.outlineVariant,
+                  )
+                }
+              }
+            }
+          }
+
+          NewArticlesScrollToTopButton(
+            unreadSinceLastSync = null,
+            canShowScrollToTop = showScrollToTop,
+            modifier =
+              Modifier.padding(
+                end = padding.calculateEndPadding(layoutDirection) + 16.dp,
+                bottom = padding.calculateBottomPadding() + 16.dp,
+              ),
+            onLoadNewArticlesClick = {},
+          ) {
+            listState.animateScrollToItem(0)
+          }
+        }
+      } else {
+        Box(
+          modifier = Modifier.fillMaxSize(),
+          contentAlignment = Alignment.Center,
+        ) {
+          Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(
+              imageVector = TwineIcons.BookmarkStacks,
+              contentDescription = null,
+              modifier = Modifier.size(80.dp),
+              tint = AppTheme.colorScheme.onSurface,
+            )
+
+            Spacer(Modifier.requiredHeight(16.dp))
+
+            Text(
+              text = stringResource(Res.string.bookmarksPlaceholder),
+              style = MaterialTheme.typography.labelLarge,
+              color = AppTheme.colorScheme.onSurfaceVariant,
+            )
+          }
+        }
+      }
+    },
+    containerColor = AppTheme.colorScheme.backdrop,
+    contentColor = Color.Unspecified,
+  )
+}
+
+@Preview(locale = "en")
+@Composable
+private fun BookmarksPreview() {
+  AppTheme {
+    BookmarksContent(
+      bookmarks = BookmarksState.DEFAULT.bookmarks.collectAsLazyPagingItems(),
+      dispatch = {},
+      goBack = {},
+      openPost = { _, _ -> },
+    )
+  }
+}

@@ -1,0 +1,44 @@
+/*
+ * Copyright 2026 Sasikanth Miriyampalli
+ *
+ * Licensed under the GPL, Version 3.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.gnu.org/licenses/gpl-3.0.en.html
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+package dev.sasikanth.rss.reader.core.model.local
+
+enum class ThemeVariant(
+  val isPremium: Boolean,
+  val isDarkModeOnly: Boolean = false,
+  val isLightModeOnly: Boolean = false,
+  val isAndroidOnly: Boolean = false,
+) {
+  Dynamic(isPremium = false),
+  SystemDynamic(isPremium = false, isAndroidOnly = true),
+  Solarized(isPremium = false),
+  Forest(isPremium = false),
+  Amber(isPremium = true),
+  Coral(isPremium = true),
+  Raspberry(isPremium = true),
+  Skyline(isPremium = true),
+  Lavender(isPremium = true),
+  Parchment(isPremium = true),
+  Slate(isPremium = true),
+  Sepia(isPremium = true);
+
+  fun isDark(isSystemDark: Boolean): Boolean {
+    if (isDarkModeOnly) return true
+    if (isLightModeOnly) return false
+    return isSystemDark
+  }
+}

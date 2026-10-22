@@ -1,0 +1,144 @@
+/*
+ * Copyright 2026 Sasikanth Miriyampalli
+ *
+ * Licensed under the GPL, Version 3.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.gnu.org/licenses/gpl-3.0.en.html
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+package dev.sasikanth.rss.reader.core.network.parser.json
+
+import co.touchlab.kermit.Logger
+import dev.sasikanth.rss.reader.core.model.remote.FeedPayload
+import dev.sasikanth.rss.reader.core.model.remote.PostPayload
+import dev.sasikanth.rss.reader.core.network.parser.common.ArticleHtmlParser
+import dev.sasikanth.rss.reader.core.network.utils.UrlUtils
+import dev.sasikanth.rss.reader.util.DispatchersProvider
+import dev.sasikanth.rss.reader.util.dateStringToEpochMillis
+import kotlin.time.Clock
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.withContext
+import kotlinx.io.Source
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.io.decodeFromSource
+import me.tatarka.inject.annotations.Inject
+
+@Inject
+class JsonFeedParser(
+  private val dispatchersProvider: DispatchersProvider,
+  private val articleHtmlParser: ArticleHtmlParser,
+) {
+
+  private val json = Json { ignoreUnknownKeys = true }
+
+  @OptIn(ExperimentalSerializationApi::class)
+  suspend fun parse(content: Source, feedUrl: String): FeedPayload {
+    return try {
+      withContext(dispatchersProvider.io) {
+        val jsonFeedPayload = json.decodeFromSource<JsonFeedPayload>(content)
+
+        val host =
+          UrlUtils.extractHost(
+            urlString = jsonFeedPayload.homePageUrl ?: jsonFeedPayload.url ?: feedUrl
+          )
+
+        val posts = flow {
+          jsonFeedPayload.items.forEach { jsonFeedPost ->
+            val postPublishedAt = jsonFeedPost.publishedAt?.dateStringToEpochMillis()
+
+            val htmlContent = articleHtmlParser.parse(jsonFeedPost.contentHtml.orEmpty())
+            val image = htmlContent?.heroImage
+
+            val description =
+              jsonFeedPost.summary
+                .let {
+                  if (it.isNullOrBlank()) {
+                    jsonFeedPost.contentText ?: htmlContent?.textContent
+                  } else {
+                    it
+                  }
+                }
+                .orEmpty()
+            val rawContent =
+              htmlContent?.cleanedHtml ?: jsonFeedPost.contentText ?: jsonFeedPost.contentHtml
+            val audioUrl =
+              jsonFeedPost.attachments.firstOrNull { it.mimeType.startsWith("audio/") }?.url
+                ?: htmlContent?.audioUrl
+
+            emit(
+              PostPayload(
+                title = jsonFeedPost.title.orEmpty(),
+                link = jsonFeedPost.url.orEmpty(),
+                description = description,
+                rawContent = rawContent,
+                fullContent = null,
+                imageUrl =
+                  jsonFeedPost.imageUrl ?: image ?: UrlUtils.youTubeThumbnail(jsonFeedPost.url),
+                audioUrl = audioUrl,
+                date = postPublishedAt ?: Clock.System.now().toEpochMilliseconds(),
+                commentsLink = null,
+                isDateParsedCorrectly = postPublishedAt != null,
+              )
+            )
+          }
+        }
+
+        val feedPayload =
+          FeedPayload(
+            name = jsonFeedPayload.title,
+            icon =
+              jsonFeedPayload.icon ?: jsonFeedPayload.favIcon ?: UrlUtils.fallbackFeedIcon(host),
+            description = jsonFeedPayload.description.orEmpty(),
+            homepageLink = jsonFeedPayload.homePageUrl ?: feedUrl,
+            link = jsonFeedPayload.url ?: feedUrl,
+            posts = posts,
+          )
+
+        return@withContext feedPayload
+      }
+    } catch (e: Exception) {
+      Logger.e(throwable = e) { "Failed to parse the feed" }
+      throw IllegalStateException(e.stackTraceToString())
+    }
+  }
+}
+
+@Serializable
+private data class JsonFeedPayload(
+  val title: String,
+  val description: String? = null,
+  @SerialName("home_page_url") val homePageUrl: String? = null,
+  @SerialName("feed_url") val url: String? = null,
+  val icon: String? = null,
+  val favIcon: String? = null,
+  val items: List<Post> = emptyList(),
+) {
+
+  @Serializable
+  data class Post(
+    val id: String,
+    val title: String? = null,
+    @SerialName("content_text") val contentText: String? = null,
+    @SerialName("content_html") val contentHtml: String? = null,
+    val summary: String? = null,
+    @SerialName("image") val imageUrl: String? = null,
+    @SerialName("date_published") val publishedAt: String? = null,
+    val url: String? = null,
+    val attachments: List<Attachment> = emptyList(),
+  )
+
+  @Serializable
+  data class Attachment(val url: String, @SerialName("mime_type") val mimeType: String)
+}

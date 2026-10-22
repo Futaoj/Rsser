@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2026 Sasikanth Miriyampalli
+  ~
+  ~ Licensed under the GPL, Version 3.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     https://www.gnu.org/licenses/gpl-3.0.en.html
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  ~
+  -->
+
+<resources>
+    <string name="widget_no_posts">没有文章</string>
+    <plurals name="notification_new_articles_title">
+      <item quantity="one">今天有 1 篇未读文章</item>
+      <item quantity="other">今天有 %1$d 篇未读文章</item>
+    </plurals>
+    <string name="notification_new_articles_content">查看订阅源中的最新内容。</string>
+<string name="app_name">Rsser</string>
+<string name="widget_unread_recent_name">最近未读（小）</string>
+<string name="widget_unread_recent_desc">以轮播形式显示最近 5 篇未读文章</string>
+<string name="widget_unread_recent_medium_name">最近未读（中）</string>
+<string name="widget_unread_recent_medium_desc">显示最近未读文章及更多信息</string>
+<string name="widget_unread_recent_large_name">最近未读（大）</string>
+<string name="widget_unread_recent_large_desc">以列表形式显示最近未读文章</string>
+<string name="widget_latest">最新</string>
+<string name="unit_seconds">不足 1 分钟</string>
+<string name="unit_minutes">%1$d 分钟</string>
+<string name="unit_hours">%1$d 小时</string>
+<string name="unit_days">%1$d 天</string>
+<string name="month_jan">1月</string>
+<string name="month_feb">2月</string>
+<string name="month_mar">3月</string>
+<string name="month_apr">4月</string>
+<string name="month_may">5月</string>
+<string name="month_jun">6月</string>
+<string name="month_jul">7月</string>
+<string name="month_aug">8月</string>
+<string name="month_sep">9月</string>
+<string name="month_oct">10月</string>
+<string name="month_nov">11月</string>
+<string name="month_dec">12月</string>
+<plurals name="notification_new_articles_per_feed_title">
+      <item quantity="one">%1$s：1 篇新文章</item>
+      <item quantity="other">%1$s：%2$d 篇新文章</item>
+    </plurals>
+</resources>

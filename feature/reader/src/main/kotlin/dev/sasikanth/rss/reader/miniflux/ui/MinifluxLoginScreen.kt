@@ -1,0 +1,281 @@
+/*
+ * Copyright 2026 Sasikanth Miriyampalli
+ *
+ * Licensed under the GPL, Version 3.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.gnu.org/licenses/gpl-3.0.en.html
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+package dev.sasikanth.rss.reader.miniflux.ui
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import dev.sasikanth.rss.reader.app.NavResultKey
+import dev.sasikanth.rss.reader.components.AlertDialog
+import dev.sasikanth.rss.reader.components.Button
+import dev.sasikanth.rss.reader.components.SimpleTopAppBar
+import dev.sasikanth.rss.reader.components.TextField
+import dev.sasikanth.rss.reader.miniflux.MinifluxLoginError
+import dev.sasikanth.rss.reader.miniflux.MinifluxLoginEvent
+import dev.sasikanth.rss.reader.miniflux.MinifluxLoginState
+import dev.sasikanth.rss.reader.miniflux.MinifluxLoginViewModel
+import dev.sasikanth.rss.reader.ui.AppTheme
+import dev.sasikanth.rss.reader.utils.Constants
+import org.jetbrains.compose.resources.getString
+import org.jetbrains.compose.resources.stringResource
+import twine.shared.generated.resources.Res
+import twine.shared.generated.resources.buttonCancel
+import twine.shared.generated.resources.minifluxAPIKeyHint
+import twine.shared.generated.resources.minifluxApiKey
+import twine.shared.generated.resources.minifluxClearDataDesc
+import twine.shared.generated.resources.minifluxClearDataPositive
+import twine.shared.generated.resources.minifluxClearDataTitle
+import twine.shared.generated.resources.minifluxErrorLoginFailed
+import twine.shared.generated.resources.minifluxErrorUnknown
+import twine.shared.generated.resources.minifluxLoginButton
+import twine.shared.generated.resources.minifluxLoginTitle
+import twine.shared.generated.resources.minifluxServerUrl
+
+val MINIFLUX_LOGIN_SUCCESS_KEY = NavResultKey<Boolean>("dev.sasikanth.twine.MINIFLUX_LOGIN_SUCCESS")
+
+@Composable
+fun MinifluxLoginScreen(
+  viewModel: MinifluxLoginViewModel,
+  onLoginSuccess: () -> Unit,
+  goBack: () -> Unit,
+  modifier: Modifier = Modifier,
+) {
+  val state by viewModel.state.collectAsStateWithLifecycle()
+
+  LaunchedEffect(state.loginSuccess, state.error) {
+    if (state.loginSuccess) {
+      onLoginSuccess()
+    }
+
+    if (state.error != null) {
+      val errorMessage =
+        when (val error = state.error!!) {
+          MinifluxLoginError.LoginFailed -> getString(Res.string.minifluxErrorLoginFailed)
+          is MinifluxLoginError.Unknown ->
+            error.message.ifBlank { getString(Res.string.minifluxErrorUnknown) }
+        }
+      // Note: snackbarHostState handling is now inside MinifluxLoginContent
+    }
+  }
+
+  MinifluxLoginContent(
+    state = state,
+    onEvent = viewModel::onEvent,
+    goBack = goBack,
+    modifier = modifier,
+  )
+}
+
+@Composable
+private fun MinifluxLoginContent(
+  state: MinifluxLoginState,
+  onEvent: (MinifluxLoginEvent) -> Unit,
+  goBack: () -> Unit,
+  modifier: Modifier = Modifier,
+) {
+  val snackbarHostState = remember { SnackbarHostState() }
+  val (urlFocus, apiKeyFocus) = remember { FocusRequester.createRefs() }
+
+  LaunchedEffect(state.error) {
+    val error = state.error
+    if (error != null) {
+      val errorMessage =
+        when (error) {
+          MinifluxLoginError.LoginFailed -> getString(Res.string.minifluxErrorLoginFailed)
+          is MinifluxLoginError.Unknown ->
+            error.message.ifBlank { getString(Res.string.minifluxErrorUnknown) }
+        }
+      snackbarHostState.showSnackbar(message = errorMessage)
+    }
+  }
+
+  if (state.showConfirmationDialog) {
+    AlertDialog(
+      title = stringResource(Res.string.minifluxClearDataTitle),
+      text = stringResource(Res.string.minifluxClearDataDesc),
+      confirmText = stringResource(Res.string.minifluxClearDataPositive),
+      dismissText = stringResource(Res.string.buttonCancel),
+      onConfirm = { onEvent(MinifluxLoginEvent.OnConfirmClearDataClicked) },
+      onDismiss = { onEvent(MinifluxLoginEvent.OnConfirmationDismissed) },
+    )
+  }
+
+  Scaffold(
+    modifier = modifier,
+    topBar = {
+      SimpleTopAppBar(title = stringResource(Res.string.minifluxLoginTitle), onBackClick = goBack)
+    },
+    snackbarHost = {
+      SnackbarHost(hostState = snackbarHostState) { snackbarData ->
+        Snackbar(
+          modifier = Modifier.padding(12.dp),
+          content = {
+            Text(
+              text = snackbarData.visuals.message,
+              maxLines = 4,
+              overflow = TextOverflow.Ellipsis,
+            )
+          },
+          containerColor = AppTheme.colorScheme.inverseSurface,
+          contentColor = AppTheme.colorScheme.inverseOnSurface,
+        )
+      }
+    },
+    bottomBar = {
+      Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        Button(
+          modifier =
+            Modifier.background(AppTheme.colorScheme.backdrop)
+              .padding(horizontal = 24.dp, vertical = 8.dp)
+              .navigationBarsPadding()
+              .imePadding()
+              .widthIn(max = Constants.MAX_CONTENT_WIDTH)
+              .fillMaxWidth()
+              .requiredHeight(56.dp),
+          colors =
+            ButtonDefaults.buttonColors(
+              containerColor = AppTheme.colorScheme.inverseSurface,
+              contentColor = AppTheme.colorScheme.inverseOnSurface,
+            ),
+          enabled = !state.isLoading && state.url.isNotBlank() && state.apiKey.isNotBlank(),
+          shape = MaterialTheme.shapes.extraLarge,
+          onClick = { onEvent(MinifluxLoginEvent.OnLoginClicked) },
+        ) {
+          if (state.isLoading) {
+            CircularProgressIndicator(
+              color = AppTheme.colorScheme.primary,
+              modifier = Modifier.requiredSize(24.dp),
+              strokeWidth = 2.dp,
+            )
+          } else {
+            Text(
+              text = stringResource(Res.string.minifluxLoginButton).uppercase(),
+              style = MaterialTheme.typography.labelLarge,
+              fontWeight = FontWeight.Medium,
+            )
+          }
+        }
+      }
+    },
+    containerColor = AppTheme.colorScheme.backdrop,
+    contentColor = Color.Unspecified,
+  ) { padding ->
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+      LazyColumn(
+        modifier =
+          Modifier.widthIn(max = Constants.MAX_CONTENT_WIDTH)
+            .fillMaxSize()
+            .padding(padding)
+            .padding(horizontal = 24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+      ) {
+        item { Spacer(Modifier.requiredHeight(8.dp)) }
+
+        item {
+          TextField(
+            modifier =
+              Modifier.fillMaxWidth().focusRequester(urlFocus).focusProperties {
+                next = apiKeyFocus
+              },
+            value = state.url,
+            onValueChange = { onEvent(MinifluxLoginEvent.OnUrlChanged(it)) },
+            hint = stringResource(Res.string.minifluxServerUrl),
+            enabled = !state.isLoading,
+            keyboardOptions =
+              KeyboardOptions(
+                autoCorrectEnabled = false,
+                keyboardType = KeyboardType.Uri,
+                imeAction = ImeAction.Next,
+              ),
+          )
+        }
+
+        item {
+          TextField(
+            modifier = Modifier.fillMaxWidth().focusRequester(apiKeyFocus),
+            value = state.apiKey,
+            onValueChange = { onEvent(MinifluxLoginEvent.OnApiKeyChanged(it)) },
+            hint = stringResource(Res.string.minifluxApiKey),
+            enabled = !state.isLoading,
+            visualTransformation = PasswordVisualTransformation(),
+            keyboardOptions =
+              KeyboardOptions(
+                autoCorrectEnabled = false,
+                keyboardType = KeyboardType.Password,
+                imeAction = ImeAction.Done,
+              ),
+            keyboardActions =
+              KeyboardActions(onDone = { onEvent(MinifluxLoginEvent.OnLoginClicked) }),
+            supportingText = {
+              Text(
+                text = stringResource(Res.string.minifluxAPIKeyHint),
+                style = MaterialTheme.typography.labelMedium,
+                color = AppTheme.colorScheme.onSurfaceVariant,
+              )
+            },
+          )
+        }
+      }
+    }
+  }
+}
+
+@Preview(locale = "en")
+@Composable
+private fun MinifluxLoginPreview() {
+  AppTheme { MinifluxLoginContent(state = MinifluxLoginState.DEFAULT, onEvent = {}, goBack = {}) }
+}

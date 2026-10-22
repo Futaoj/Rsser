@@ -1,0 +1,48 @@
+/*
+ * Copyright 2026 Sasikanth Miriyampalli
+ *
+ * Licensed under the GPL, Version 3.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.gnu.org/licenses/gpl-3.0.en.html
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+package dev.sasikanth.rss.reader.core.model.local
+
+import androidx.compose.runtime.Immutable
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Instant
+
+@Immutable
+data class Feed(
+  override val id: String,
+  override val name: String,
+  val icon: String,
+  val description: String,
+  val link: String,
+  val homepageLink: String,
+  val createdAt: Instant,
+  override val pinnedAt: Instant?,
+  val lastCleanUpAt: Instant? = null,
+  val numberOfUnreadPosts: Long = 0L,
+  val lastUpdatedAt: Instant? = null,
+  val refreshInterval: Duration = 1.hours,
+  val alwaysFetchSourceArticle: Boolean = false,
+  override val sourceType: SourceType = SourceType.Feed,
+  override val pinnedPosition: Double = 0.0,
+  val showFeedFavIcon: Boolean = true,
+  val hideFromAllFeeds: Boolean = false,
+  val enableNotifications: Boolean = true,
+  override val isDeleted: Boolean = false,
+  val remoteId: String? = null,
+  val consecutiveFetchErrors: Long = 0L,
+  val syncError: String? = null,
+) : Source

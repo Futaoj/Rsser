@@ -1,0 +1,71 @@
+/*
+ * Copyright 2026 Sasikanth Miriyampalli
+ *
+ * Licensed under the GPL, Version 3.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.gnu.org/licenses/gpl-3.0.en.html
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+package dev.sasikanth.rss.reader.utils
+
+import androidx.activity.ComponentActivity
+import com.google.android.play.core.review.ReviewManagerFactory
+import dev.sasikanth.rss.reader.data.repository.SettingsRepository
+import dev.sasikanth.rss.reader.di.scopes.ActivityScope
+import kotlin.coroutines.resume
+import kotlin.time.Clock
+import kotlin.time.Instant
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.suspendCancellableCoroutine
+import me.tatarka.inject.annotations.Inject
+
+@Inject
+@ActivityScope
+class AndroidInAppRating(
+  private val activity: ComponentActivity,
+  private val settingsRepository: SettingsRepository,
+) : InAppRating {
+
+  override suspend fun request() {
+    val now = Clock.System.now()
+    val installDate = settingsRepository.installDate.firstOrNull() ?: now
+    val lastPromptDate =
+      settingsRepository.lastReviewPromptDate.firstOrNull() ?: Instant.DISTANT_PAST
+    val sessionCount = settingsRepository.userSessionCount.first()
+    val canShowReviewPrompt =
+      canShowReviewPrompt(
+        currentTime = now,
+        installDate = installDate,
+        lastPromptDate = lastPromptDate,
+        sessionCount = sessionCount,
+      )
+
+    if (!canShowReviewPrompt) return
+
+    val manager = ReviewManagerFactory.create(activity)
+    val request = suspendCancellableCoroutine { continuation ->
+      manager.requestReviewFlow().addOnCompleteListener { task ->
+        if (task.isSuccessful) {
+          continuation.resume(task.result)
+        } else {
+          continuation.resume(null)
+        }
+      }
+    }
+
+    if (request != null) {
+      manager.launchReviewFlow(activity, request)
+      settingsRepository.updateLastReviewPromptDate(now)
+    }
+  }
+}

@@ -1,0 +1,342 @@
+sourcesCount:
+WITH feeds AS (
+  SELECT COUNT(*) AS count FROM feed WHERE isDeleted = 0
+),
+feedGroups AS (
+  SELECT COUNT(*) AS count FROM feedGroup WHERE isDeleted = 0
+)
+SELECT feeds.count + feedGroups.count
+FROM feeds, feedGroups;
+
+pinnedSources:
+WITH ranked_feeds AS (
+  SELECT
+    gf.feedGroupId,
+    gf.feedId,
+    f.homepageLink,
+    f.icon,
+    CASE
+      WHEN f.showFeedFavIcon IS NULL THEN 'null'
+      WHEN f.showFeedFavIcon = 1 THEN 'true'
+      ELSE 'false'
+    END AS showFeedFavIconStr,
+    ROW_NUMBER() OVER (PARTITION BY gf.feedGroupId ORDER BY gf.rowid) AS rn
+  FROM feedGroupFeed gf
+  JOIN feed f ON gf.feedId = f.id
+  WHERE f.isDeleted = 0
+),
+feed_group_metadata AS (
+  SELECT
+    feedGroupId,
+    GROUP_CONCAT(feedId, '::') AS feedIds,
+    COALESCE(GROUP_CONCAT(CASE WHEN rn <= 4 THEN homepageLink END, '::'), '') AS feedHomepageLinks,
+    COALESCE(GROUP_CONCAT(CASE WHEN rn <= 4 THEN icon END, '::'), '') AS feedIcons,
+    COALESCE(GROUP_CONCAT(CASE WHEN rn <= 4 THEN showFeedFavIconStr END, '::'), '') AS feedShowFavIconSettings
+  FROM ranked_feeds
+  GROUP BY feedGroupId
+)
+
+SELECT
+  type,
+  id,
+  name,
+  icon,
+  description,
+  link,
+  homepageLink,
+  createdAt,
+  pinnedAt,
+  lastCleanUpAt,
+  numberOfUnreadPosts,
+  feedIds,
+  feedHomepageLinks,
+  feedIcons,
+  feedShowFavIconSettings,
+  updatedAt,
+  pinnedPosition,
+  showFeedFavIcon,
+  remoteId,
+  syncError
+FROM (
+  SELECT
+    'feed' AS type,
+    f.id,
+    f.name,
+    f.icon,
+    f.description,
+    f.link,
+    f.homepageLink,
+    f.lastCleanUpAt,
+    COUNT(CASE WHEN (p.flags & 2) == 0 AND (p.flags & 4) == 0 THEN 1 ELSE NULL END) AS numberOfUnreadPosts,
+    NULL AS feedIds,
+    NULL AS feedHomepageLinks,
+    NULL AS feedIcons,
+    NULL AS feedShowFavIconSettings,
+    f.createdAt,
+    f.pinnedAt,
+    NULL AS updatedAt,
+    f.pinnedPosition,
+    f.showFeedFavIcon,
+    f.remoteId,
+    f.syncError
+  FROM feed f
+  LEFT JOIN post p ON f.id = p.sourceId AND p.postDate > :postsAfter AND p.createdAt < :postsUpperBound
+  WHERE f.isDeleted = 0
+  GROUP BY f.id
+
+  UNION ALL
+
+  SELECT
+    'group' AS type,
+    fg.id,
+    fg.name,
+    NULL AS icon,
+    NULL AS description,
+    NULL AS link,
+    NULL AS homepageLink,
+    NULL AS lastCleanUpAt,
+    COUNT(CASE WHEN (p.flags & 2) == 0 AND (p.flags & 4) == 0 THEN 1 ELSE NULL END) AS numberOfUnreadPosts,
+    fgm.feedIds,
+    fgm.feedHomepageLinks,
+    fgm.feedIcons,
+    fgm.feedShowFavIconSettings,
+    fg.createdAt,
+    fg.pinnedAt,
+    fg.updatedAt,
+    fg.pinnedPosition,
+    NULL AS showFeedFavIcon,
+    NULL AS remoteId,
+    NULL AS syncError
+  FROM feedGroup fg
+  LEFT JOIN feedGroupFeed gf ON fg.id = gf.feedGroupId
+  LEFT JOIN feed f ON gf.feedId = f.id AND f.isDeleted = 0
+  LEFT JOIN post p ON f.id = p.sourceId AND p.postDate > :postsAfter AND p.createdAt < :postsUpperBound
+  LEFT JOIN feed_group_metadata fgm ON fg.id = fgm.feedGroupId
+  WHERE fg.isDeleted = 0
+  GROUP BY fg.id
+)
+WHERE pinnedAt IS NOT NULL
+ORDER BY pinnedPosition, pinnedAt DESC;
+
+sources:
+WITH ranked_feeds AS (
+  SELECT
+    gf.feedGroupId,
+    gf.feedId,
+    f.homepageLink,
+    f.icon,
+    CASE
+      WHEN f.showFeedFavIcon IS NULL THEN 'null'
+      WHEN f.showFeedFavIcon = 1 THEN 'true'
+      ELSE 'false'
+    END AS showFeedFavIconStr,
+    ROW_NUMBER() OVER (PARTITION BY gf.feedGroupId ORDER BY gf.rowid) AS rn
+  FROM feedGroupFeed gf
+  JOIN feed f ON gf.feedId = f.id
+  WHERE f.isDeleted = 0
+),
+feed_group_metadata AS (
+  SELECT
+    feedGroupId,
+    GROUP_CONCAT(feedId, '::') AS feedIds,
+    COALESCE(GROUP_CONCAT(CASE WHEN rn <= 4 THEN homepageLink END, '::'), '') AS feedHomepageLinks,
+    COALESCE(GROUP_CONCAT(CASE WHEN rn <= 4 THEN icon END, '::'), '') AS feedIcons,
+    COALESCE(GROUP_CONCAT(CASE WHEN rn <= 4 THEN showFeedFavIconStr END, '::'), '') AS feedShowFavIconSettings
+  FROM ranked_feeds
+  GROUP BY feedGroupId
+)
+
+SELECT
+  type,
+  id,
+  name,
+  icon,
+  description,
+  link,
+  homepageLink,
+  createdAt,
+  pinnedAt,
+  lastCleanUpAt,
+  numberOfUnreadPosts,
+  feedIds,
+  feedHomepageLinks,
+  feedIcons,
+  feedShowFavIconSettings,
+  updatedAt,
+  pinnedPosition,
+  showFeedFavIcon,
+  remoteId,
+  syncError
+FROM (
+  SELECT
+    'feed' AS type,
+    f.id,
+    f.name,
+    f.icon,
+    f.description,
+    f.link,
+    f.homepageLink,
+    f.lastCleanUpAt,
+    COUNT(CASE WHEN (p.flags & 2) == 0 AND (p.flags & 4) == 0 THEN 1 ELSE NULL END) AS numberOfUnreadPosts,
+    NULL AS feedIds,
+    NULL AS feedHomepageLinks,
+    NULL AS feedIcons,
+    NULL AS feedShowFavIconSettings,
+    f.createdAt,
+    f.pinnedAt,
+    NULL AS updatedAt,
+    f.pinnedPosition,
+    f.showFeedFavIcon,
+    f.remoteId,
+    f.syncError
+  FROM feed f
+  LEFT JOIN post p ON f.id = p.sourceId AND p.postDate > :postsAfter AND p.createdAt < :postsUpperBound
+  WHERE f.isDeleted = 0
+  GROUP BY f.id
+
+  UNION ALL
+
+  SELECT
+    'group' AS type,
+    fg.id,
+    fg.name,
+    NULL AS icon,
+    NULL AS description,
+    NULL AS link,
+    NULL AS homepageLink,
+    NULL AS lastCleanUpAt,
+    COUNT(CASE WHEN (p.flags & 2) == 0 AND (p.flags & 4) == 0 THEN 1 ELSE NULL END) AS numberOfUnreadPosts,
+    fgm.feedIds,
+    fgm.feedHomepageLinks,
+    fgm.feedIcons,
+    fgm.feedShowFavIconSettings,
+    fg.createdAt,
+    fg.pinnedAt,
+    fg.updatedAt,
+    fg.pinnedPosition,
+    NULL AS showFeedFavIcon,
+    NULL AS remoteId,
+    NULL AS syncError
+  FROM feedGroup fg
+  LEFT JOIN feedGroupFeed gf ON fg.id = gf.feedGroupId
+  LEFT JOIN feed f ON gf.feedId = f.id AND f.isDeleted = 0
+  LEFT JOIN post p ON f.id = p.sourceId AND p.postDate > :postsAfter AND p.createdAt < :postsUpperBound
+  LEFT JOIN feed_group_metadata fgm ON fg.id = fgm.feedGroupId
+  WHERE fg.isDeleted = 0
+  GROUP BY fg.id
+)
+ORDER BY type DESC,
+  CASE WHEN :orderBy = 'latest' THEN createdAt END DESC,
+  CASE WHEN :orderBy = 'oldest' THEN createdAt END ASC,
+  CASE WHEN :orderBy = 'alphabetical' THEN name END ASC,
+  CASE WHEN :orderBy = 'pinned' THEN pinnedAt END DESC,
+  createdAt DESC
+LIMIT :limit OFFSET :offset;
+
+source:
+WITH ranked_feeds AS (
+  SELECT
+    gf.feedGroupId,
+    gf.feedId,
+    f.homepageLink,
+    f.icon,
+    CASE
+      WHEN f.showFeedFavIcon IS NULL THEN 'null'
+      WHEN f.showFeedFavIcon = 1 THEN 'true'
+      ELSE 'false'
+    END AS showFeedFavIconStr,
+    ROW_NUMBER() OVER (PARTITION BY gf.feedGroupId ORDER BY gf.rowid) AS rn
+  FROM feedGroupFeed gf
+  JOIN feed f ON gf.feedId = f.id
+  WHERE f.isDeleted = 0
+),
+feed_group_metadata AS (
+  SELECT
+    feedGroupId,
+    GROUP_CONCAT(feedId, '::') AS feedIds,
+    COALESCE(GROUP_CONCAT(CASE WHEN rn <= 4 THEN homepageLink END, '::'), '') AS feedHomepageLinks,
+    COALESCE(GROUP_CONCAT(CASE WHEN rn <= 4 THEN icon END, '::'), '') AS feedIcons,
+    COALESCE(GROUP_CONCAT(CASE WHEN rn <= 4 THEN showFeedFavIconStr END, '::'), '') AS feedShowFavIconSettings
+  FROM ranked_feeds
+  GROUP BY feedGroupId
+)
+
+SELECT
+  type,
+  id,
+  name,
+  icon,
+  description,
+  link,
+  homepageLink,
+  createdAt,
+  pinnedAt,
+  lastCleanUpAt,
+  numberOfUnreadPosts,
+  feedIds,
+  feedHomepageLinks,
+  feedIcons,
+  feedShowFavIconSettings,
+  updatedAt,
+  pinnedPosition,
+  showFeedFavIcon,
+  remoteId,
+  syncError
+FROM (
+  SELECT
+    'feed' AS type,
+    f.id,
+    f.name,
+    f.icon,
+    f.description,
+    f.link,
+    f.homepageLink,
+    f.lastCleanUpAt,
+    COUNT(CASE WHEN (p.flags & 2) == 0 AND (p.flags & 4) == 0 THEN 1 ELSE NULL END) AS numberOfUnreadPosts,
+    NULL AS feedIds,
+    NULL AS feedHomepageLinks,
+    NULL AS feedIcons,
+    NULL AS feedShowFavIconSettings,
+    f.createdAt,
+    f.pinnedAt,
+    NULL AS updatedAt,
+    f.pinnedPosition,
+    f.showFeedFavIcon,
+    f.remoteId,
+    f.syncError
+  FROM feed f
+  LEFT JOIN post p ON f.id = p.sourceId AND p.postDate > :postsAfter AND p.createdAt < :postsUpperBound
+  WHERE f.id = :id AND f.isDeleted = 0
+  GROUP BY f.id
+
+  UNION ALL
+
+  SELECT
+    'group' AS type,
+    fg.id,
+    fg.name,
+    NULL AS icon,
+    NULL AS description,
+    NULL AS link,
+    NULL AS homepageLink,
+    NULL AS lastCleanUpAt,
+    COUNT(CASE WHEN (p.flags & 2) == 0 AND (p.flags & 4) == 0 THEN 1 ELSE NULL END) AS numberOfUnreadPosts,
+    fgm.feedIds,
+    fgm.feedHomepageLinks,
+    fgm.feedIcons,
+    fgm.feedShowFavIconSettings,
+    fg.createdAt,
+    fg.pinnedAt,
+    fg.updatedAt,
+    fg.pinnedPosition,
+    NULL AS showFeedFavIcon,
+    NULL AS remoteId,
+    NULL AS syncError
+  FROM feedGroup fg
+  LEFT JOIN feedGroupFeed gf ON fg.id = gf.feedGroupId
+  LEFT JOIN feed f ON gf.feedId = f.id AND f.isDeleted = 0
+  LEFT JOIN post p ON f.id = p.sourceId AND p.postDate > :postsAfter AND p.createdAt < :postsUpperBound
+  LEFT JOIN feed_group_metadata fgm ON fg.id = fgm.feedGroupId
+  WHERE fg.id = :id AND fg.isDeleted = 0
+  GROUP BY fg.id
+);

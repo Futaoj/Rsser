@@ -1,0 +1,441 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2026 Sasikanth Miriyampalli
+  ~
+  ~ Licensed under the GPL, Version 3.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     https://www.gnu.org/licenses/gpl-3.0.en.html
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  ~
+  -->
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+  <uses-permission android:name="android.permission.INTERNET" />
+  <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+
+  <queries>
+    <intent>
+      <action android:name="android.intent.action.VIEW" />
+      <category android:name="android.intent.category.BROWSABLE" />
+      <data android:scheme="https" />
+    </intent>
+  </queries>
+
+  <application
+      android:name=".ReaderApplication"
+      android:allowBackup="false"
+      android:dataExtractionRules="@xml/data_extraction_rules"
+      android:enableOnBackInvokedCallback="true"
+      android:fullBackupContent="false"
+      android:icon="@mipmap/ic_rsser"
+      android:label="@string/app_name"
+      android:largeHeap="true"
+      android:networkSecurityConfig="@xml/network_security_config"
+      android:supportsRtl="true"
+      android:theme="@style/Theme.Twine.App"
+      android:usesCleartextTraffic="true"
+      tools:targetApi="tiramisu">
+
+    <meta-data
+        android:name="com.bugsnag.android.API_KEY"
+        android:value="${BUGSNAG_API_KEY}" />
+
+    <service
+        android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"
+        android:enabled="false"
+        android:exported="false">
+      <meta-data android:name="autoStoreLocales" android:value="true" />
+    </service>
+
+    <activity
+        android:name="dev.sasikanth.rss.reader.MainActivity"
+        android:exported="true"
+        android:launchMode="singleTask"
+        android:windowSoftInputMode="adjustResize">
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+
+        <data
+            android:host="reader"
+            android:scheme="twine" />
+      </intent-filter>
+
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+
+        <data
+            android:host="add"
+            android:scheme="twine" />
+      </intent-filter>
+
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+
+        <data
+            android:host="oauth"
+            android:scheme="twine" />
+      </intent-filter>
+
+      <!-- Google OAuth redirect: reversed client ID of the Android Google Drive OAuth client -->
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+
+        <data android:scheme="com.googleusercontent.apps.854893327148-oacdbvthcv76h5uge4trc36lu5t4o6m5" />
+      </intent-filter>
+
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+
+        <data
+            android:host="bookmarks"
+            android:scheme="twine" />
+      </intent-filter>
+    </activity>
+
+    <activity-alias
+        android:name=".MainActivityAntiqueGold"
+        android:enabled="false"
+        android:exported="true"
+        android:icon="@mipmap/ic_rsser"
+        android:label="@string/app_name"
+        android:targetActivity="dev.sasikanth.rss.reader.MainActivity">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity-alias>
+
+    <activity-alias
+        android:name=".MainActivityCranberry"
+        android:enabled="false"
+        android:exported="true"
+        android:icon="@mipmap/ic_rsser"
+        android:label="@string/app_name"
+        android:targetActivity="dev.sasikanth.rss.reader.MainActivity">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity-alias>
+
+    <activity-alias
+        android:name=".MainActivityDarkJade"
+        android:enabled="true"
+        android:exported="true"
+        android:icon="@mipmap/ic_rsser"
+        android:label="@string/app_name"
+        android:targetActivity="dev.sasikanth.rss.reader.MainActivity">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity-alias>
+
+    <activity-alias
+        android:name=".MainActivityDeepIce"
+        android:enabled="false"
+        android:exported="true"
+        android:icon="@mipmap/ic_rsser"
+        android:label="@string/app_name"
+        android:targetActivity="dev.sasikanth.rss.reader.MainActivity">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity-alias>
+
+    <activity-alias
+        android:name=".MainActivityDeepTeal"
+        android:enabled="false"
+        android:exported="true"
+        android:icon="@mipmap/ic_rsser"
+        android:label="@string/app_name"
+        android:targetActivity="dev.sasikanth.rss.reader.MainActivity">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity-alias>
+
+    <activity-alias
+        android:name=".MainActivityDustyRose"
+        android:enabled="false"
+        android:exported="true"
+        android:icon="@mipmap/ic_rsser"
+        android:label="@string/app_name"
+        android:targetActivity="dev.sasikanth.rss.reader.MainActivity">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity-alias>
+
+    <activity-alias
+        android:name=".MainActivityRoyalPlum"
+        android:enabled="false"
+        android:exported="true"
+        android:icon="@mipmap/ic_rsser"
+        android:label="@string/app_name"
+        android:targetActivity="dev.sasikanth.rss.reader.MainActivity">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity-alias>
+
+    <activity-alias
+        android:name=".MainActivitySlateBlue"
+        android:enabled="false"
+        android:exported="true"
+        android:icon="@mipmap/ic_rsser"
+        android:label="@string/app_name"
+        android:targetActivity="dev.sasikanth.rss.reader.MainActivity">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity-alias>
+
+    <activity-alias
+        android:name=".MainActivitySoftSage"
+        android:enabled="false"
+        android:exported="true"
+        android:icon="@mipmap/ic_rsser"
+        android:label="@string/app_name"
+        android:targetActivity="dev.sasikanth.rss.reader.MainActivity">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity-alias>
+
+    <activity-alias
+        android:name=".MainActivityStormySky"
+        android:enabled="false"
+        android:exported="true"
+        android:icon="@mipmap/ic_rsser"
+        android:label="@string/app_name"
+        android:targetActivity="dev.sasikanth.rss.reader.MainActivity">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity-alias>
+
+    <activity-alias
+        android:name=".MainActivityDefault"
+        android:enabled="false"
+        android:exported="true"
+        android:icon="@mipmap/ic_rsser"
+        android:label="@string/app_name"
+        android:targetActivity="dev.sasikanth.rss.reader.MainActivity">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity-alias>
+
+    <activity-alias
+        android:name=".MainActivitySolarized"
+        android:enabled="false"
+        android:exported="true"
+        android:icon="@mipmap/ic_rsser"
+        android:label="@string/app_name"
+        android:targetActivity="dev.sasikanth.rss.reader.MainActivity">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity-alias>
+
+
+    <activity-alias
+        android:name=".MainActivityAmber"
+        android:enabled="false"
+        android:exported="true"
+        android:icon="@mipmap/ic_rsser"
+        android:label="@string/app_name"
+        android:targetActivity="dev.sasikanth.rss.reader.MainActivity">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity-alias>
+
+    <activity-alias
+        android:name=".MainActivityCoral"
+        android:enabled="false"
+        android:exported="true"
+        android:icon="@mipmap/ic_rsser"
+        android:label="@string/app_name"
+        android:targetActivity="dev.sasikanth.rss.reader.MainActivity">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity-alias>
+
+    <activity-alias
+        android:name=".MainActivityRaspberry"
+        android:enabled="false"
+        android:exported="true"
+        android:icon="@mipmap/ic_rsser"
+        android:label="@string/app_name"
+        android:targetActivity="dev.sasikanth.rss.reader.MainActivity">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity-alias>
+
+    <activity-alias
+        android:name=".MainActivitySkyline"
+        android:enabled="false"
+        android:exported="true"
+        android:icon="@mipmap/ic_rsser"
+        android:label="@string/app_name"
+        android:targetActivity="dev.sasikanth.rss.reader.MainActivity">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity-alias>
+
+    <activity-alias
+        android:name=".MainActivityLavender"
+        android:enabled="false"
+        android:exported="true"
+        android:icon="@mipmap/ic_rsser"
+        android:label="@string/app_name"
+        android:targetActivity="dev.sasikanth.rss.reader.MainActivity">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity-alias>
+
+    <activity-alias
+        android:name=".MainActivityParchment"
+        android:enabled="false"
+        android:exported="true"
+        android:icon="@mipmap/ic_rsser"
+        android:label="@string/app_name"
+        android:targetActivity="dev.sasikanth.rss.reader.MainActivity">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity-alias>
+
+    <activity-alias
+        android:name=".MainActivitySlate"
+        android:enabled="false"
+        android:exported="true"
+        android:icon="@mipmap/ic_rsser"
+        android:label="@string/app_name"
+        android:targetActivity="dev.sasikanth.rss.reader.MainActivity">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity-alias>
+
+    <activity-alias
+        android:name=".MainActivitySepia"
+        android:enabled="false"
+        android:exported="true"
+        android:icon="@mipmap/ic_rsser"
+        android:label="@string/app_name"
+        android:targetActivity="dev.sasikanth.rss.reader.MainActivity">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity-alias>
+
+
+    <receiver
+        android:name=".widget.TwineUnreadSmallWidgetReceiver"
+        android:label="@string/widget_unread_recent_name"
+        android:exported="true">
+      <intent-filter>
+        <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+      </intent-filter>
+      <meta-data
+          android:name="android.appwidget.provider"
+          android:resource="@xml/twine_unread_small_widget_info" />
+    </receiver>
+
+    <receiver
+        android:name=".widget.TwineUnreadMediumWidgetReceiver"
+        android:label="@string/widget_unread_recent_medium_name"
+        android:exported="true">
+      <intent-filter>
+        <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+      </intent-filter>
+      <meta-data
+          android:name="android.appwidget.provider"
+          android:resource="@xml/twine_unread_medium_widget_info" />
+    </receiver>
+
+    <receiver
+        android:name=".widget.TwineUnreadLargeWidgetReceiver"
+        android:label="@string/widget_unread_recent_large_name"
+        android:exported="true">
+      <intent-filter>
+        <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+      </intent-filter>
+      <meta-data
+          android:name="android.appwidget.provider"
+          android:resource="@xml/twine_unread_large_widget_info" />
+    </receiver>
+
+    <provider
+        android:name="androidx.startup.InitializationProvider"
+        android:authorities="${applicationId}.androidx-startup"
+        android:exported="false"
+        tools:node="merge">
+      <!-- If you are using androidx.startup to initialize other components -->
+      <meta-data
+          android:name="androidx.work.WorkManagerInitializer"
+          android:value="androidx.startup"
+          tools:node="remove" />
+    </provider>
+
+    <service
+        android:name="dev.sasikanth.rss.reader.media.MediaService"
+        android:exported="false"
+        android:foregroundServiceType="mediaPlayback">
+      <intent-filter>
+        <action android:name="androidx.media3.session.MediaSessionService" />
+      </intent-filter>
+    </service>
+  </application>
+
+</manifest>

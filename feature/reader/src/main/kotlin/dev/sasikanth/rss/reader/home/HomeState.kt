@@ -1,0 +1,97 @@
+/*
+ * Copyright 2026 Sasikanth Miriyampalli
+ *
+ * Licensed under the GPL, Version 3.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.gnu.org/licenses/gpl-3.0.en.html
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+package dev.sasikanth.rss.reader.home
+
+import androidx.compose.material3.SheetValue
+import androidx.compose.runtime.Immutable
+import androidx.paging.PagingData
+import dev.sasikanth.rss.reader.core.model.local.FeaturedPostItem
+import dev.sasikanth.rss.reader.core.model.local.PostsSortOrder
+import dev.sasikanth.rss.reader.core.model.local.PostsType
+import dev.sasikanth.rss.reader.core.model.local.ResolvedPost
+import dev.sasikanth.rss.reader.core.model.local.Source
+import dev.sasikanth.rss.reader.core.model.local.ThemeVariant
+import dev.sasikanth.rss.reader.core.model.local.UnreadSinceLastSync
+import dev.sasikanth.rss.reader.data.repository.HomeViewMode
+import dev.sasikanth.rss.reader.data.repository.MarkAsReadOn
+import dev.sasikanth.rss.reader.data.sync.SyncState
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.datetime.LocalDateTime
+
+@Immutable
+data class HomeState(
+  val allPosts: Flow<PagingData<ResolvedPost>>,
+  val feedPosts: Flow<PagingData<ResolvedPost>>?,
+  val featuredPosts: StateFlow<ImmutableList<FeaturedPostItem>>,
+  val syncState: SyncState,
+  val feedsSheetState: SheetValue,
+  val activeSource: Source?,
+  val hasFeeds: Boolean?,
+  val postsType: PostsType,
+  val postsSortOrder: PostsSortOrder,
+  val hasUnreadPosts: Boolean,
+  val homeViewMode: HomeViewMode,
+  val showFeaturedSection: Boolean,
+  val themeVariant: ThemeVariant,
+  val markAsReadOn: MarkAsReadOn,
+  val confirmMarkAllAsRead: Boolean,
+  val lastRefreshedAt: LocalDateTime?,
+  val unreadSinceLastSync: UnreadSinceLastSync?,
+  val prevActiveSource: Source?,
+  val activePostId: String?,
+  val activePostIndex: Int,
+  val activePostScrollOffset: Int?,
+  val showPostsSortFilter: Boolean,
+) {
+
+  companion object {
+
+    fun default() =
+      HomeState(
+        allPosts = emptyFlow(),
+        feedPosts = null,
+        featuredPosts = MutableStateFlow(persistentListOf()),
+        syncState = SyncState.Idle,
+        feedsSheetState = SheetValue.PartiallyExpanded,
+        activeSource = null,
+        hasFeeds = null,
+        postsType = PostsType.ALL,
+        postsSortOrder = PostsSortOrder.Latest,
+        hasUnreadPosts = false,
+        showFeaturedSection = true,
+        lastRefreshedAt = null,
+        homeViewMode = HomeViewMode.Default,
+        themeVariant = ThemeVariant.Dynamic,
+        markAsReadOn = MarkAsReadOn.Open,
+        confirmMarkAllAsRead = true,
+        unreadSinceLastSync = null,
+        prevActiveSource = null,
+        activePostId = null,
+        activePostIndex = 0,
+        activePostScrollOffset = null,
+        showPostsSortFilter = false,
+      )
+  }
+
+  val isSyncing: Boolean
+    get() = syncState is SyncState.InProgress
+}

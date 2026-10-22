@@ -1,0 +1,59 @@
+/*
+ * Copyright 2026 Sasikanth Miriyampalli
+ *
+ * Licensed under the GPL, Version 3.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.gnu.org/licenses/gpl-3.0.en.html
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+package dev.sasikanth.rss.reader.app
+
+import dev.sasikanth.rss.reader.core.model.local.PostsSortOrder
+import dev.sasikanth.rss.reader.core.model.local.PostsType
+import dev.sasikanth.rss.reader.core.model.local.Source
+import dev.sasikanth.rss.reader.core.model.local.ThemeVariant
+import dev.sasikanth.rss.reader.data.repository.AppThemeMode
+import dev.sasikanth.rss.reader.data.repository.HomeViewMode
+
+data class AppState(
+  val appThemeMode: AppThemeMode,
+  val useAmoled: Boolean,
+  val themeVariant: ThemeVariant,
+  val showFeedFavIcon: Boolean,
+  val homeViewMode: HomeViewMode,
+  val showReaderView: Boolean,
+  val blockImages: Boolean,
+  val activeSource: Source?,
+  val postsType: PostsType,
+  val postsSortOrder: PostsSortOrder,
+  val showChangelog: Boolean,
+  val versionName: String,
+) {
+
+  companion object {
+    val DEFAULT =
+      AppState(
+        appThemeMode = AppThemeMode.Auto,
+        useAmoled = false,
+        themeVariant = ThemeVariant.Dynamic,
+        showFeedFavIcon = true,
+        homeViewMode = HomeViewMode.Default,
+        showReaderView = false,
+        blockImages = false,
+        activeSource = null,
+        postsType = PostsType.ALL,
+        postsSortOrder = PostsSortOrder.Latest,
+        showChangelog = false,
+        versionName = "",
+      )
+  }
+}

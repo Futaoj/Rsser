@@ -1,0 +1,30 @@
+import kotlin.time.Instant;
+
+CREATE TABLE postContent (
+  id TEXT NOT NULL PRIMARY KEY,
+  feedContent TEXT,
+  articleContent TEXT,
+  feedContentLen INTEGER,
+  createdAt INTEGER AS Instant NOT NULL,
+  feedContentReadingTime INTEGER DEFAULT NULL,
+  articleContentReadingTime INTEGER DEFAULT NULL
+);
+
+upsert:
+INSERT INTO postContent (id, feedContent, feedContentLen, articleContent, createdAt, feedContentReadingTime, articleContentReadingTime)
+VALUES (:id, :feedContent, :feedContentLen, :articleContent, :createdAt, :feedContentReadingTime, :articleContentReadingTime)
+ON CONFLICT (id) DO UPDATE SET
+  feedContent = excluded.feedContent,
+  feedContentReadingTime = excluded.feedContentReadingTime
+WHERE COALESCE(postContent.feedContentLen, 0) < COALESCE(length(excluded.feedContent), 0);
+
+getByPostId:
+SELECT * FROM postContent
+WHERE id = :id;
+
+updateArticleContent:
+UPDATE postContent SET articleContent = :articleContent, articleContentReadingTime = :articleContentReadingTime
+WHERE id = :id;
+
+deleteAll:
+DELETE FROM postContent;

@@ -1,0 +1,114 @@
+/*
+ * Copyright 2026 Sasikanth Miriyampalli
+ *
+ * Licensed under the GPL, Version 3.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.gnu.org/licenses/gpl-3.0.en.html
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+package dev.sasikanth.rss.reader.settings
+
+import androidx.compose.runtime.Immutable
+import dev.sasikanth.rss.reader.app.AppIcon
+import dev.sasikanth.rss.reader.app.AppInfo
+import dev.sasikanth.rss.reader.core.model.local.ServiceType
+import dev.sasikanth.rss.reader.core.model.local.ThemeVariant
+import dev.sasikanth.rss.reader.data.opml.OpmlFeed
+import dev.sasikanth.rss.reader.data.opml.OpmlResult
+import dev.sasikanth.rss.reader.data.repository.AppThemeMode
+import dev.sasikanth.rss.reader.data.repository.AudioMarkAsReadThreshold
+import dev.sasikanth.rss.reader.data.repository.BrowserType
+import dev.sasikanth.rss.reader.data.repository.HomeViewMode
+import dev.sasikanth.rss.reader.data.repository.MarkAsReadOn
+import dev.sasikanth.rss.reader.data.repository.Period
+import kotlin.time.Instant
+
+@Immutable
+data class SettingsState(
+  val browserType: BrowserType,
+  val showUnreadPostsCount: Boolean,
+  val hasFeeds: Boolean,
+  val appInfo: AppInfo,
+  val opmlResult: OpmlResult?,
+  val postsDeletionPeriod: Period?,
+  val showReaderView: Boolean,
+  val appThemeMode: AppThemeMode,
+  val themeVariant: ThemeVariant,
+  val useAmoled: Boolean,
+  val enableAutoSync: Boolean,
+  val showFeedFavIcon: Boolean,
+  val showFeaturedSection: Boolean,
+  val markAsReadOn: MarkAsReadOn,
+  val audioMarkAsReadThreshold: AudioMarkAsReadThreshold,
+  val confirmMarkAllAsRead: Boolean,
+  val homeViewMode: HomeViewMode,
+  val blockImages: Boolean,
+  val enableNotifications: Boolean,
+  val groupByFeedNotifications: Boolean,
+  val downloadFullContent: Boolean,
+  val syncProgress: SyncProgress,
+  val lastSyncedAt: Instant?,
+  val hasCloudServiceSignedIn: Boolean,
+  val signedInService: ServiceType?,
+  val authUrlToOpen: String?,
+  val appIcon: AppIcon,
+  val opmlFeedsToSelect: List<OpmlFeed>?,
+  val opmlFeedSelectionLimit: Int,
+  val blockedWordsCount: Int,
+) {
+
+  sealed interface SyncProgress {
+    data object Idle : SyncProgress
+
+    data object Syncing : SyncProgress
+
+    data object Success : SyncProgress
+
+    data class Failure(val exception: Exception) : SyncProgress
+  }
+
+  companion object {
+
+    fun default(appInfo: AppInfo) =
+      SettingsState(
+        browserType = BrowserType.Default,
+        showUnreadPostsCount = false,
+        hasFeeds = false,
+        appInfo = appInfo,
+        opmlResult = null,
+        postsDeletionPeriod = null,
+        showReaderView = false,
+        appThemeMode = AppThemeMode.Auto,
+        themeVariant = ThemeVariant.Dynamic,
+        useAmoled = false,
+        enableAutoSync = true,
+        showFeedFavIcon = true,
+        showFeaturedSection = true,
+        markAsReadOn = MarkAsReadOn.Open,
+        audioMarkAsReadThreshold = AudioMarkAsReadThreshold.Fifty,
+        confirmMarkAllAsRead = true,
+        homeViewMode = HomeViewMode.Default,
+        blockImages = false,
+        enableNotifications = false,
+        groupByFeedNotifications = false,
+        downloadFullContent = false,
+        syncProgress = SyncProgress.Idle,
+        lastSyncedAt = null,
+        hasCloudServiceSignedIn = false,
+        signedInService = null,
+        authUrlToOpen = null,
+        appIcon = AppIcon.Default,
+        opmlFeedsToSelect = null,
+        opmlFeedSelectionLimit = 0,
+        blockedWordsCount = 0,
+      )
+  }
+}

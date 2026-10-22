@@ -1,0 +1,41 @@
+import kotlin.Boolean;
+import kotlin.time.Instant;
+
+countBookmarks:
+SELECT COUNT(*) FROM post
+WHERE (flags & 1) != 0;
+
+bookmarks:
+SELECT
+  post.id,
+  post.sourceId,
+  post.title,
+  post.description,
+  post.imageUrl,
+  post.audioUrl,
+  post.postDate AS date,
+  post.createdAt,
+  post.link,
+  post.commentsLink,
+  post.flags,
+  feed.name AS feedName,
+  feed.icon AS feedIcon,
+  feed.homepageLink AS feedHomepageLink,
+  feed.showFeedFavIcon AS showFeedFavIcon,
+  pc.feedContentReadingTime AS feedContentReadingTime,
+  pc.articleContentReadingTime AS articleContentReadingTime,
+  post.seedColor AS seedColor,
+  post.audioProgress AS audioProgress,
+  post.audioDuration AS audioDuration
+FROM post
+INNER JOIN feed ON post.sourceId == feed.id
+LEFT JOIN postContent pc ON post.id == pc.id
+WHERE (post.flags & 1) != 0
+ORDER BY date DESC
+LIMIT :limit OFFSET :offset;
+
+allBookmarkIds:
+SELECT id FROM post WHERE (flags & 1) != 0;
+
+deleteBookmark:
+UPDATE post SET flags = flags & ~1 WHERE id = :id;

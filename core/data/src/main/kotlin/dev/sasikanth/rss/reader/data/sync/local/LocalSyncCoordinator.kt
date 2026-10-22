@@ -1,0 +1,268 @@
+/*
+ * Copyright 2026 Sasikanth Miriyampalli
+ *
+ * Licensed under the GPL, Version 3.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.gnu.org/licenses/gpl-3.0.en.html
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+package dev.sasikanth.rss.reader.data.sync.local
+
+import dev.sasikanth.rss.reader.core.base.widget.WidgetUpdater
+import dev.sasikanth.rss.reader.core.model.local.Feed
+import dev.sasikanth.rss.reader.core.model.local.FeedGroup
+import dev.sasikanth.rss.reader.core.model.local.Source
+import dev.sasikanth.rss.reader.core.network.fetcher.FeedFetchResult
+import dev.sasikanth.rss.reader.core.network.fetcher.FeedFetcher
+import dev.sasikanth.rss.reader.data.refreshpolicy.RefreshPolicy
+import dev.sasikanth.rss.reader.data.repository.FeedSyncMetadataUpdate
+import dev.sasikanth.rss.reader.data.repository.ObservableActiveSource
+import dev.sasikanth.rss.reader.data.repository.RssRepository
+import dev.sasikanth.rss.reader.data.repository.SettingsRepository
+import dev.sasikanth.rss.reader.data.sync.SyncCoordinator
+import dev.sasikanth.rss.reader.data.sync.SyncState
+import dev.sasikanth.rss.reader.data.utils.PostsFilterUtils
+import dev.sasikanth.rss.reader.di.scopes.AppScope
+import dev.sasikanth.rss.reader.util.DispatchersProvider
+import kotlin.time.Clock
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Instant
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
+import me.tatarka.inject.annotations.Inject
+
+@AppScope
+@Inject
+class LocalSyncCoordinator(
+  private val feedFetcher: FeedFetcher,
+  private val rssRepository: RssRepository,
+  private val widgetUpdater: WidgetUpdater,
+  private val dispatchersProvider: DispatchersProvider,
+  private val observableActiveSource: ObservableActiveSource,
+  private val settingsRepository: SettingsRepository,
+  private val refreshPolicy: RefreshPolicy,
+) : SyncCoordinator {
+
+  companion object {
+    private const val SYNC_CHUNK_SIZE = 3
+  }
+
+  private val syncMutex = Mutex()
+  private val _syncState = MutableStateFlow<SyncState>(SyncState.Idle)
+  override val syncState: StateFlow<SyncState> = _syncState.asStateFlow()
+
+  override suspend fun pull(): Boolean {
+    withContext(dispatchersProvider.default) {
+      try {
+        updateSyncState(SyncState.InProgress(0f))
+
+        checkAndRefreshLastRefreshTime {
+          val allFeeds =
+            withContext(dispatchersProvider.databaseRead) {
+              rssRepository.allFeedsBlocking().filterNot { it.isDeleted }
+            }
+          val now = Clock.System.now()
+          val feedsToRefresh = allFeeds.filter { feed -> shouldRefreshFeed(feed, now) }
+          val feedsChunks = feedsToRefresh.chunked(SYNC_CHUNK_SIZE)
+
+          feedsChunks.forEachIndexed { index, feeds ->
+            val metadataUpdates = coroutineScope {
+              feeds.map { feed -> async { pullFeed(feed, now) } }.awaitAll()
+            }
+            // Feed metadata commits invalidate every UI query that joins the feed
+            // table; batching them keeps the pagers from re-querying per feed.
+            rssRepository.applyFeedsSyncMetadata(metadataUpdates)
+
+            updateSyncState(SyncState.InProgress((index + 1).toFloat() / feedsChunks.size))
+          }
+        }
+
+        refreshPolicy.updateLastSyncedAt()
+        updateSyncState(SyncState.Complete)
+        widgetUpdater.updateUnreadWidget()
+      } catch (e: Exception) {
+        updateSyncState(SyncState.Error(e))
+      }
+    }
+
+    return true
+  }
+
+  override suspend fun pull(feedIds: List<String>): Boolean {
+    withContext(dispatchersProvider.default) {
+      try {
+        updateSyncState(SyncState.InProgress(0f))
+
+        val now = Clock.System.now()
+        feedIds.forEachIndexed { index, feedId ->
+          val feed =
+            withContext(dispatchersProvider.databaseRead) { rssRepository.feed(feedId = feedId) }
+
+          if (feed != null) {
+            checkAndRefreshLastRefreshTime {
+              val metadataUpdate = pullFeed(feed, now)
+              rssRepository.applyFeedsSyncMetadata(listOf(metadataUpdate))
+            }
+          }
+
+          updateSyncState(SyncState.InProgress((index + 1).toFloat() / feedIds.size))
+        }
+
+        refreshPolicy.updateLastSyncedAt()
+        updateSyncState(SyncState.Complete)
+        widgetUpdater.updateUnreadWidget()
+      } catch (e: Exception) {
+        updateSyncState(SyncState.Error(e))
+      }
+    }
+
+    return true
+  }
+
+  override suspend fun pull(feedId: String): Boolean {
+    withContext(dispatchersProvider.default) {
+      try {
+        updateSyncState(SyncState.InProgress(0f))
+
+        val feed =
+          withContext(dispatchersProvider.databaseRead) { rssRepository.feed(feedId = feedId) }
+        val now = Clock.System.now()
+
+        if (feed != null) {
+          checkAndRefreshLastRefreshTime {
+            updateSyncState(SyncState.InProgress(0.5f))
+            val metadataUpdate = pullFeed(feed, now)
+            rssRepository.applyFeedsSyncMetadata(listOf(metadataUpdate))
+          }
+        }
+
+        refreshPolicy.updateLastSyncedAt()
+        updateSyncState(SyncState.Complete)
+        widgetUpdater.updateUnreadWidget()
+      } catch (e: Exception) {
+        updateSyncState(SyncState.Error(e))
+      }
+    }
+
+    return true
+  }
+
+  override suspend fun push(): Boolean {
+    return false
+  }
+
+  /**
+   * Fetches the feed and upserts its posts. Feed metadata changes (fetch errors, last updated,
+   * refresh interval) are returned instead of written so callers can commit them for a whole chunk
+   * in a single transaction.
+   */
+  private suspend fun pullFeed(feed: Feed, now: Instant): FeedSyncMetadataUpdate {
+    val initialPostCount = rssRepository.postsCountForFeed(feed.id)
+    val fetchFullContent = settingsRepository.downloadFullContent.first()
+    val feedFetchResult = feedFetcher.fetch(url = feed.link, fetchFullContent = fetchFullContent)
+
+    if (feedFetchResult !is FeedFetchResult.Success) {
+      return FeedSyncMetadataUpdate(feedId = feed.id, fetchSucceeded = false)
+    }
+
+    rssRepository.upsertFeedWithPosts(
+      feedPayload = feedFetchResult.feedPayload,
+      feedId = feed.id,
+      feedLastCleanUpAt = feed.lastCleanUpAt,
+      updateFeed = false,
+    )
+
+    val finalPostCount = rssRepository.postsCountForFeed(feed.id)
+    val hasNewContent = finalPostCount > initialPostCount
+
+    return FeedSyncMetadataUpdate(
+      feedId = feed.id,
+      fetchSucceeded = true,
+      lastUpdatedAt = now,
+      refreshInterval = adjustedRefreshInterval(feed, hasNewContent),
+    )
+  }
+
+  private suspend fun checkAndRefreshLastRefreshTime(block: suspend () -> Unit) {
+    withContext(dispatchersProvider.default) {
+      val activeSource = observableActiveSource.activeSource.firstOrNull()
+      val postsType = settingsRepository.postsType.first()
+      val lastRefreshedAtDateTime = refreshPolicy.lastRefreshedAtFlow.first()
+
+      val unreadOnly = PostsFilterUtils.shouldGetUnreadPostsOnly(postsType)
+      val postsAfter = PostsFilterUtils.postsThresholdTime(postsType, lastRefreshedAtDateTime)
+      val activeSourceIds = activeSourceIds(activeSource)
+
+      val allPostsCount =
+        withContext(dispatchersProvider.databaseRead) {
+          rssRepository.allPostsCount(
+            activeSourceIds = activeSourceIds,
+            unreadOnly = unreadOnly,
+            after = postsAfter,
+            postsUpperBound =
+              lastRefreshedAtDateTime.toInstant(TimeZone.Companion.currentSystemDefault()),
+          )
+        }
+
+      block()
+
+      if (allPostsCount == 0L) {
+        refreshPolicy.updateLastRefreshedAt()
+      }
+    }
+  }
+
+  private fun activeSourceIds(activeSource: Source?) =
+    when (activeSource) {
+      is Feed -> listOf(activeSource.id)
+      is FeedGroup -> activeSource.feedIds
+      else -> emptyList()
+    }
+
+  private suspend fun updateSyncState(newState: SyncState) {
+    syncMutex.withLock { _syncState.value = newState }
+  }
+
+  private fun shouldRefreshFeed(feed: Feed, now: Instant): Boolean {
+    val lastUpdatedAt = feed.lastUpdatedAt ?: return true
+    val timeSinceLastUpdate = (now - lastUpdatedAt)
+    return timeSinceLastUpdate >= feed.refreshInterval
+  }
+
+  /** Returns the adjusted refresh interval, or null when it is unchanged. */
+  private fun adjustedRefreshInterval(feed: Feed, hasNewContent: Boolean): Duration? {
+    val currentRefreshInterval = feed.refreshInterval
+
+    val adjustmentFactor = if (hasNewContent) 0.8 else 1.2
+    val newRefreshInterval =
+      if (hasNewContent) {
+        maxOf(15.minutes, (currentRefreshInterval * adjustmentFactor))
+      } else {
+        minOf(1.days, (currentRefreshInterval * adjustmentFactor))
+      }
+
+    return newRefreshInterval.takeIf { it != currentRefreshInterval }
+  }
+}

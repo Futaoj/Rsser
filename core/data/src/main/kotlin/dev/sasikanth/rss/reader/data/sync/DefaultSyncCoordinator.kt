@@ -1,0 +1,154 @@
+/*
+ * Copyright 2026 Sasikanth Miriyampalli
+ *
+ * Licensed under the GPL, Version 3.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.gnu.org/licenses/gpl-3.0.en.html
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+package dev.sasikanth.rss.reader.data.sync
+
+import dev.sasikanth.rss.reader.data.sync.bazqux.BazQuxSyncProvider
+import dev.sasikanth.rss.reader.data.sync.dropbox.DropboxCloudServiceProvider
+import dev.sasikanth.rss.reader.data.sync.dropbox.DropboxSyncCoordinator
+import dev.sasikanth.rss.reader.data.sync.freshrss.FreshRSSSyncCoordinator
+import dev.sasikanth.rss.reader.data.sync.freshrss.FreshRssSyncProvider
+import dev.sasikanth.rss.reader.data.sync.google.GoogleDriveCloudServiceProvider
+import dev.sasikanth.rss.reader.data.sync.google.GoogleDriveSyncCoordinator
+import dev.sasikanth.rss.reader.data.sync.local.LocalSyncCoordinator
+import dev.sasikanth.rss.reader.data.sync.miniflux.MinifluxSyncCoordinator
+import dev.sasikanth.rss.reader.data.sync.miniflux.MinifluxSyncProvider
+import dev.sasikanth.rss.reader.di.scopes.AppScope
+import dev.sasikanth.rss.reader.util.DispatchersProvider
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+import me.tatarka.inject.annotations.Inject
+
+@Inject
+@AppScope
+class DefaultSyncCoordinator(
+  private val localSyncCoordinator: LocalSyncCoordinator,
+  private val dropboxSyncCoordinator: DropboxSyncCoordinator,
+  private val dropboxSyncProvider: DropboxCloudServiceProvider,
+  private val googleDriveSyncCoordinator: GoogleDriveSyncCoordinator,
+  private val googleDriveSyncProvider: GoogleDriveCloudServiceProvider,
+  private val freshRSSSyncCoordinator: FreshRSSSyncCoordinator,
+  private val freshRssSyncProvider: FreshRssSyncProvider,
+  private val minifluxSyncCoordinator: MinifluxSyncCoordinator,
+  private val minifluxSyncProvider: MinifluxSyncProvider,
+  private val bazQuxSyncProvider: BazQuxSyncProvider,
+  dispatchersProvider: DispatchersProvider,
+) : SyncCoordinator {
+
+  private val scope = CoroutineScope(SupervisorJob() + dispatchersProvider.main)
+
+  @OptIn(ExperimentalCoroutinesApi::class)
+  override val syncState: StateFlow<SyncState> =
+    combine(
+        dropboxSyncProvider.isSignedIn(),
+        googleDriveSyncProvider.isSignedIn(),
+        freshRssSyncProvider.isSignedIn(),
+        minifluxSyncProvider.isSignedIn(),
+        bazQuxSyncProvider.isSignedIn(),
+      ) { dropboxSignedIn, googleDriveSignedIn, freshRssSignedIn, minifluxSignedIn, bazQuxSignedIn
+        ->
+        when {
+          // BazQux speaks the GReader protocol, so it shares the FreshRSS coordinator
+          freshRssSignedIn || bazQuxSignedIn -> freshRSSSyncCoordinator
+          minifluxSignedIn -> minifluxSyncCoordinator
+          dropboxSignedIn -> dropboxSyncCoordinator
+          googleDriveSignedIn -> googleDriveSyncCoordinator
+          else -> localSyncCoordinator
+        }
+      }
+      .flatMapLatest { it.syncState }
+      .stateIn(scope, SharingStarted.WhileSubscribed(), SyncState.Idle)
+
+  override suspend fun pull(): Boolean {
+    return when {
+      freshRssSyncProvider.isSignedInImmediate() || bazQuxSyncProvider.isSignedInImmediate() ->
+        freshRSSSyncCoordinator.pull()
+      minifluxSyncProvider.isSignedInImmediate() -> minifluxSyncCoordinator.pull()
+      dropboxSyncProvider.isSignedInImmediate() -> dropboxSyncCoordinator.pull()
+      googleDriveSyncProvider.isSignedInImmediate() -> googleDriveSyncCoordinator.pull()
+      else -> localSyncCoordinator.pull()
+    }
+  }
+
+  override fun triggerPull() {
+    scope.launch { pull() }
+  }
+
+  override suspend fun pull(feedIds: List<String>): Boolean {
+    return when {
+      freshRssSyncProvider.isSignedInImmediate() || bazQuxSyncProvider.isSignedInImmediate() ->
+        freshRSSSyncCoordinator.pull(feedIds)
+      minifluxSyncProvider.isSignedInImmediate() -> minifluxSyncCoordinator.pull(feedIds)
+      dropboxSyncProvider.isSignedInImmediate() -> dropboxSyncCoordinator.pull(feedIds)
+      googleDriveSyncProvider.isSignedInImmediate() -> googleDriveSyncCoordinator.pull(feedIds)
+      else -> localSyncCoordinator.pull(feedIds)
+    }
+  }
+
+  override fun triggerPull(feedIds: List<String>) {
+    scope.launch { pull(feedIds) }
+  }
+
+  override suspend fun pull(feedId: String): Boolean {
+    return when {
+      freshRssSyncProvider.isSignedInImmediate() || bazQuxSyncProvider.isSignedInImmediate() ->
+        freshRSSSyncCoordinator.pull(feedId)
+      minifluxSyncProvider.isSignedInImmediate() -> minifluxSyncCoordinator.pull(feedId)
+      dropboxSyncProvider.isSignedInImmediate() -> dropboxSyncCoordinator.pull(feedId)
+      googleDriveSyncProvider.isSignedInImmediate() -> googleDriveSyncCoordinator.pull(feedId)
+      else -> localSyncCoordinator.pull(feedId)
+    }
+  }
+
+  override fun triggerPull(feedId: String) {
+    scope.launch { pull(feedId) }
+  }
+
+  override suspend fun push(): Boolean {
+    return when {
+      freshRssSyncProvider.isSignedInImmediate() || bazQuxSyncProvider.isSignedInImmediate() ->
+        freshRSSSyncCoordinator.push()
+      minifluxSyncProvider.isSignedInImmediate() -> minifluxSyncCoordinator.push()
+      dropboxSyncProvider.isSignedInImmediate() -> dropboxSyncCoordinator.push()
+      googleDriveSyncProvider.isSignedInImmediate() -> googleDriveSyncCoordinator.push()
+      else -> localSyncCoordinator.push()
+    }
+  }
+
+  override fun triggerPush() {
+    scope.launch { push() }
+  }
+
+  override fun triggerFeedPush() {
+    scope.launch {
+      val keepsFeedsOnServer =
+        freshRssSyncProvider.isSignedInImmediate() ||
+          bazQuxSyncProvider.isSignedInImmediate() ||
+          minifluxSyncProvider.isSignedInImmediate()
+
+      if (keepsFeedsOnServer) {
+        push()
+      }
+    }
+  }
+}

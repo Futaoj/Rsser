@@ -1,0 +1,124 @@
+/*
+ * Copyright 2026 Sasikanth Miriyampalli
+ *
+ * Licensed under the GPL, Version 3.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.gnu.org/licenses/gpl-3.0.en.html
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+/*
+ * Copyright 2023 Sasikanth Miriyampalli
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+@Suppress("DSL_SCOPE_VIOLATION")
+plugins {
+  alias(libs.plugins.android.application)
+  alias(libs.plugins.compose)
+  alias(libs.plugins.ksp)
+  alias(libs.plugins.kotlin.compose)
+}
+
+android {
+  compileSdk = libs.versions.android.sdk.compile.get().toInt()
+  namespace = "dev.sasikanth.rss.reader"
+
+  defaultConfig {
+    applicationId = "dev.sasikanth.rss.reader"
+    minSdk = libs.versions.android.sdk.min.get().toInt()
+    targetSdk = libs.versions.android.sdk.target.get().toInt()
+
+    val keyBugsnagAPIKey = "BUGSNAG_API_KEY"
+    manifestPlaceholders[keyBugsnagAPIKey] = System.getenv(keyBugsnagAPIKey).orEmpty()
+
+    versionCode =
+      if (project.properties["VERSION_CODE"] != null) {
+        (project.properties["VERSION_CODE"] as String).toInt()
+      } else {
+        1
+      }
+
+    versionName =
+      if (project.properties["VERSION_NAME"] != null) {
+        project.properties["VERSION_NAME"] as String
+      } else {
+        "1.0.0"
+      }
+  }
+
+  flavorDimensions += "version"
+  productFlavors {
+    create("full") { dimension = "version" }
+    create("foss") {
+      dimension = "version"
+      versionNameSuffix = "-FOSS"
+    }
+  }
+
+  compileOptions { isCoreLibraryDesugaringEnabled = true }
+
+  buildTypes {
+    release {
+      isMinifyEnabled = true
+      isShrinkResources = true
+
+      proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+    }
+    debug { applicationIdSuffix = ".debug" }
+  }
+
+  packaging {
+    resources { excludes.add("/META-INF/{AL2.0,LGPL2.1}") }
+    if (project.findProperty("twine.isFoss")?.toString()?.toBoolean() == true) {
+      jniLibs { keepDebugSymbols.add("**/*.so") }
+    }
+  }
+
+  buildFeatures { buildConfig = true }
+
+  lint { baseline = file("lint-baseline.xml") }
+
+  dependenciesInfo {
+    includeInApk = false
+    includeInBundle = false
+  }
+}
+
+dependencies {
+  debugImplementation(libs.leakcanary)
+
+  implementation(project(":feature:reader"))
+  api(project(":core:data"))
+  implementation(libs.kotlininject.runtime)
+  ksp(libs.kotlininject.compiler)
+  implementation(libs.androidx.work)
+  coreLibraryDesugaring(libs.desugarJdk)
+  implementation(libs.kotlinx.datetime)
+  "fullImplementation"(libs.bugsnag)
+  "fullImplementation"(libs.crashkios.bugsnag)
+  implementation(libs.glance)
+  implementation(libs.glance.material3)
+  implementation(libs.kotlinx.immutable.collections)
+  implementation(libs.filekit.core)
+  implementation(libs.filekit.dialogs)
+  implementation(libs.jetbrains.navigation3.ui)
+}

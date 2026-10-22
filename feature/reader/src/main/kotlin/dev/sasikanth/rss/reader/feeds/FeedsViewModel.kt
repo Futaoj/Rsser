@@ -1,0 +1,473 @@
+/*
+ * Copyright 2026 Sasikanth Miriyampalli
+ *
+ * Licensed under the GPL, Version 3.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.gnu.org/licenses/gpl-3.0.en.html
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+package dev.sasikanth.rss.reader.feeds
+
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import androidx.paging.insertSeparators
+import androidx.paging.map
+import dev.sasikanth.rss.reader.core.model.local.Feed
+import dev.sasikanth.rss.reader.core.model.local.FeedGroup
+import dev.sasikanth.rss.reader.core.model.local.Source
+import dev.sasikanth.rss.reader.core.model.local.SourceType
+import dev.sasikanth.rss.reader.data.refreshpolicy.RefreshPolicy
+import dev.sasikanth.rss.reader.data.repository.FeedsOrderBy
+import dev.sasikanth.rss.reader.data.repository.ObservableActiveSource
+import dev.sasikanth.rss.reader.data.repository.RssRepository
+import dev.sasikanth.rss.reader.data.repository.SettingsRepository
+import dev.sasikanth.rss.reader.data.utils.PostsFilterUtils
+import dev.sasikanth.rss.reader.util.DispatchersProvider
+import dev.sasikanth.rss.reader.utils.Constants.MINIMUM_REQUIRED_SEARCH_CHARACTERS
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Instant
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
+import me.tatarka.inject.annotations.Inject
+
+@Stable
+@Inject
+class FeedsViewModel(
+  private val dispatchersProvider: DispatchersProvider,
+  private val rssRepository: RssRepository,
+  private val settingsRepository: SettingsRepository,
+  private val observableActiveSource: ObservableActiveSource,
+  private val refreshPolicy: RefreshPolicy,
+) : ViewModel() {
+
+  var searchQuery by mutableStateOf(TextFieldValue())
+    private set
+
+  var drawerListScrollIndex by mutableStateOf(0)
+  var drawerListScrollOffset by mutableStateOf(0)
+
+  @OptIn(ExperimentalCoroutinesApi::class)
+  private val allSourcesFlow =
+    combine(
+        settingsRepository.postsType,
+        settingsRepository.feedsSortOrder,
+        refreshPolicy.lastRefreshedAtFlow,
+      ) { postsType, feedsSortOrder, dateTime ->
+        Triple(postsType, feedsSortOrder, dateTime)
+      }
+      .flatMapLatest { (postsType, feedsSortOrder, dateTime) ->
+        val postsAfter = PostsFilterUtils.postsThresholdTime(postsType, dateTime)
+        val sources =
+          sources(
+            postsAfter = postsAfter,
+            postsUpperBound = dateTime,
+            feedsSortOrder = feedsSortOrder,
+          )
+
+        addSourcesSeparator(sources)
+      }
+      .cachedIn(viewModelScope)
+
+  @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+  private val feedsSearchResultsFlow =
+    combine(
+        snapshotFlow { searchQuery }.debounce(500.milliseconds).distinctUntilChangedBy { it.text },
+        settingsRepository.postsType,
+        refreshPolicy.lastRefreshedAtFlow,
+      ) { searchQuery, postsType, dateTime ->
+        Triple(searchQuery, postsType, dateTime)
+      }
+      .flatMapLatest { (searchQuery, postsType, dateTime) ->
+        val postsAfter = PostsFilterUtils.postsThresholdTime(postsType, dateTime)
+        if (searchQuery.text.length >= MINIMUM_REQUIRED_SEARCH_CHARACTERS) {
+          feedsSearchResultsPager(
+            transformedSearchQuery = searchQuery.text,
+            postsAfter = postsAfter,
+          )
+        } else {
+          flowOf(PagingData.empty())
+        }
+      }
+      .cachedIn(viewModelScope)
+
+  private val _state = MutableStateFlow(FeedsState.DEFAULT)
+  val state: StateFlow<FeedsState>
+    get() = _state
+
+  init {
+    _state.update { it.copy(sources = allSourcesFlow, feedsSearchResults = feedsSearchResultsFlow) }
+    init()
+  }
+
+  fun dispatch(event: FeedsEvent) {
+    when (event) {
+      is FeedsEvent.OnDeleteFeed -> onDeleteFeed(event.feed)
+      is FeedsEvent.OnToggleFeedSelection -> onToggleSourceSelection(event.source)
+      is FeedsEvent.OnSourceAddToGroupClicked -> onSourceAddToGroupClicked(event.source)
+      is FeedsEvent.OnDeleteSourceClicked -> onDeleteSourceClicked(event.source)
+      is FeedsEvent.OnMarkSourceAsReadClicked -> onMarkSourceAsReadClicked(event.source)
+      is FeedsEvent.OnFeedNameUpdated -> onFeedNameUpdated(event.newFeedName, event.feedId)
+      is FeedsEvent.OnSourcePinClicked -> onSourcePinClicked(event.source)
+      FeedsEvent.ClearSearchQuery -> clearSearchQuery()
+      is FeedsEvent.SearchQueryChanged -> onSearchQueryChanged(event.searchQuery)
+      is FeedsEvent.OnSourceClick -> onSourceClicked(event.source)
+      FeedsEvent.TogglePinnedSection -> onTogglePinnedSection()
+      is FeedsEvent.OnFeedSortOrderChanged -> onFeedSortOrderChanged(event.feedsOrderBy)
+      is FeedsEvent.OnHomeSelected -> onHomeSelected()
+      FeedsEvent.CancelSourcesSelection -> onCancelSourcesSelection()
+      FeedsEvent.DeleteSelectedSourcesClicked -> onDeleteSelectedSourcesClicked()
+      FeedsEvent.PinSelectedSources -> onPinSelectedSources()
+      FeedsEvent.UnPinSelectedSources -> onUnpinSelectedSources()
+      is FeedsEvent.OnCreateGroup -> onCreateGroup(event.name)
+      is FeedsEvent.OnGroupsSelected -> onGroupsSelected(event.groupIds)
+      FeedsEvent.OnNewFeedClicked -> {
+        viewModelScope.launch { _state.update { it.copy(openAddFeedScreen = true) } }
+      }
+      FeedsEvent.DeleteSelectedSources -> deleteSelectedSources()
+      FeedsEvent.OnAddToGroupClicked -> onAddToGroupClicked()
+      FeedsEvent.DismissDeleteConfirmation -> dismissDeleteConfirmation()
+      is FeedsEvent.OnPinnedSourcePositionChanged ->
+        onPinnedSourcePositionChanged(event.newSourcesList)
+
+      is FeedsEvent.MarkOpenAddFeedDone -> {
+        _state.update { it.copy(openAddFeedScreen = false) }
+      }
+      is FeedsEvent.MarkOpenGroupSelectionDone -> {
+        _state.update { it.copy(openGroupSelection = null) }
+      }
+    }
+  }
+
+  private fun onAddToGroupClicked() {
+    viewModelScope.launch {
+      val sourceToAddToGroup = _state.value.sourceToAddToGroup
+      val selectedSources = _state.value.selectedSources
+
+      val groupIds =
+        when {
+          sourceToAddToGroup != null -> {
+            rssRepository.groupIdsForFeed(sourceToAddToGroup.id).toSet()
+          }
+          selectedSources.size == 1 -> {
+            rssRepository.groupIdsForFeed(selectedSources.first().id).toSet()
+          }
+          else -> {
+            emptySet()
+          }
+        }
+
+      _state.update { it.copy(openGroupSelection = groupIds) }
+    }
+  }
+
+  private fun onSourceAddToGroupClicked(source: Source) {
+    _state.update { it.copy(sourceToAddToGroup = source) }
+    onAddToGroupClicked()
+  }
+
+  private fun init() {
+    observeSources()
+    observePreferences()
+    observeShowUnreadCountPreference()
+  }
+
+  private fun onPinnedSourcePositionChanged(newSourcesList: List<Source>) {
+    viewModelScope.launch {
+      _state.update { it.copy(pinnedSources = newSourcesList.toImmutableList()) }
+      rssRepository.updatedSourcePinnedPosition(_state.value.pinnedSources)
+    }
+  }
+
+  private fun dismissDeleteConfirmation() {
+    _state.update { it.copy(showDeleteConfirmation = false, sourceToDelete = null) }
+  }
+
+  private fun deleteSelectedSources() {
+    viewModelScope
+      .launch {
+        val sourcesToDelete =
+          if (_state.value.sourceToDelete != null) {
+            setOf(_state.value.sourceToDelete!!)
+          } else {
+            _state.value.selectedSources
+          }
+
+        rssRepository.markSourcesAsDeleted(sourcesToDelete)
+
+        if (sourcesToDelete.any { it.id == _state.value.activeSource?.id }) {
+          observableActiveSource.clearSelection()
+        }
+      }
+      .invokeOnCompletion { dispatch(FeedsEvent.CancelSourcesSelection) }
+  }
+
+  private fun onGroupsSelected(groupIds: Set<String>) {
+    viewModelScope.launch {
+      val sourcesToAdd =
+        if (_state.value.sourceToAddToGroup != null) {
+          setOf(_state.value.sourceToAddToGroup!!)
+        } else {
+          _state.value.selectedSources
+        }
+
+      rssRepository.addFeedIdsToGroups(groupIds = groupIds, feedIds = sourcesToAdd.map { it.id })
+      dispatch(FeedsEvent.CancelSourcesSelection)
+    }
+  }
+
+  private fun onCreateGroup(name: String) {
+    viewModelScope.launch { rssRepository.createGroup(name) }
+  }
+
+  private fun onSourceClicked(source: Source) {
+    viewModelScope.launch {
+      if (_state.value.activeSource?.id != source.id) {
+        observableActiveSource.changeActiveSource(source)
+      }
+    }
+  }
+
+  private fun onUnpinSelectedSources() {
+    viewModelScope
+      .launch { rssRepository.unpinSources(_state.value.selectedSources) }
+      .invokeOnCompletion { dispatch(FeedsEvent.CancelSourcesSelection) }
+  }
+
+  private fun onPinSelectedSources() {
+    viewModelScope
+      .launch { rssRepository.pinSources(_state.value.selectedSources) }
+      .invokeOnCompletion { dispatch(FeedsEvent.CancelSourcesSelection) }
+  }
+
+  private fun onDeleteSelectedSourcesClicked() {
+    _state.update { it.copy(showDeleteConfirmation = true) }
+  }
+
+  private fun onDeleteSourceClicked(source: Source) {
+    _state.update { it.copy(sourceToDelete = source, showDeleteConfirmation = true) }
+  }
+
+  private fun onMarkSourceAsReadClicked(source: Source) {
+    viewModelScope.launch {
+      val postsAfter =
+        PostsFilterUtils.postsThresholdTime(
+          postsType = settingsRepository.postsType.first(),
+          dateTime = refreshPolicy.lastRefreshedAtFlow.first(),
+        )
+
+      when (source) {
+        is Feed -> {
+          rssRepository.markPostsInFeedAsRead(feedIds = listOf(source.id), postsAfter = postsAfter)
+        }
+        is FeedGroup -> {
+          rssRepository.markPostsInFeedAsRead(feedIds = source.feedIds, postsAfter = postsAfter)
+        }
+      }
+    }
+  }
+
+  private fun onCancelSourcesSelection() {
+    _state.update { it.copy(selectedSources = emptySet(), sourceToAddToGroup = null) }
+  }
+
+  private fun onHomeSelected() {
+    viewModelScope.launch { observableActiveSource.clearSelection() }
+  }
+
+  private fun onFeedSortOrderChanged(feedsOrderBy: FeedsOrderBy) {
+    viewModelScope.launch {
+      withContext(dispatchersProvider.io) { settingsRepository.updateFeedsSortOrder(feedsOrderBy) }
+    }
+  }
+
+  private fun onTogglePinnedSection() {
+    _state.update { it.copy(isPinnedSectionExpanded = !_state.value.isPinnedSectionExpanded) }
+  }
+
+  private fun onSearchQueryChanged(searchQuery: TextFieldValue) {
+    this.searchQuery = searchQuery
+  }
+
+  private fun clearSearchQuery() {
+    searchQuery = TextFieldValue()
+  }
+
+  private fun onSourcePinClicked(source: Source) {
+    viewModelScope.launch { rssRepository.toggleSourcePinStatus(source) }
+  }
+
+  private fun onFeedNameUpdated(newFeedName: String, feedId: String) {
+    viewModelScope.launch { rssRepository.updateFeedName(newFeedName, feedId) }
+  }
+
+  private fun onDeleteFeed(feed: Feed) {
+    viewModelScope.launch {
+      rssRepository.removeFeed(feed.id)
+      if (_state.value.activeSource?.id == feed.id) {
+        observableActiveSource.clearSelection()
+      }
+    }
+  }
+
+  private fun onToggleSourceSelection(source: Source) {
+    _state.update {
+      val selectedFeeds = _state.value.selectedSources
+      if (selectedFeeds.any { selectedFeed -> selectedFeed.id == source.id }) {
+        it.copy(selectedSources = selectedFeeds.filterNot { feed -> feed.id == source.id }.toSet())
+      } else {
+        it.copy(selectedSources = selectedFeeds + setOf(source))
+      }
+    }
+  }
+
+  private fun observePreferences() {
+    settingsRepository.feedsSortOrder
+      .onEach { feedsSortOrder -> _state.update { it.copy(feedsSortOrder = feedsSortOrder) } }
+      .launchIn(viewModelScope)
+  }
+
+  @OptIn(ExperimentalCoroutinesApi::class)
+  private fun observeSources() {
+    val activeSourceFlow = observableActiveSource.activeSource
+    val postsTypeFlow = settingsRepository.postsType
+
+    combine(activeSourceFlow, refreshPolicy.lastRefreshedAtFlow, postsTypeFlow) {
+        activeSource,
+        lastRefreshedAt,
+        postsType ->
+        Triple(activeSource, lastRefreshedAt, postsType)
+      }
+      .flatMapLatest { (activeSource, lastRefreshedAt, postsType) ->
+        when {
+          activeSource?.pinnedAt != null || activeSource == null -> {
+            flowOf(activeSource)
+          }
+          else -> {
+            val postsAfter = PostsFilterUtils.postsThresholdTime(postsType, lastRefreshedAt)
+
+            rssRepository.source(
+              id = activeSource.id,
+              postsUpperBound = lastRefreshedAt.toInstant(TimeZone.currentSystemDefault()),
+              postsAfter = postsAfter,
+            )
+          }
+        }
+      }
+      .onEach { source -> _state.update { it.copy(activeSource = source) } }
+      .launchIn(viewModelScope)
+
+    combine(rssRepository.numberOfFeeds(), rssRepository.numberOfFeedGroups()) {
+        numberOfFeeds,
+        numberOfFeedGroups ->
+        numberOfFeeds to numberOfFeedGroups
+      }
+      .onEach { (numberOfFeeds, numberOfFeedGroups) ->
+        _state.update {
+          it.copy(
+            numberOfFeeds = numberOfFeeds.toInt(),
+            numberOfFeedGroups = numberOfFeedGroups.toInt(),
+          )
+        }
+      }
+      .launchIn(viewModelScope)
+
+    combine(settingsRepository.postsType, refreshPolicy.lastRefreshedAtFlow) { postsType, dateTime
+        ->
+        Pair(postsType, dateTime)
+      }
+      .flatMapLatest { (postsType, dateTime) ->
+        val postsAfter = PostsFilterUtils.postsThresholdTime(postsType, dateTime)
+        rssRepository.pinnedSources(
+          postsAfter = postsAfter,
+          postsUpperBound = dateTime.toInstant(TimeZone.currentSystemDefault()),
+        )
+      }
+      .map { it.toImmutableList() }
+      .onEach { pinnedSources -> _state.update { it.copy(pinnedSources = pinnedSources) } }
+      .launchIn(viewModelScope)
+  }
+
+  private fun feedsSearchResultsPager(transformedSearchQuery: String, postsAfter: Instant) =
+    Pager(config = PagingConfig(pageSize = 20)) {
+        rssRepository.searchFeed(searchQuery = transformedSearchQuery, postsAfter = postsAfter)
+      }
+      .flow
+
+  private fun sources(
+    postsAfter: Instant,
+    postsUpperBound: LocalDateTime,
+    feedsSortOrder: FeedsOrderBy,
+  ) =
+    Pager(config = PagingConfig(pageSize = 20)) {
+        rssRepository.sources(
+          postsAfter = postsAfter,
+          postsUpperBound = postsUpperBound.toInstant(TimeZone.currentSystemDefault()),
+          orderBy = feedsSortOrder,
+        )
+      }
+      .flow
+
+  private fun observeShowUnreadCountPreference() {
+    settingsRepository.showUnreadPostsCount
+      .onEach { value -> _state.update { it.copy(canShowUnreadPostsCount = value) } }
+      .launchIn(viewModelScope)
+  }
+
+  private fun addSourcesSeparator(
+    sources: Flow<PagingData<Source>>
+  ): Flow<PagingData<SourceListItem>> {
+    return sources.mapLatest {
+      it
+        .map { source -> SourceListItem.SourceItem(source) }
+        .insertSeparators { before, after ->
+          when {
+            before?.source?.sourceType == SourceType.FeedGroup &&
+              after?.source?.sourceType == SourceType.Feed -> {
+              SourceListItem.Separator
+            }
+            else -> {
+              null
+            }
+          }
+        }
+    }
+  }
+}

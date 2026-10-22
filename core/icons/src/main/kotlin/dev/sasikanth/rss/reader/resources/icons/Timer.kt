@@ -1,0 +1,26 @@
+/*
+ * Copyright 2026 Sasikanth Miriyampalli
+ *
+ * Licensed under the GPL, Version 3.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.gnu.org/licenses/gpl-3.0.en.html
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+package dev.sasikanth.rss.reader.resources.icons
+
+import androidx.compose.ui.graphics.vector.ImageVector
+
+val TwineIcons.Timer: ImageVector
+  get() = rsserTimer
+private val rsserTimer by lazy {
+  rsserIcon("Timer", "M7 2H17M12 2V5M19 5L21 3M21 14A9 9 0 1 1 3 14A9 9 0 1 1 21 14ZM12 9V14L15 16")
+}

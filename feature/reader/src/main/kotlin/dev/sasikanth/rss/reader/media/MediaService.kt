@@ -1,0 +1,105 @@
+/*
+ * Copyright 2026 Sasikanth Miriyampalli
+ *
+ * Licensed under the GPL, Version 3.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.gnu.org/licenses/gpl-3.0.en.html
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+package dev.sasikanth.rss.reader.media
+
+import android.app.PendingIntent
+import android.content.ComponentName
+import android.content.Intent
+import android.net.Uri
+import androidx.annotation.OptIn
+import androidx.media3.common.AudioAttributes
+import androidx.media3.common.C
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.datasource.DefaultHttpDataSource
+import androidx.media3.datasource.cache.CacheDataSource
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
+import androidx.media3.session.MediaSession
+import androidx.media3.session.MediaSessionService
+
+@OptIn(UnstableApi::class)
+class MediaService : MediaSessionService() {
+
+  private var mediaSession: MediaSession? = null
+
+  override fun onCreate() {
+    super.onCreate()
+    val cacheDataSourceFactory =
+      CacheDataSource.Factory()
+        .setCache(AudioCacheProvider.cache)
+        .setUpstreamDataSourceFactory(
+          DefaultHttpDataSource.Factory().setAllowCrossProtocolRedirects(true).setUserAgent("Twine")
+        )
+
+    val player =
+      ExoPlayer.Builder(this)
+        .setAudioAttributes(
+          AudioAttributes.Builder()
+            .setContentType(C.AUDIO_CONTENT_TYPE_SPEECH)
+            .setUsage(C.USAGE_MEDIA)
+            .build(),
+          true,
+        )
+        .setMediaSourceFactory(DefaultMediaSourceFactory(cacheDataSourceFactory))
+        .build()
+
+    val sessionActivityIntent =
+      Intent(Intent.ACTION_VIEW, Uri.parse("twine://reader/currently-playing")).apply {
+        setPackage(packageName)
+        resolveDeepLinkComponent(this)?.let { component = it }
+      }
+
+    mediaSession =
+      MediaSession.Builder(this, player)
+        .setSessionActivity(
+          PendingIntent.getActivity(
+            this,
+            0,
+            sessionActivityIntent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+          )
+        )
+        .build()
+  }
+
+  // Resolving the component ourselves instead of using `getLaunchIntentForPackage`, which throws
+  // on some devices where the resolved activity info has a null class name.
+  private fun resolveDeepLinkComponent(intent: Intent): ComponentName? {
+    val activityInfo =
+      runCatching { packageManager.resolveActivity(intent, 0)?.activityInfo }.getOrNull()
+    val className = activityInfo?.name ?: return null
+    return ComponentName(activityInfo.packageName ?: packageName, className)
+  }
+
+  override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? {
+    return mediaSession
+  }
+
+  override fun onDestroy() {
+    mediaSession?.run {
+      player.release()
+      release()
+      mediaSession = null
+    }
+    super.onDestroy()
+  }
+
+  override fun onTaskRemoved(rootIntent: Intent?) {
+    stopSelf()
+  }
+}

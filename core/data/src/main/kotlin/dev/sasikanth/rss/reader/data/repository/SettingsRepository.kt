@@ -1,0 +1,484 @@
+/*
+ * Copyright 2026 Sasikanth Miriyampalli
+ *
+ * Licensed under the GPL, Version 3.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.gnu.org/licenses/gpl-3.0.en.html
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+package dev.sasikanth.rss.reader.data.repository
+
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.floatPreferencesKey
+import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
+import dev.sasikanth.rss.reader.app.AppIcon
+import dev.sasikanth.rss.reader.app.AppInfo
+import dev.sasikanth.rss.reader.app.LegacyAppIcon
+import dev.sasikanth.rss.reader.core.model.local.PostsSortOrder
+import dev.sasikanth.rss.reader.core.model.local.PostsType
+import dev.sasikanth.rss.reader.core.model.local.ThemeVariant
+import dev.sasikanth.rss.reader.di.scopes.AppScope
+import kotlin.time.Instant
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import me.tatarka.inject.annotations.Inject
+
+@Inject
+@AppScope
+class SettingsRepository(
+  private val dataStore: DataStore<Preferences>,
+  private val appInfo: AppInfo,
+) {
+
+  private val browserTypeKey = stringPreferencesKey("pref_browser_type")
+  private val showUnreadPostsCountKey = booleanPreferencesKey("show_unread_posts_count")
+  private val postsDeletionPeriodKey = stringPreferencesKey("posts_cleanup_frequency")
+  private val postsTypeKey = stringPreferencesKey("posts_type")
+  private val postsSortOrderKey = stringPreferencesKey("posts_sort_order")
+  private val showReaderViewKey = booleanPreferencesKey("pref_show_reader_view")
+  private val feedsSortOrderKey = stringPreferencesKey("pref_feeds_sort_order")
+  private val appThemeModeKey = stringPreferencesKey("pref_app_theme_mode_v2")
+  private val useAmoledKey = booleanPreferencesKey("use_amoled")
+  private val enableAutoSyncKey = booleanPreferencesKey("enable_auto_sync")
+  private val showFeedFavIconKey = booleanPreferencesKey("show_feed_fav_icon")
+  private val markPostsAsReadOnKey = stringPreferencesKey("mark_posts_as_read_on")
+  private val confirmMarkAllAsReadKey = booleanPreferencesKey("confirm_mark_all_as_read")
+  private val audioMarkAsReadThresholdKey = stringPreferencesKey("audio_mark_as_read_threshold")
+  private val homeViewModeKey = stringPreferencesKey("home_view_mode")
+  private val readerFontScaleFactorKey = floatPreferencesKey("reader_font_scale")
+  private val readerLineHeightScaleFactorKey = floatPreferencesKey("reader_line_height_scale")
+  private val readerFontStyleKey = stringPreferencesKey("reader_font_style")
+  private val themeVariantKey = stringPreferencesKey("pref_theme_variant")
+  private val blockImagesKey = booleanPreferencesKey("block_images")
+  private val enableNotificationsKey = booleanPreferencesKey("enable_notifications")
+  private val groupByFeedNotificationsKey = booleanPreferencesKey("group_by_feed_notifications")
+  private val downloadFullContentKey = booleanPreferencesKey("download_full_content")
+  private val lastReviewPromptDateKey = longPreferencesKey("last_review_prompt_date")
+  private val installDateKey = longPreferencesKey("install_date")
+  private val userSessionCountKey = intPreferencesKey("user_session_count")
+  private val appIconKey = stringPreferencesKey("app_icon")
+  private val isOnboardingDoneKey = booleanPreferencesKey("is_onboarding_done_v2")
+  private val showFeaturedSectionKey = booleanPreferencesKey("show_featured_section")
+  private val lastSeenChangelogVersionKey = stringPreferencesKey("last_seen_changelog_version")
+
+  val browserType: Flow<BrowserType> =
+    dataStore.data.map { preferences ->
+      mapToBrowserType(preferences[browserTypeKey]) ?: BrowserType.Default
+    }
+
+  val showUnreadPostsCount: Flow<Boolean> =
+    dataStore.data.map { preferences -> preferences[showUnreadPostsCountKey] ?: true }
+
+  val postsDeletionPeriod: Flow<Period> =
+    dataStore.data.map { preferences ->
+      mapToPostsDeletionPeriod(preferences[postsDeletionPeriodKey]) ?: Period.ONE_MONTH
+    }
+
+  val showReaderView: Flow<Boolean> =
+    dataStore.data.map { preferences -> preferences[showReaderViewKey] ?: true }
+
+  val postsType: Flow<PostsType> =
+    dataStore.data.map { preferences -> mapToPostsType(preferences[postsTypeKey]) ?: PostsType.ALL }
+
+  val postsSortOrder: Flow<PostsSortOrder> =
+    dataStore.data.map { preferences ->
+      mapToPostsSortOrder(preferences[postsSortOrderKey]) ?: PostsSortOrder.Latest
+    }
+
+  val feedsSortOrder: Flow<FeedsOrderBy> =
+    dataStore.data.map { preferences ->
+      mapToFeedsOrderBy(preferences[feedsSortOrderKey]) ?: FeedsOrderBy.Latest
+    }
+
+  val appThemeMode: Flow<AppThemeMode> =
+    dataStore.data.map { preferences ->
+      mapToAppThemeMode(preferences[appThemeModeKey]) ?: AppThemeMode.Auto
+    }
+
+  val useAmoled: Flow<Boolean> =
+    dataStore.data.map { preferences -> preferences[useAmoledKey] ?: false }
+
+  val isOnboardingDone: Flow<Boolean> =
+    dataStore.data.map { preferences -> preferences[isOnboardingDoneKey] ?: false }
+
+  val enableAutoSync: Flow<Boolean> =
+    dataStore.data.map { preferences -> preferences[enableAutoSyncKey] ?: true }
+
+  val showFeedFavIcon: Flow<Boolean> =
+    dataStore.data.map { preferences -> preferences[showFeedFavIconKey] ?: true }
+
+  val showFeaturedSection: Flow<Boolean> =
+    dataStore.data.map { preferences -> preferences[showFeaturedSectionKey] ?: true }
+
+  val markAsReadOn: Flow<MarkAsReadOn> =
+    dataStore.data.map { preferences -> mapToMarkAsReadOnType(preferences[markPostsAsReadOnKey]) }
+
+  val confirmMarkAllAsRead: Flow<Boolean> =
+    dataStore.data.map { preferences -> preferences[confirmMarkAllAsReadKey] ?: true }
+
+  val audioMarkAsReadThreshold: Flow<AudioMarkAsReadThreshold> =
+    dataStore.data.map { preferences ->
+      mapToAudioMarkAsReadThreshold(preferences[audioMarkAsReadThresholdKey])
+    }
+
+  val homeViewMode: Flow<HomeViewMode> =
+    dataStore.data.map { preferences -> mapToHomeViewMode(preferences[homeViewModeKey]) }
+
+  val readerFontScaleFactor: Flow<Float> =
+    dataStore.data.map { preferences -> preferences[readerFontScaleFactorKey] ?: 1f }
+
+  val readerLineHeightScaleFactor: Flow<Float> =
+    dataStore.data.map { preferences -> preferences[readerLineHeightScaleFactorKey] ?: 1f }
+
+  val readerFontStyle: Flow<ReaderFont> =
+    dataStore.data.map { preferences -> mapToReaderFont(preferences[readerFontStyleKey]) }
+
+  val themeVariant: Flow<ThemeVariant> =
+    dataStore.data.map { preferences -> mapToThemeVariant(preferences[themeVariantKey]) }
+
+  val blockImages: Flow<Boolean> =
+    dataStore.data.map { preferences -> preferences[blockImagesKey] ?: false }
+
+  val enableNotifications: Flow<Boolean> =
+    dataStore.data.map { preferences -> preferences[enableNotificationsKey] ?: false }
+
+  val groupByFeedNotifications: Flow<Boolean> =
+    dataStore.data.map { preferences -> preferences[groupByFeedNotificationsKey] ?: false }
+
+  val downloadFullContent: Flow<Boolean> =
+    dataStore.data.map { preferences -> preferences[downloadFullContentKey] ?: false }
+
+  val lastReviewPromptDate: Flow<Instant?> =
+    dataStore.data.map { preferences ->
+      preferences[lastReviewPromptDateKey]?.let(Instant::fromEpochMilliseconds)
+    }
+
+  val installDate: Flow<Instant?> =
+    dataStore.data.map { preferences ->
+      preferences[installDateKey]?.let(Instant::fromEpochMilliseconds)
+    }
+
+  val userSessionCount: Flow<Int> =
+    dataStore.data.map { preferences -> preferences[userSessionCountKey] ?: 0 }
+
+  val appIcon: Flow<AppIcon> =
+    dataStore.data.map { preferences -> mapToAppIcon(preferences[appIconKey]) }
+
+  val lastSeenChangelogVersion: Flow<String?> =
+    dataStore.data.map { preferences -> preferences[lastSeenChangelogVersionKey] }
+
+  suspend fun enableAutoSyncImmediate(): Boolean {
+    return enableAutoSync.first()
+  }
+
+  suspend fun updateFeedsSortOrder(value: FeedsOrderBy) {
+    dataStore.edit { preferences -> preferences[feedsSortOrderKey] = value.name }
+  }
+
+  suspend fun postsDeletionPeriodImmediate(): Period {
+    return postsDeletionPeriod.first()
+  }
+
+  suspend fun updateBrowserType(browserType: BrowserType) {
+    dataStore.edit { preferences -> preferences[browserTypeKey] = browserType.name }
+  }
+
+  suspend fun toggleShowUnreadPostsCount(value: Boolean) {
+    dataStore.edit { preferences -> preferences[showUnreadPostsCountKey] = value }
+  }
+
+  suspend fun updatePostsDeletionPeriod(postsDeletionPeriod: Period) {
+    dataStore.edit { preferences -> preferences[postsDeletionPeriodKey] = postsDeletionPeriod.name }
+  }
+
+  suspend fun updatePostsType(postsType: PostsType) {
+    dataStore.edit { preferences -> preferences[postsTypeKey] = postsType.name }
+  }
+
+  suspend fun updatePostsSortOrder(postsSortOrder: PostsSortOrder) {
+    dataStore.edit { preferences -> preferences[postsSortOrderKey] = postsSortOrder.name }
+  }
+
+  suspend fun toggleShowReaderView(value: Boolean) {
+    dataStore.edit { preferences -> preferences[showReaderViewKey] = value }
+  }
+
+  suspend fun updateAppTheme(value: AppThemeMode) {
+    dataStore.edit { preferences -> preferences[appThemeModeKey] = value.name }
+  }
+
+  suspend fun updateAppIcon(value: AppIcon) {
+    dataStore.edit { preferences -> preferences[appIconKey] = value.name }
+  }
+
+  suspend fun toggleAmoled(value: Boolean) {
+    dataStore.edit { preferences -> preferences[useAmoledKey] = value }
+  }
+
+  suspend fun completeOnboarding() {
+    dataStore.edit { preferences ->
+      preferences[isOnboardingDoneKey] = true
+      preferences[lastSeenChangelogVersionKey] = appInfo.versionName
+    }
+  }
+
+  suspend fun toggleAutoSync(value: Boolean) {
+    dataStore.edit { preferences -> preferences[enableAutoSyncKey] = value }
+  }
+
+  suspend fun toggleShowFeedFavIcon(value: Boolean) {
+    dataStore.edit { preferences -> preferences[showFeedFavIconKey] = value }
+  }
+
+  suspend fun toggleShowFeaturedSection(value: Boolean) {
+    dataStore.edit { preferences -> preferences[showFeaturedSectionKey] = value }
+  }
+
+  suspend fun updateMarkAsReadOn(value: MarkAsReadOn) {
+    dataStore.edit { preferences -> preferences[markPostsAsReadOnKey] = value.name }
+  }
+
+  suspend fun toggleConfirmMarkAllAsRead(value: Boolean) {
+    dataStore.edit { preferences -> preferences[confirmMarkAllAsReadKey] = value }
+  }
+
+  suspend fun updateAudioMarkAsReadThreshold(value: AudioMarkAsReadThreshold) {
+    dataStore.edit { preferences -> preferences[audioMarkAsReadThresholdKey] = value.name }
+  }
+
+  suspend fun updateHomeViewMode(value: HomeViewMode) {
+    dataStore.edit { preferences -> preferences[homeViewModeKey] = value.name }
+  }
+
+  suspend fun updateReaderFontScaleFactor(value: Float) {
+    dataStore.edit { preferences -> preferences[readerFontScaleFactorKey] = value }
+  }
+
+  suspend fun updateReaderLineHeightScaleFactor(value: Float) {
+    dataStore.edit { preferences -> preferences[readerLineHeightScaleFactorKey] = value }
+  }
+
+  suspend fun updateReaderFont(value: ReaderFont) {
+    dataStore.edit { preferences -> preferences[readerFontStyleKey] = value.name }
+  }
+
+  suspend fun updateThemeVariant(value: ThemeVariant) {
+    dataStore.edit { preferences -> preferences[themeVariantKey] = value.name }
+  }
+
+  suspend fun toggleBlockImages(value: Boolean) {
+    dataStore.edit { preferences -> preferences[blockImagesKey] = value }
+  }
+
+  suspend fun toggleNotifications(value: Boolean) {
+    dataStore.edit { preferences -> preferences[enableNotificationsKey] = value }
+  }
+
+  suspend fun toggleGroupByFeedNotifications(value: Boolean) {
+    dataStore.edit { preferences -> preferences[groupByFeedNotificationsKey] = value }
+  }
+
+  suspend fun toggleDownloadFullContent(value: Boolean) {
+    dataStore.edit { preferences -> preferences[downloadFullContentKey] = value }
+  }
+
+  suspend fun updateLastReviewPromptDate(value: Instant) {
+    dataStore.edit { preferences ->
+      preferences[lastReviewPromptDateKey] = value.toEpochMilliseconds()
+    }
+  }
+
+  suspend fun updateInstallDate(value: Instant) {
+    dataStore.edit { preferences -> preferences[installDateKey] = value.toEpochMilliseconds() }
+  }
+
+  suspend fun incrementUserSessionCount() {
+    dataStore.edit { preferences ->
+      val currentSessionCount = preferences[userSessionCountKey] ?: 0
+      preferences[userSessionCountKey] = currentSessionCount + 1
+    }
+  }
+
+  suspend fun updateLastSeenChangelogVersion(versionName: String) {
+    dataStore.edit { preferences -> preferences[lastSeenChangelogVersionKey] = versionName }
+  }
+
+  suspend fun clear() {
+    dataStore.edit { it.clear() }
+  }
+
+  private fun mapToAppThemeMode(pref: String?): AppThemeMode? {
+    if (pref.isNullOrBlank()) return null
+    return AppThemeMode.valueOf(pref)
+  }
+
+  private fun mapToFeedsOrderBy(pref: String?): FeedsOrderBy? {
+    if (pref.isNullOrBlank()) return null
+    return FeedsOrderBy.valueOf(pref)
+  }
+
+  private fun mapToBrowserType(pref: String?): BrowserType? {
+    if (pref.isNullOrBlank()) return null
+    return BrowserType.valueOf(pref)
+  }
+
+  private fun mapToPostsDeletionPeriod(pref: String?): Period? {
+    if (pref.isNullOrBlank()) return null
+    return Period.valueOf(pref)
+  }
+
+  private fun mapToPostsType(pref: String?): PostsType? {
+    if (pref.isNullOrBlank()) return null
+    return PostsType.valueOf(pref)
+  }
+
+  private fun mapToPostsSortOrder(pref: String?): PostsSortOrder? {
+    if (pref.isNullOrBlank()) return null
+    return try {
+      when (pref) {
+        "UploadedLatest" -> PostsSortOrder.AddedLatest
+        "UploadedOldest" -> PostsSortOrder.AddedOldest
+        else -> PostsSortOrder.valueOf(pref)
+      }
+    } catch (e: Exception) {
+      null
+    }
+  }
+
+  private fun mapToMarkAsReadOnType(pref: String?): MarkAsReadOn {
+    if (pref.isNullOrBlank()) return MarkAsReadOn.Open
+    return MarkAsReadOn.valueOf(pref)
+  }
+
+  private fun mapToAudioMarkAsReadThreshold(pref: String?): AudioMarkAsReadThreshold {
+    if (pref.isNullOrBlank()) return AudioMarkAsReadThreshold.Fifty
+    return try {
+      AudioMarkAsReadThreshold.valueOf(pref)
+    } catch (e: Exception) {
+      AudioMarkAsReadThreshold.Fifty
+    }
+  }
+
+  private fun mapToHomeViewMode(pref: String?): HomeViewMode {
+    if (pref.isNullOrBlank()) return HomeViewMode.Default
+    return HomeViewMode.valueOf(pref)
+  }
+
+  private fun mapToReaderFont(pref: String?): ReaderFont {
+    if (pref.isNullOrBlank()) return ReaderFont.Outfit
+    return try {
+      ReaderFont.valueOf(pref)
+    } catch (e: Exception) {
+      ReaderFont.Outfit
+    }
+  }
+
+  private fun mapToThemeVariant(pref: String?): ThemeVariant {
+    val defaultThemeVariant =
+      if (isDynamicThemeSupported) ThemeVariant.Dynamic else ThemeVariant.Forest
+    if (pref.isNullOrBlank()) return defaultThemeVariant
+    val themeVariant =
+      try {
+        ThemeVariant.valueOf(pref)
+      } catch (e: Exception) {
+        defaultThemeVariant
+      }
+    val isDynamicVariant =
+      themeVariant == ThemeVariant.Dynamic || themeVariant == ThemeVariant.SystemDynamic
+    return if (isDynamicVariant && !isDynamicThemeSupported) {
+      ThemeVariant.Forest
+    } else {
+      themeVariant
+    }
+  }
+
+  /**
+   * Rewrites a stored [LegacyAppIcon] to its replacement, returning it so callers can re-apply the
+   * icon. Returns null once the stored value is already current.
+   */
+  suspend fun migrateLegacyAppIcon(): AppIcon? {
+    val stored = dataStore.data.first()[appIconKey]
+    val replacement =
+      runCatching { LegacyAppIcon.valueOf(stored.orEmpty()) }.getOrNull()?.replacement
+    return replacement?.also { updateAppIcon(it) }
+  }
+
+  private fun mapToAppIcon(pref: String?): AppIcon {
+    if (pref.isNullOrBlank()) return AppIcon.Default
+    return runCatching { AppIcon.valueOf(pref) }
+      .recoverCatching { LegacyAppIcon.valueOf(pref).replacement }
+      .getOrDefault(AppIcon.Default)
+  }
+}
+
+enum class AppThemeMode {
+  Auto,
+  Light,
+  Dark,
+}
+
+enum class BrowserType {
+  Default,
+  InApp,
+}
+
+enum class Period {
+  ONE_WEEK,
+  ONE_MONTH,
+  THREE_MONTHS,
+  SIX_MONTHS,
+  ONE_YEAR,
+  NEVER,
+}
+
+enum class MarkAsReadOn {
+  Open,
+  Scroll,
+}
+
+enum class AudioMarkAsReadThreshold(val value: Float) {
+  TwentyFive(0.25f),
+  Fifty(0.50f),
+  SeventyFive(0.75f),
+  Ninety(0.90f),
+  Hundred(1f),
+}
+
+enum class HomeViewMode {
+  Default,
+  Simple,
+  Compact,
+}
+
+enum class ReaderFont(val value: String) {
+  ComicNeue("Comic Neue"),
+  Golos("Golos Text"),
+  RobotoSerif("Roboto Serif"),
+  GoogleSans("Google Sans"),
+  Lora("Lora"),
+  Merriweather("Merriweather"),
+  Outfit("Outfit"),
+}
+
+val ReaderFont.isPremium: Boolean
+  get() =
+    when (this) {
+      ReaderFont.Lora -> true
+      ReaderFont.Merriweather -> true
+      ReaderFont.GoogleSans -> true
+      else -> false
+    }

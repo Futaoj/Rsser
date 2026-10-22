@@ -1,0 +1,408 @@
+/*
+ * Copyright 2026 Sasikanth Miriyampalli
+ *
+ * Licensed under the GPL, Version 3.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.gnu.org/licenses/gpl-3.0.en.html
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+package dev.sasikanth.rss.reader.addfeed.ui
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.FocusRequester.Companion.FocusRequesterFactory.component1
+import androidx.compose.ui.focus.FocusRequester.Companion.FocusRequesterFactory.component2
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import dev.sasikanth.rss.reader.addfeed.AddFeedEffect
+import dev.sasikanth.rss.reader.addfeed.AddFeedErrorType
+import dev.sasikanth.rss.reader.addfeed.AddFeedEvent
+import dev.sasikanth.rss.reader.addfeed.AddFeedState
+import dev.sasikanth.rss.reader.addfeed.AddFeedViewModel
+import dev.sasikanth.rss.reader.addfeed.FeedFetchingState
+import dev.sasikanth.rss.reader.components.Button
+import dev.sasikanth.rss.reader.components.CircularIconButton
+import dev.sasikanth.rss.reader.components.TextField
+import dev.sasikanth.rss.reader.components.TranslucentButton
+import dev.sasikanth.rss.reader.core.model.local.FeedGroup
+import dev.sasikanth.rss.reader.feeds.ui.pinned.PinnedFeedGroupItem
+import dev.sasikanth.rss.reader.resources.icons.ArrowBack
+import dev.sasikanth.rss.reader.resources.icons.Close
+import dev.sasikanth.rss.reader.resources.icons.NewGroup
+import dev.sasikanth.rss.reader.resources.icons.Newsstand
+import dev.sasikanth.rss.reader.resources.icons.TwineIcons
+import dev.sasikanth.rss.reader.ui.AppTheme
+import dev.sasikanth.rss.reader.utils.Constants
+import dev.sasikanth.rss.reader.utils.LocalInAppRating
+import dev.sasikanth.rss.reader.utils.removeLineBreaks
+import org.jetbrains.compose.resources.getString
+import org.jetbrains.compose.resources.stringResource
+import twine.shared.generated.resources.Res
+import twine.shared.generated.resources.addToGroup
+import twine.shared.generated.resources.buttonAddFeed
+import twine.shared.generated.resources.buttonGoBack
+import twine.shared.generated.resources.discoveryTitle
+import twine.shared.generated.resources.errorFeedNotFound
+import twine.shared.generated.resources.errorMalformedXml
+import twine.shared.generated.resources.errorRequestTimeout
+import twine.shared.generated.resources.errorServer
+import twine.shared.generated.resources.errorTooManyRedirects
+import twine.shared.generated.resources.errorUnAuthorized
+import twine.shared.generated.resources.errorUnknown
+import twine.shared.generated.resources.errorUnknownHttpStatus
+import twine.shared.generated.resources.errorUnsupportedFeed
+import twine.shared.generated.resources.feedEntryLinkHint
+import twine.shared.generated.resources.feedEntryTitleHint
+
+@Composable
+fun AddFeedScreen(
+  viewModel: AddFeedViewModel,
+  goBack: () -> Unit,
+  openGroupSelection: (Set<String>) -> Unit,
+  openDiscovery: () -> Unit,
+  modifier: Modifier = Modifier,
+) {
+  val state by viewModel.state.collectAsStateWithLifecycle()
+  val snackbarHostState = remember { SnackbarHostState() }
+  val inAppRating = LocalInAppRating.current
+
+  LaunchedEffect(Unit) {
+    viewModel.effects.collect { effect ->
+      when (effect) {
+        AddFeedEffect.RequestInAppRating -> inAppRating.request()
+      }
+    }
+  }
+
+  LaunchedEffect(state.error, state.goBack) {
+    when {
+      state.goBack -> {
+        goBack()
+        viewModel.dispatch(AddFeedEvent.MarkGoBackAsDone)
+      }
+      state.error != null -> {
+        val errorMessage = errorMessageForErrorType(state.error!!)
+        if (errorMessage != null) {
+          snackbarHostState.showSnackbar(message = errorMessage)
+          viewModel.dispatch(AddFeedEvent.MarkErrorAsShown)
+        }
+      }
+    }
+  }
+
+  AddFeedContent(
+    state = state,
+    dispatch = viewModel::dispatch,
+    goBack = goBack,
+    openGroupSelection = openGroupSelection,
+    openDiscovery = openDiscovery,
+    snackbarHostState = snackbarHostState,
+    modifier = modifier,
+  )
+}
+
+@Composable
+private fun AddFeedContent(
+  state: AddFeedState,
+  dispatch: (AddFeedEvent) -> Unit,
+  goBack: () -> Unit,
+  openGroupSelection: (Set<String>) -> Unit,
+  openDiscovery: () -> Unit,
+  snackbarHostState: SnackbarHostState,
+  modifier: Modifier = Modifier,
+) {
+  val (feedLinkFocus, feedTitleFocus) = remember { FocusRequester.createRefs() }
+  var feedLink by remember { mutableStateOf(TextFieldValue()) }
+  var feedTitle by remember { mutableStateOf(TextFieldValue()) }
+  val maxContentWidth = Constants.MAX_CONTENT_WIDTH
+
+  LaunchedEffect(Unit) { feedLinkFocus.requestFocus() }
+
+  Scaffold(
+    modifier = modifier,
+    topBar = {
+      TopAppBar(
+        title = {},
+        navigationIcon = {
+          CircularIconButton(
+            modifier = Modifier.padding(start = 12.dp),
+            icon = TwineIcons.ArrowBack,
+            label = stringResource(Res.string.buttonGoBack),
+            onClick = { goBack() },
+          )
+        },
+        contentPadding = PaddingValues(end = 12.dp),
+        actions = {
+          TranslucentButton(
+            leadingIcon = TwineIcons.Newsstand,
+            text = stringResource(Res.string.discoveryTitle),
+            onClick = openDiscovery,
+          )
+        },
+        colors =
+          TopAppBarDefaults.topAppBarColors(
+            containerColor = AppTheme.colorScheme.backdrop,
+            navigationIconContentColor = AppTheme.colorScheme.onSurface,
+            titleContentColor = AppTheme.colorScheme.onSurface,
+            actionIconContentColor = AppTheme.colorScheme.onSurface,
+          ),
+      )
+    },
+    snackbarHost = {
+      SnackbarHost(hostState = snackbarHostState) { snackbarData ->
+        Snackbar(
+          modifier = Modifier.padding(12.dp),
+          content = {
+            Text(
+              text = snackbarData.visuals.message,
+              maxLines = 4,
+              overflow = TextOverflow.Ellipsis,
+            )
+          },
+          containerColor = AppTheme.colorScheme.inverseSurface,
+          contentColor = AppTheme.colorScheme.inverseOnSurface,
+        )
+      }
+    },
+    bottomBar = {
+      Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        Button(
+          modifier =
+            Modifier.background(AppTheme.colorScheme.backdrop)
+              .padding(horizontal = 24.dp, vertical = 8.dp)
+              .navigationBarsPadding()
+              .imePadding()
+              .widthIn(max = maxContentWidth)
+              .fillMaxWidth()
+              .requiredHeight(56.dp),
+          colors =
+            ButtonDefaults.buttonColors(
+              containerColor = AppTheme.colorScheme.inverseSurface,
+              contentColor = AppTheme.colorScheme.inverseOnSurface,
+            ),
+          enabled =
+            feedLink.text.isNotBlank() && state.feedFetchingState != FeedFetchingState.Loading,
+          shape = MaterialTheme.shapes.extraLarge,
+          onClick = {
+            dispatch(AddFeedEvent.AddFeedClicked(feedLink = feedLink.text, name = feedTitle.text))
+          },
+        ) {
+          if (state.feedFetchingState == FeedFetchingState.Loading) {
+            CircularProgressIndicator(
+              color = AppTheme.colorScheme.primary,
+              modifier = Modifier.requiredSize(24.dp),
+              strokeWidth = 2.dp,
+            )
+          } else {
+            Text(
+              text = stringResource(Res.string.buttonAddFeed).uppercase(),
+              style = MaterialTheme.typography.labelLarge,
+              fontWeight = FontWeight.Medium,
+            )
+          }
+        }
+      }
+    },
+    content = { paddingValues ->
+      Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+        LazyColumn(
+          modifier =
+            Modifier.widthIn(max = maxContentWidth).fillMaxSize().padding(horizontal = 24.dp),
+          contentPadding = paddingValues,
+          verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+          item { Spacer(Modifier.requiredHeight(16.dp)) }
+
+          item {
+            TextField(
+              modifier =
+                Modifier.fillMaxWidth().focusRequester(feedLinkFocus).focusProperties {
+                  next = feedTitleFocus
+                },
+              value = feedLink,
+              onValueChange = { feedLink = it },
+              hint = stringResource(Res.string.feedEntryLinkHint),
+              keyboardOptions =
+                KeyboardOptions(
+                  autoCorrectEnabled = false,
+                  keyboardType = KeyboardType.Uri,
+                  imeAction = ImeAction.Next,
+                ),
+            )
+          }
+
+          item {
+            TextField(
+              modifier =
+                Modifier.fillMaxWidth().focusRequester(feedTitleFocus).focusProperties {
+                  previous = feedLinkFocus
+                },
+              value = feedTitle,
+              onValueChange = { feedTitle = it.copy(text = it.text.removeLineBreaks()) },
+              hint = stringResource(Res.string.feedEntryTitleHint),
+              keyboardOptions =
+                KeyboardOptions(
+                  autoCorrectEnabled = false,
+                  keyboardType = KeyboardType.Text,
+                  imeAction = ImeAction.Done,
+                ),
+            )
+          }
+
+          item {
+            val selectedGroup = state.selectedFeedGroups.firstOrNull()
+            if (selectedGroup == null) {
+              TranslucentButton(
+                text = stringResource(Res.string.addToGroup),
+                leadingIcon = TwineIcons.NewGroup,
+                onClick = { openGroupSelection(emptySet()) },
+              )
+            } else {
+              GroupItem(
+                group = selectedGroup,
+                onChangeClick = { openGroupSelection(setOf(selectedGroup.id)) },
+                onRemoveClick = { dispatch(AddFeedEvent.OnRemoveGroupClicked(selectedGroup)) },
+              )
+            }
+          }
+        }
+      }
+    },
+    containerColor = AppTheme.colorScheme.backdrop,
+    contentColor = Color.Unspecified,
+    contentWindowInsets = WindowInsets.systemBars,
+  )
+}
+
+@Composable
+private fun GroupItem(group: FeedGroup, onChangeClick: () -> Unit, onRemoveClick: () -> Unit) {
+  Column(
+    modifier =
+      Modifier.clip(MaterialTheme.shapes.small)
+        .clickable { onChangeClick() }
+        .padding(bottom = 4.dp),
+    horizontalAlignment = Alignment.CenterHorizontally,
+  ) {
+    Box {
+      PinnedFeedGroupItem(feedGroup = group, canShowUnreadPostsCount = false)
+
+      Box(
+        modifier =
+          Modifier.align(Alignment.TopEnd)
+            .clip(CircleShape)
+            .requiredSize(24.dp)
+            .background(AppTheme.colorScheme.primary, CircleShape)
+            .border(2.dp, AppTheme.colorScheme.backdrop, CircleShape)
+            .clickable { onRemoveClick() },
+        contentAlignment = Alignment.Center,
+      ) {
+        Icon(
+          modifier = Modifier.requiredSize(12.dp),
+          imageVector = TwineIcons.Close,
+          contentDescription = null,
+          tint = AppTheme.colorScheme.backdrop,
+        )
+      }
+    }
+
+    Text(
+      text = group.name,
+      style = MaterialTheme.typography.labelSmall,
+      color = AppTheme.colorScheme.onSurface,
+      textAlign = TextAlign.Center,
+      overflow = TextOverflow.Ellipsis,
+      maxLines = 1,
+    )
+  }
+}
+
+private suspend fun errorMessageForErrorType(errorType: AddFeedErrorType): String? {
+  return when (errorType) {
+    AddFeedErrorType.UnknownFeedType -> getString(Res.string.errorUnsupportedFeed)
+    AddFeedErrorType.FailedToParseXML -> getString(Res.string.errorMalformedXml)
+    AddFeedErrorType.Timeout -> getString(Res.string.errorRequestTimeout)
+    is AddFeedErrorType.Unknown -> errorType.e.message ?: getString(Res.string.errorUnknown)
+    is AddFeedErrorType.FeedNotFound ->
+      getString(Res.string.errorFeedNotFound, errorType.statusCode.value)
+    is AddFeedErrorType.ServerError -> getString(Res.string.errorServer, errorType.statusCode.value)
+    AddFeedErrorType.TooManyRedirects -> getString(Res.string.errorTooManyRedirects)
+    is AddFeedErrorType.UnAuthorized ->
+      getString(Res.string.errorUnAuthorized, errorType.statusCode.value)
+    is AddFeedErrorType.UnknownHttpStatusError ->
+      getString(Res.string.errorUnknownHttpStatus, errorType.statusCode.value)
+  }
+}
+
+@Preview(locale = "en")
+@Composable
+private fun AddFeedPreview() {
+  AppTheme {
+    AddFeedContent(
+      state = AddFeedState.DEFAULT,
+      dispatch = {},
+      goBack = {},
+      openGroupSelection = {},
+      openDiscovery = {},
+      snackbarHostState = remember { SnackbarHostState() },
+    )
+  }
+}

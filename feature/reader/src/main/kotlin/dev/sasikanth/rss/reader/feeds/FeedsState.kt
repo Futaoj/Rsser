@@ -1,0 +1,72 @@
+/*
+ * Copyright 2026 Sasikanth Miriyampalli
+ *
+ * Licensed under the GPL, Version 3.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.gnu.org/licenses/gpl-3.0.en.html
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+package dev.sasikanth.rss.reader.feeds
+
+import androidx.compose.runtime.Immutable
+import androidx.paging.PagingData
+import dev.sasikanth.rss.reader.core.model.local.Feed
+import dev.sasikanth.rss.reader.core.model.local.Source
+import dev.sasikanth.rss.reader.data.repository.FeedsOrderBy
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
+
+@Immutable
+data class FeedsState(
+  val pinnedSources: ImmutableList<Source>,
+  val sources: Flow<PagingData<SourceListItem>>,
+  val feedsSearchResults: Flow<PagingData<Feed>>,
+  val activeSource: Source?,
+  val canShowUnreadPostsCount: Boolean,
+  val feedsSortOrder: FeedsOrderBy,
+  val isPinnedSectionExpanded: Boolean,
+  val selectedSources: Set<Source>,
+  val numberOfFeeds: Int,
+  val numberOfFeedGroups: Int,
+  val sourceToDelete: Source? = null,
+  val sourceToAddToGroup: Source? = null,
+  val showDeleteConfirmation: Boolean,
+  val openAddFeedScreen: Boolean,
+  val openGroupSelection: Set<String>? = null,
+) {
+
+  val isInMultiSelectMode: Boolean
+    get() = selectedSources.isNotEmpty()
+
+  companion object {
+
+    val DEFAULT =
+      FeedsState(
+        feedsSearchResults = emptyFlow(),
+        pinnedSources = persistentListOf(),
+        sources = emptyFlow(),
+        activeSource = null,
+        canShowUnreadPostsCount = false,
+        feedsSortOrder = FeedsOrderBy.Latest,
+        isPinnedSectionExpanded = false,
+        selectedSources = emptySet(),
+        numberOfFeeds = 0,
+        numberOfFeedGroups = 0,
+        sourceToDelete = null,
+        sourceToAddToGroup = null,
+        showDeleteConfirmation = false,
+        openAddFeedScreen = false,
+        openGroupSelection = null,
+      )
+  }
+}

@@ -1,0 +1,171 @@
+[versions]
+kotlin = "2.4.10"
+android_gradle_plugin = "9.3.2"
+compose = "1.12.0"
+compose-material3 = "1.12.0-alpha03"
+compose_material3_adaptive = "1.3.0-beta02"
+
+android_sdk_compile = "37"
+android_sdk_target = "37"
+android_sdk_min = "26"
+
+sqldelight = "2.3.2"
+ktor = "3.5.2"
+kotlinx_coroutines = "1.11.0"
+kotlinx_date_time = "0.8.0"
+kotlinx_immutable_collections = "0.5.1"
+kotlinx_serialization_json = "1.11.0"
+kotlinx_io = "0.9.1"
+androidx_activity = "1.13.0"
+androidx_appcompat = "1.8.0"
+androidx_core = "1.19.0"
+androidx_collection = "1.6.0"
+androidx_test_runner = "1.7.0"
+androidx_test_rules = "1.7.0"
+androidx_work = "2.11.2"
+androidx_datastore = "1.2.1"
+androidx_browser = "1.10.0"
+androidx_annotation = "1.10.0"
+androidx_graphics_shapes = "1.1.0"
+coil = "3.6.0"
+kotlininject = "0.9.0"
+ksp = "2.3.10"
+ksoup = "0.2.6"
+sqliteAndroid = "3.49.0"
+desugarJdk = "2.1.5"
+atomicfu = "0.33.0"
+paging = "3.5.1"
+stately = "2.1.0"
+xmlutil = "1.0.2"
+ktxml = "1.0.0"
+uuid = "0.8.4"
+bugsnag = "6.27.0"
+google-play-review = "2.0.2"
+crashkios-bugsnag = "0.9.0"
+kermit = "2.1.0"
+reorderable = "3.1.0"
+korlibs = "6.0.0"
+filekit = "0.15.0"
+leakcanary = "2.14"
+markdown = "0.44.0"
+revenuecat = "3.5.1"
+landscapist = "2.11.0"
+viewmodel = "2.11.0"
+multiplatform-nav3-ui = "1.1.1"
+navigationevent-compose = "1.1.2"
+glance = "1.2.0-rc01"
+material-kolor = "5.0.1"
+androidx_media3 = "1.11.0"
+
+[libraries]
+compose_runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "compose" }
+compose_foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "compose" }
+compose_ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "compose" }
+compose_ui_tooling = { module = "org.jetbrains.compose.ui:ui-tooling", version.ref = "compose" }
+compose_ui_util = { module = "org.jetbrains.compose.ui:ui-util", version.ref = "compose" }
+compose_material = { module = "org.jetbrains.compose.material:material", version.ref = "compose" }
+compose_material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "compose-material3" }
+compose_material3_adaptive = { module = "org.jetbrains.compose.material3.adaptive:adaptive", version.ref = "compose_material3_adaptive" }
+compose_material3_adaptive_navigation3 = { module = "org.jetbrains.compose.material3.adaptive:adaptive-navigation3", version.ref = "compose_material3_adaptive" }
+compose_resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "compose" }
+compose_material3_windowsizeclass = { module = "org.jetbrains.compose.material3:material3-window-size-class", version.ref = "compose-material3" }
+compose_ui_tooling_preview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "compose" }
+compose_backhandler = { module = "org.jetbrains.compose.ui:ui-backhandler", version.ref = "compose" }
+ktor_core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor_client_okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
+ktor_client_logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
+ktor_client_mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
+ktor_content_negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+ktor_json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+ktor_resources = { module = "io.ktor:ktor-client-resources", version.ref = "ktor" }
+kotlin_test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+kotlinx_coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx_coroutines" }
+kotlinx_coroutines_test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx_coroutines" }
+kotlinx_coroutines_guava = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-guava", version.ref = "kotlinx_coroutines" }
+kotlinx_datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx_date_time" }
+kotlinx_immutable_collections = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinx_immutable_collections" }
+kotlinx_atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "atomicfu" }
+kotlinx_serialization_json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx_serialization_json" }
+kotlinx_io = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version.ref = "kotlinx_io" }
+kotlinx_io_okio = { module = "org.jetbrains.kotlinx:kotlinx-io-okio", version.ref = "kotlinx_io" }
+sqldelight_driver_android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
+sqldelight_extensions_coroutines = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "sqldelight" }
+sqldelight_extensions_paging = { module = "app.cash.sqldelight:androidx-paging3-extensions", version.ref = "sqldelight" }
+sqldelight_sqlite_dialect = { module = "app.cash.sqldelight:sqlite-3-35-dialect", version.ref = "sqldelight" }
+androidx_activity_compose = { module = "androidx.activity:activity-compose", version.ref = "androidx_activity" }
+androidx_graphics_shapes = { module = "androidx.graphics:graphics-shapes", version.ref = "androidx_graphics_shapes" }
+androidx_appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx_appcompat" }
+androidx_core = { module = "androidx.core:core-ktx", version.ref = "androidx_core" }
+androidx_collection = { module = "androidx.collection:collection", version.ref = "androidx_collection" }
+androidx_test_runner = { module = "androidx.test:runner", version.ref = "androidx_test_runner" }
+androidx_test_rules = { module = "androidx.test:rules", version.ref = "androidx_test_rules" }
+androidx_work = { module = "androidx.work:work-runtime-ktx", version.ref = "androidx_work" }
+androidx_datastore_okio = { module = "androidx.datastore:datastore-core-okio", version.ref = "androidx_datastore" }
+androidx_datastore_preferences = { module = "androidx.datastore:datastore-preferences-core", version.ref = "androidx_datastore" }
+androidx_browser = { module = "androidx.browser:browser", version.ref = "androidx_browser" }
+androidx_annotation= { module = "androidx.annotation:annotation", version.ref = "androidx_annotation" }
+landscapist-coil3 = { module = "com.github.skydoves:landscapist-coil3", version.ref = "landscapist" }
+landscapist-image = { module = "com.github.skydoves:landscapist-image", version.ref = "landscapist" }
+landscapist-zoomable = { module = "com.github.skydoves:landscapist-zoomable", version.ref = "landscapist" }
+coil_compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
+coil_network = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coil" }
+coil_svg = { module = "io.coil-kt.coil3:coil-svg", version.ref = "coil" }
+kotlininject-compiler = { module = 'me.tatarka.inject:kotlin-inject-compiler-ksp', version.ref = 'kotlininject' }
+kotlininject-runtime = { module = 'me.tatarka.inject:kotlin-inject-runtime', version.ref = 'kotlininject' }
+ksoup = { module = "com.fleeksoft.ksoup:ksoup", version.ref = "ksoup" }
+ksoup-kotlinx-io = { module = "com.fleeksoft.ksoup:ksoup-kotlinx", version.ref = "ksoup" }
+sqliteAndroid = { module = "com.github.requery:sqlite-android", version.ref = "sqliteAndroid" }
+desugarJdk = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugarJdk" }
+paging-common = { module = "androidx.paging:paging-common", version.ref = "paging" }
+paging-compose = { module = "androidx.paging:paging-compose", version.ref = "paging" }
+stately-isolate = { module = "co.touchlab:stately-isolate", version.ref = "stately" }
+stately-iso-collections = { module = "co.touchlab:stately-iso-collections", version.ref = "stately" }
+xmlutil-core = { module = "io.github.pdvrieze.xmlutil:core", version.ref = "xmlutil" }
+xmlutil-serialization = { module = "io.github.pdvrieze.xmlutil:serialization", version.ref = "xmlutil" }
+ktxml = { module = "org.kobjects.ktxml:core", version.ref = "ktxml" }
+uuid = { module = "com.benasher44:uuid", version.ref = "uuid" }
+googlePlayReview = { module = "com.google.android.play:review", version.ref = "google-play-review" }
+bugsnag = { module = "com.bugsnag:bugsnag-android", version.ref = "bugsnag" }
+crashkios-bugsnag = { module = "co.touchlab.crashkios:bugsnag", version.ref = "crashkios-bugsnag" }
+kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
+kermit-bugsnag = { module = "co.touchlab:kermit-bugsnag", version.ref = "kermit" }
+reorderable = { module = "sh.calvin.reorderable:reorderable", version.ref = "reorderable"  }
+korlibs-string = { module = "com.soywiz:korlibs-string", version.ref = "korlibs" }
+filekit-core = { module = "io.github.vinceglb:filekit-core", version.ref = "filekit" }
+filekit-dialogs = { module = "io.github.vinceglb:filekit-dialogs", version.ref = "filekit" }
+leakcanary = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanary" }
+markdown-renderer = { module = "com.mikepenz:multiplatform-markdown-renderer", version.ref = "markdown"  }
+markdown-material3 = { module = "com.mikepenz:multiplatform-markdown-renderer-m3", version.ref = "markdown"  }
+markdown-coil = { module = "com.mikepenz:multiplatform-markdown-renderer-coil3", version.ref = "markdown" }
+markdown-code = { module = "com.mikepenz:multiplatform-markdown-renderer-code", version.ref = "markdown" }
+purchases-core = { module = "com.revenuecat.purchases:purchases-kmp-core", version.ref = "revenuecat" }
+purchases-ui = { module = "com.revenuecat.purchases:purchases-kmp-ui", version.ref = "revenuecat" }
+viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "viewmodel" }
+lifecycle-runtime-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "viewmodel" }
+jetbrains-navigation3-ui = { module = "org.jetbrains.androidx.navigation3:navigation3-ui", version.ref = "multiplatform-nav3-ui" }
+androidx-navigationevent-compose = { module = "androidx.navigationevent:navigationevent-compose", version.ref = "navigationevent-compose" }
+jetbrains-lifecycle-viewmodelNavigation3 = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "viewmodel" }
+glance = { module = "androidx.glance:glance-appwidget", version.ref = "glance" }
+glance-material3 = { module = "androidx.glance:glance-material3", version.ref = "glance" }
+material-kolor = { module = "com.materialkolor:material-kolor", version.ref = "material-kolor" }
+androidx_media3_exoplayer = { module = "androidx.media3:media3-exoplayer", version.ref = "androidx_media3" }
+androidx_media3_session = { module = "androidx.media3:media3-session", version.ref = "androidx_media3" }
+androidx_media3_ui = { module = "androidx.media3:media3-ui", version.ref = "androidx_media3" }
+
+[plugins]
+android_application = { id = "com.android.application", version.ref = "android_gradle_plugin" }
+android_library = { id = "com.android.library", version.ref = "android_gradle_plugin" }
+android_kmp_library = { id = "com.android.kotlin.multiplatform.library", version.ref = "android_gradle_plugin" }
+kotlin_multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlin_parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
+kotlin_compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlin_serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+compose = { id = "org.jetbrains.compose", version.ref = "compose" }
+sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
+ksp = { id = 'com.google.devtools.ksp', version.ref = 'ksp' }
+
+[bundles]
+compose = [ "compose_runtime", "compose_foundation", "compose_material", "compose_material3", "compose_material3_adaptive", "compose_material3_windowsizeclass", "compose_resources", "compose_ui_tooling_preview", "compose_ui", "compose_ui_util", "compose_backhandler" ]
+kotlinx = [ "kotlinx_coroutines", "kotlinx_datetime", "kotlinx_immutable_collections", "kotlinx_serialization_json", "kotlinx_io", "kotlinx_io_okio" ]
+androidx_test = [ "androidx_test_runner", "androidx_test_rules" ]
+xmlutil = [ "xmlutil-core", "xmlutil-serialization" ]

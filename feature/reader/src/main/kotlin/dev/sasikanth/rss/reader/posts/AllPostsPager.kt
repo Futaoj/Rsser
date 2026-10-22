@@ -1,0 +1,268 @@
+/*
+ * Copyright 2026 Sasikanth Miriyampalli
+ *
+ * Licensed under the GPL, Version 3.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.gnu.org/licenses/gpl-3.0.en.html
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+package dev.sasikanth.rss.reader.posts
+
+import androidx.compose.ui.graphics.toArgb
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import dev.sasikanth.rss.reader.core.model.local.FeaturedPostItem
+import dev.sasikanth.rss.reader.core.model.local.Feed
+import dev.sasikanth.rss.reader.core.model.local.FeedGroup
+import dev.sasikanth.rss.reader.core.model.local.PostsSortOrder
+import dev.sasikanth.rss.reader.core.model.local.PostsType
+import dev.sasikanth.rss.reader.core.model.local.ResolvedPost
+import dev.sasikanth.rss.reader.core.model.local.Source
+import dev.sasikanth.rss.reader.core.model.local.UnreadSinceLastSync
+import dev.sasikanth.rss.reader.data.refreshpolicy.RefreshPolicy
+import dev.sasikanth.rss.reader.data.repository.ObservableActiveSource
+import dev.sasikanth.rss.reader.data.repository.RssRepository
+import dev.sasikanth.rss.reader.data.repository.SettingsRepository
+import dev.sasikanth.rss.reader.data.sync.SyncCoordinator
+import dev.sasikanth.rss.reader.data.sync.SyncState
+import dev.sasikanth.rss.reader.data.utils.PostsFilterUtils
+import dev.sasikanth.rss.reader.di.scopes.AppScope
+import dev.sasikanth.rss.reader.ui.SeedColorExtractor
+import dev.sasikanth.rss.reader.util.DispatchersProvider
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Instant
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
+import me.tatarka.inject.annotations.Inject
+
+@Inject
+@AppScope
+class AllPostsPager(
+  observableActiveSource: ObservableActiveSource,
+  settingsRepository: SettingsRepository,
+  private val refreshPolicy: RefreshPolicy,
+  private val rssRepository: RssRepository,
+  private val syncCoordinator: SyncCoordinator,
+  private val seedColorExtractor: SeedColorExtractor,
+  private val dispatchersProvider: DispatchersProvider,
+) {
+  private val coroutineScope = CoroutineScope(SupervisorJob() + dispatchersProvider.default)
+
+  private data class PostsParameters(
+    val activeSourceIds: List<String>,
+    val postsAfter: Instant,
+    val featuredPostsAfter: Instant,
+    val postsUpperBound: Instant,
+    val unreadOnly: Boolean?,
+    val postsSortOrder: PostsSortOrder,
+  )
+
+  private val baseParameters =
+    combine(
+        observableActiveSource.activeSource,
+        settingsRepository.postsType,
+        settingsRepository.postsSortOrder,
+        refreshPolicy.lastRefreshedAtFlow,
+      ) { activeSource, postsType, postsSortOrder, dateTime ->
+        computeParameters(activeSource, postsType, postsSortOrder, dateTime)
+      }
+      .distinctUntilChanged()
+
+  fun allPostsPagingData(
+    sessionPostIds: () -> List<String> = { emptyList() }
+  ): Flow<PagingData<ResolvedPost>> =
+    baseParameters.flatMapLatest { params ->
+      Pager(config = PagingConfig(pageSize = 20, enablePlaceholders = true, jumpThreshold = 60)) {
+          rssRepository.allPosts(
+            activeSourceIds = params.activeSourceIds,
+            postsSortOrder = params.postsSortOrder,
+            unreadOnly = params.unreadOnly,
+            after = params.postsAfter,
+            postsUpperBound = params.postsUpperBound,
+            sessionPostIds = sessionPostIds(),
+          )
+        }
+        .flow
+    }
+
+  fun nonFeaturedPostsPagingData(
+    sessionPostIds: () -> List<String> = { emptyList() }
+  ): Flow<PagingData<ResolvedPost>> =
+    baseParameters.flatMapLatest { params ->
+      Pager(config = PagingConfig(pageSize = 20, enablePlaceholders = true, jumpThreshold = 60)) {
+          rssRepository.nonFeaturedPosts(
+            activeSourceIds = params.activeSourceIds,
+            postsSortOrder = params.postsSortOrder,
+            unreadOnly = params.unreadOnly,
+            after = params.postsAfter,
+            featuredPostsAfter = params.featuredPostsAfter,
+            postsUpperBound = params.postsUpperBound,
+            sessionPostIds = sessionPostIds(),
+          )
+        }
+        .flow
+    }
+
+  fun featuredPosts(
+    sessionPostIds: Flow<List<String>> = flowOf(emptyList())
+  ): Flow<ImmutableList<FeaturedPostItem>> =
+    combine(baseParameters, sessionPostIds, ::Pair).flatMapLatest { (params, sessionPostIds) ->
+      rssRepository
+        .featuredPosts(
+          activeSourceIds = params.activeSourceIds,
+          postsSortOrder = params.postsSortOrder,
+          unreadOnly = params.unreadOnly,
+          after = params.postsAfter,
+          featuredPostsAfter = params.featuredPostsAfter,
+          postsUpperBound = params.postsUpperBound,
+          sessionPostIds = sessionPostIds,
+        )
+        .onEach { posts ->
+          val postsNeedingSeedColor =
+            posts.filter { it.seedColor == null && !it.imageUrl.isNullOrBlank() }
+          if (postsNeedingSeedColor.isEmpty()) return@onEach
+
+          coroutineScope.launch(dispatchersProvider.io) {
+            val seedColorUpdates =
+              postsNeedingSeedColor
+                .map { post ->
+                  async {
+                    val seedColor = seedColorExtractor.calculateSeedColor(post.imageUrl)
+                    if (seedColor != null) {
+                      post.id to seedColor.toArgb()
+                    } else {
+                      null
+                    }
+                  }
+                }
+                .awaitAll()
+                .filterNotNull()
+                .toMap()
+
+            if (seedColorUpdates.isNotEmpty()) {
+              rssRepository.updateSeedColors(seedColorUpdates)
+            }
+          }
+        }
+        .map { featuredPosts ->
+          featuredPosts
+            .map { post -> FeaturedPostItem(resolvedPost = post, seedColor = post.seedColor) }
+            .toImmutableList()
+        }
+    }
+
+  private val _hasUnreadPosts = MutableStateFlow(false)
+  val hasUnreadPosts: StateFlow<Boolean> = _hasUnreadPosts.asStateFlow()
+
+  private val _unreadSinceLastSync = MutableStateFlow<UnreadSinceLastSync?>(null)
+  val unreadSinceLastSync: StateFlow<UnreadSinceLastSync?> = _unreadSinceLastSync.asStateFlow()
+
+  init {
+    observeHasUnreadPosts()
+    observeHasNewerArticles()
+  }
+
+  private fun observeHasNewerArticles() {
+    baseParameters
+      .flatMapLatest { params ->
+        rssRepository
+          .unreadSinceLastSync(
+            sources = params.activeSourceIds,
+            postsAfter = params.postsAfter,
+            postsUpperBound = params.postsUpperBound,
+          )
+          .map { it to params }
+      }
+      .combine(syncCoordinator.syncState) { (unreadSinceLastSync, params), syncState ->
+        Triple(unreadSinceLastSync, params, syncState)
+      }
+      .onEach { (unreadSinceLastSync, params, _) ->
+        if (unreadSinceLastSync.hasNewArticles) {
+          val currentPostsCount =
+            rssRepository.allPostsCount(
+              activeSourceIds = params.activeSourceIds,
+              unreadOnly = params.unreadOnly,
+              after = params.postsAfter,
+              postsUpperBound = params.postsUpperBound,
+            )
+
+          if (currentPostsCount == 0L || currentPostsCount == null) {
+            refreshPolicy.updateLastRefreshedAt()
+          }
+        }
+      }
+      .filter { (_, _, syncState) -> syncState !is SyncState.InProgress }
+      .map { (unreadSinceLastSync, _, _) -> unreadSinceLastSync }
+      .distinctUntilChanged()
+      .onEach { _unreadSinceLastSync.value = it }
+      .launchIn(coroutineScope)
+  }
+
+  private fun observeHasUnreadPosts() {
+    baseParameters
+      .flatMapLatest { params ->
+        rssRepository.hasUnreadPostsInSource(
+          activeSourceIds = params.activeSourceIds,
+          postsAfter = params.postsAfter,
+        )
+      }
+      .onEach { _hasUnreadPosts.value = it }
+      .launchIn(coroutineScope)
+  }
+
+  private fun computeParameters(
+    activeSource: Source?,
+    postsType: PostsType,
+    postsSortOrder: PostsSortOrder,
+    dateTime: LocalDateTime,
+  ): PostsParameters {
+    val postsAfter = PostsFilterUtils.postsThresholdTime(postsType, dateTime)
+    val featuredPostsAfter = dateTime.toInstant(TimeZone.currentSystemDefault()).minus(24.hours)
+
+    return PostsParameters(
+      activeSourceIds = activeSourceIds(activeSource),
+      postsAfter = postsAfter,
+      featuredPostsAfter = featuredPostsAfter,
+      postsUpperBound = dateTime.toInstant(TimeZone.currentSystemDefault()),
+      unreadOnly = PostsFilterUtils.shouldGetUnreadPostsOnly(postsType),
+      postsSortOrder = postsSortOrder,
+    )
+  }
+
+  private fun activeSourceIds(activeSource: Source?) =
+    when (activeSource) {
+      is Feed -> listOf(activeSource.id)
+      is FeedGroup -> activeSource.feedIds
+      else -> emptyList()
+    }
+}

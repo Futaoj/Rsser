@@ -1,0 +1,50 @@
+/*
+ * Copyright 2026 Sasikanth Miriyampalli
+ *
+ * Licensed under the GPL, Version 3.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.gnu.org/licenses/gpl-3.0.en.html
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+package dev.sasikanth.rss.reader.utils
+
+import androidx.compose.runtime.staticCompositionLocalOf
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Instant
+
+interface InAppRating {
+  suspend fun request()
+
+  fun canShowReviewPrompt(
+    currentTime: Instant,
+    installDate: Instant,
+    lastPromptDate: Instant,
+    sessionCount: Int,
+  ): Boolean {
+    val daysSinceInstall = currentTime - installDate
+    val daysSinceLastPrompt = currentTime - lastPromptDate
+
+    if (daysSinceInstall < 48.hours) return false
+
+    if (daysSinceLastPrompt < 48.hours) return false
+
+    if (sessionCount < 5) return false
+
+    return true
+  }
+}
+
+val LocalInAppRating = staticCompositionLocalOf<InAppRating> { NoopInAppRating }
+
+private object NoopInAppRating : InAppRating {
+  override suspend fun request() {}
+}

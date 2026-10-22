@@ -1,0 +1,67 @@
+/*
+ * Copyright 2026 Sasikanth Miriyampalli
+ *
+ * Licensed under the GPL, Version 3.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.gnu.org/licenses/gpl-3.0.en.html
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+package dev.sasikanth.rss.reader.reader
+
+import androidx.compose.runtime.Immutable
+import androidx.paging.PagingData
+import dev.sasikanth.rss.reader.core.model.local.ResolvedPost
+import dev.sasikanth.rss.reader.core.model.local.ThemeVariant
+import dev.sasikanth.rss.reader.data.repository.ReaderFont
+import dev.sasikanth.rss.reader.reader.ReaderScreenArgs.FromScreen
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
+
+@Immutable
+data class ReaderState(
+  val activePostIndex: Int,
+  val activePostId: String,
+  val posts: Flow<PagingData<ResolvedPost>>,
+  val panelContent: ReaderPanelContent,
+  val selectedReaderFont: ReaderFont,
+  val selectedThemeVariant: ThemeVariant,
+  val readerFontScaleFactor: Float,
+  val readerLineHeightScaleFactor: Float,
+  val fromScreen: FromScreen,
+) {
+
+  val isPanelExpanded: Boolean
+    get() = panelContent != ReaderPanelContent.Actions
+
+  companion object {
+
+    fun default(initialPostIndex: Int, initialPostId: String, fromScreen: FromScreen): ReaderState {
+      return ReaderState(
+        activePostIndex = initialPostIndex,
+        activePostId = initialPostId,
+        posts = emptyFlow(),
+        panelContent = ReaderPanelContent.Actions,
+        selectedReaderFont = ReaderFont.Golos,
+        selectedThemeVariant = ThemeVariant.Dynamic,
+        readerFontScaleFactor = 1f,
+        readerLineHeightScaleFactor = 1f,
+        fromScreen = fromScreen,
+      )
+    }
+  }
+}
+
+enum class ReaderPanelContent {
+  Actions,
+  Customizations,
+  Player,
+}

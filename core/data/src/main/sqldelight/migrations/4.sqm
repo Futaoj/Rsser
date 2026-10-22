@@ -1,0 +1,25 @@
+-- Post table
+ALTER TABLE post ADD COLUMN commentsLink TEXT DEFAULT NULL;
+-- Post table
+
+-- Bookmark table
+ALTER TABLE bookmark ADD COLUMN commentsLink TEXT DEFAULT NULL;
+
+DROP TRIGGER IF EXISTS post_bookmarked;
+DROP TRIGGER IF EXISTS post_content_update;
+
+CREATE TRIGGER IF NOT EXISTS
+post_bookmarked
+AFTER UPDATE OF bookmarked ON post WHEN new.bookmarked == 1
+BEGIN
+  INSERT OR REPLACE INTO bookmark(title, description, imageUrl, date, link, bookmarked, commentsLink, feedName, feedIcon, feedLink)
+  SELECT new.title, new.description, new.imageUrl, new.date, new.link, new.bookmarked, new.commentsLink, feed.name, feed.icon, feed.link
+  FROM feed WHERE link == new.feedLink;
+END;
+
+CREATE TRIGGER IF NOT EXISTS
+post_content_update
+AFTER UPDATE OF title, description, imageUrl, date ON post WHEN new.bookmarked == 1
+BEGIN UPDATE OR IGNORE bookmark SET title = new.title, description = new.description, imageUrl = new.imageUrl, date = new.date, commentsLink = new.commentsLink WHERE link = new.link;
+END;
+-- Bookmark table

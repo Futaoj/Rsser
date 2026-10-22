@@ -1,0 +1,525 @@
+/*
+ * Copyright 2026 Sasikanth Miriyampalli
+ *
+ * Licensed under the GPL, Version 3.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.gnu.org/licenses/gpl-3.0.en.html
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+package dev.sasikanth.rss.reader.discovery.ui
+
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.requiredWidth
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import dev.sasikanth.rss.reader.components.Button
+import dev.sasikanth.rss.reader.components.CircularIconButton
+import dev.sasikanth.rss.reader.components.IconButton
+import dev.sasikanth.rss.reader.components.ModalSheet
+import dev.sasikanth.rss.reader.components.SimpleTopAppBar
+import dev.sasikanth.rss.reader.components.TextField
+import dev.sasikanth.rss.reader.components.image.FeedIcon
+import dev.sasikanth.rss.reader.core.model.DiscoveryFeed
+import dev.sasikanth.rss.reader.discovery.DiscoveryEvent
+import dev.sasikanth.rss.reader.discovery.DiscoveryState
+import dev.sasikanth.rss.reader.discovery.DiscoveryViewModel
+import dev.sasikanth.rss.reader.resources.icons.ArrowDown
+import dev.sasikanth.rss.reader.resources.icons.ArrowUp
+import dev.sasikanth.rss.reader.resources.icons.Check
+import dev.sasikanth.rss.reader.resources.icons.Close
+import dev.sasikanth.rss.reader.resources.icons.Refresh
+import dev.sasikanth.rss.reader.resources.icons.TwineIcons
+import dev.sasikanth.rss.reader.ui.AppTheme
+import dev.sasikanth.rss.reader.utils.Constants
+import dev.sasikanth.rss.reader.utils.restrictContentWidth
+import org.jetbrains.compose.resources.stringResource
+import twine.shared.generated.resources.Res
+import twine.shared.generated.resources.buttonChange
+import twine.shared.generated.resources.discoveryAddFeed
+import twine.shared.generated.resources.discoveryAdded
+import twine.shared.generated.resources.discoveryOnboardingHint
+import twine.shared.generated.resources.discoveryRefresh
+import twine.shared.generated.resources.discoverySearchHint
+import twine.shared.generated.resources.discoveryTitle
+
+@Composable
+fun DiscoveryScreen(
+  viewModel: DiscoveryViewModel,
+  goBack: () -> Unit,
+  showDoneButton: Boolean = false,
+  onDone: () -> Unit = goBack,
+  modifier: Modifier = Modifier,
+) {
+  val state by viewModel.state.collectAsState()
+
+  DiscoveryContent(
+    state = state,
+    dispatch = viewModel::dispatch,
+    goBack = goBack,
+    showDoneButton = showDoneButton,
+    onDone = onDone,
+    modifier = modifier,
+  )
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun DiscoveryContent(
+  state: DiscoveryState,
+  dispatch: (DiscoveryEvent) -> Unit,
+  goBack: () -> Unit,
+  showDoneButton: Boolean,
+  onDone: () -> Unit,
+  modifier: Modifier = Modifier,
+) {
+  val focusRequester = remember { FocusRequester() }
+  var collapsedGroups by
+    rememberSaveable(
+      stateSaver =
+        Saver<Set<String>, List<String>>(save = { it.toList() }, restore = { it.toSet() })
+    ) {
+      mutableStateOf(emptySet<String>())
+    }
+
+  Scaffold(
+    modifier = modifier,
+    topBar = {
+      Column {
+        SimpleTopAppBar(
+          title = stringResource(Res.string.discoveryTitle),
+          onBackClick = goBack,
+          showDivider = false,
+          actions = {
+            val refreshButtonPaddingEnd = if (showDoneButton) 0.dp else 12.dp
+            CircularIconButton(
+              modifier = Modifier.padding(end = refreshButtonPaddingEnd),
+              icon = TwineIcons.Refresh,
+              label = stringResource(Res.string.discoveryRefresh),
+              onClick = { dispatch(DiscoveryEvent.Refresh) },
+            )
+
+            if (showDoneButton) {
+              Spacer(Modifier.width(8.dp))
+
+              CircularIconButton(
+                modifier = Modifier.padding(end = 12.dp),
+                icon = TwineIcons.Check,
+                label = stringResource(Res.string.buttonChange),
+                enabled = state.addedFeedLinks.size >= 3,
+                onClick = onDone,
+              )
+            }
+          },
+        )
+
+        Column(
+          modifier = Modifier.fillMaxWidth().background(AppTheme.colorScheme.backdrop),
+          horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+          TextField(
+            modifier =
+              Modifier.widthIn(max = Constants.MAX_CONTENT_WIDTH)
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .focusRequester(focusRequester),
+            value = state.searchQuery,
+            onValueChange = { dispatch(DiscoveryEvent.SearchQueryChanged(it)) },
+            hint = stringResource(Res.string.discoverySearchHint),
+            trailingIcon = {
+              if (state.searchQuery.text.isNotBlank()) {
+                IconButton(icon = TwineIcons.Close, contentDescription = null) {
+                  dispatch(DiscoveryEvent.SearchQueryChanged(TextFieldValue()))
+                }
+              }
+            },
+          )
+
+          if (showDoneButton) {
+            Text(
+              text = stringResource(Res.string.discoveryOnboardingHint),
+              style = MaterialTheme.typography.bodyMedium,
+              color = AppTheme.colorScheme.onSurfaceVariant,
+              modifier =
+                Modifier.widthIn(max = Constants.MAX_CONTENT_WIDTH)
+                  .fillMaxWidth()
+                  .padding(horizontal = 24.dp)
+                  .padding(bottom = 16.dp),
+              textAlign = TextAlign.Center,
+            )
+          }
+        }
+      }
+    },
+    content = { paddingValues ->
+      if (state.isLoading) {
+        Box(
+          modifier = Modifier.fillMaxSize().padding(paddingValues),
+          contentAlignment = Alignment.Center,
+        ) {
+          CircularProgressIndicator(color = AppTheme.colorScheme.primary)
+        }
+      } else {
+        LazyColumn(
+          modifier =
+            Modifier.restrictContentWidth()
+              .padding(top = paddingValues.calculateTopPadding())
+              ,
+          contentPadding = PaddingValues(bottom = paddingValues.calculateBottomPadding() + 80.dp),
+        ) {
+          state.filteredGroups.forEach { group ->
+            val isCollapsed = collapsedGroups.contains(group.name)
+
+            stickyHeader(key = group.name) {
+              DiscoveryGroupHeader(
+                name = group.name,
+                count = group.feeds.size,
+                isCollapsed = isCollapsed,
+                onClick = {
+                  collapsedGroups =
+                    if (isCollapsed) {
+                      collapsedGroups - group.name
+                    } else {
+                      collapsedGroups + group.name
+                    }
+                },
+                modifier = Modifier.fillMaxWidth().background(AppTheme.colorScheme.backdrop),
+              )
+            }
+
+            if (!isCollapsed) {
+              itemsIndexed(items = group.feeds, key = { _, feed -> feed.link }) { index, feed ->
+                DiscoveryFeedItem(
+                  feed = feed,
+                  isAdded =
+                    state.addedFeedLinks.contains(feed.link) ||
+                      state.addedFeedLinks.contains(feed.link.removeSuffix("/")),
+                  isLoading = state.inProgressFeedLinks.contains(feed.link),
+                  onAddFeed = { dispatch(DiscoveryEvent.AddFeedClicked(feed)) },
+                  onFeedClick = { dispatch(DiscoveryEvent.ShowFeedInfo(feed)) },
+                )
+
+                if (index < group.feeds.size - 1) {
+                  HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 24.dp),
+                    color = AppTheme.colorScheme.outlineVariant,
+                  )
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    containerColor = AppTheme.colorScheme.backdrop,
+  )
+
+  if (state.selectedFeed != null) {
+    val selectedFeed = state.selectedFeed
+    DiscoveryFeedInfoBottomSheet(
+      feed = selectedFeed,
+      isAdded =
+        state.addedFeedLinks.contains(selectedFeed.link) ||
+          state.addedFeedLinks.contains(selectedFeed.link.removeSuffix("/")),
+      isLoading = state.inProgressFeedLinks.contains(selectedFeed.link),
+      onAddFeed = { dispatch(DiscoveryEvent.AddFeedClicked(selectedFeed)) },
+      dismiss = { dispatch(DiscoveryEvent.HideFeedInfo) },
+    )
+  }
+}
+
+@Composable
+private fun DiscoveryGroupHeader(
+  name: String,
+  count: Int,
+  isCollapsed: Boolean,
+  onClick: () -> Unit,
+  modifier: Modifier = Modifier,
+) {
+  Row(
+    modifier = modifier.clickable { onClick() }.padding(horizontal = 24.dp, vertical = 16.dp),
+    horizontalArrangement = Arrangement.spacedBy(8.dp),
+    verticalAlignment = Alignment.CenterVertically,
+  ) {
+    Text(
+      text = name,
+      style = MaterialTheme.typography.titleMedium,
+      color = AppTheme.colorScheme.onSurface,
+    )
+
+    Text(
+      text = count.toString(),
+      style = MaterialTheme.typography.titleMedium,
+      color = AppTheme.colorScheme.primary,
+    )
+
+    Spacer(Modifier.weight(1f))
+
+    Icon(
+      imageVector = if (isCollapsed) TwineIcons.ArrowDown else TwineIcons.ArrowUp,
+      contentDescription = null,
+      tint = AppTheme.colorScheme.onSurfaceVariant,
+      modifier = Modifier.requiredSize(20.dp),
+    )
+  }
+}
+
+@Composable
+private fun DiscoveryFeedItem(
+  feed: DiscoveryFeed,
+  isAdded: Boolean,
+  isLoading: Boolean,
+  onAddFeed: () -> Unit,
+  onFeedClick: () -> Unit,
+  modifier: Modifier = Modifier,
+) {
+  Row(
+    modifier =
+      modifier
+        .fillMaxWidth()
+        .clickable { onFeedClick() }
+        .padding(horizontal = 24.dp, vertical = 12.dp),
+    verticalAlignment = Alignment.CenterVertically,
+  ) {
+    FeedIcon(
+      icon = feed.icon,
+      homepageLink = feed.homepageLink,
+      showFeedFavIcon = !(feed.useFeedIcon),
+      contentDescription = null,
+      modifier = Modifier.requiredSize(48.dp),
+    )
+
+    Spacer(Modifier.requiredWidth(16.dp))
+
+    Column(modifier = Modifier.weight(1f)) {
+      Text(
+        text = feed.name,
+        style = MaterialTheme.typography.titleMedium,
+        color = AppTheme.colorScheme.onSurface,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+      )
+
+      Spacer(Modifier.requiredHeight(4.dp))
+
+      Text(
+        text = feed.description,
+        style = MaterialTheme.typography.bodyMedium,
+        color = AppTheme.colorScheme.onSurfaceVariant,
+        minLines = 2,
+        maxLines = 2,
+        overflow = TextOverflow.Ellipsis,
+      )
+    }
+
+    Spacer(Modifier.requiredWidth(16.dp))
+
+    if (isAdded) {
+      Row(
+        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+      ) {
+        Icon(
+          imageVector = TwineIcons.Check,
+          contentDescription = null,
+          modifier = Modifier.requiredSize(16.dp),
+          tint = AppTheme.colorScheme.onSurfaceVariant,
+        )
+        Text(
+          text = stringResource(Res.string.discoveryAdded),
+          style = MaterialTheme.typography.labelSmall,
+          color = AppTheme.colorScheme.onSurfaceVariant,
+        )
+      }
+    } else {
+      Box(contentAlignment = Alignment.Center) {
+        Button(
+          onClick = onAddFeed,
+          modifier =
+            Modifier.requiredHeight(36.dp).graphicsLayer { alpha = if (isLoading) 0f else 1f },
+          enabled = !isLoading,
+          shape = MaterialTheme.shapes.large,
+          colors =
+            ButtonDefaults.buttonColors(
+              containerColor = AppTheme.colorScheme.primary,
+              contentColor = AppTheme.colorScheme.onPrimary,
+            ),
+        ) {
+          Text(
+            text = stringResource(Res.string.discoveryAddFeed),
+            style = MaterialTheme.typography.labelMedium,
+            fontWeight = FontWeight.Medium,
+          )
+        }
+
+        if (isLoading) {
+          CircularProgressIndicator(
+            modifier = Modifier.requiredSize(16.dp),
+            color = AppTheme.colorScheme.primary,
+            strokeWidth = 2.dp,
+          )
+        }
+      }
+    }
+  }
+}
+
+@Composable
+private fun DiscoveryFeedInfoBottomSheet(
+  feed: DiscoveryFeed,
+  isAdded: Boolean,
+  isLoading: Boolean,
+  onAddFeed: () -> Unit,
+  dismiss: () -> Unit,
+) {
+  ModalSheet(
+    onDismissRequest = dismiss,
+    containerColor = AppTheme.colorScheme.surfaceContainerLow,
+    contentColor = AppTheme.colorScheme.onSurface,
+  ) {
+    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 16.dp)) {
+      Column(modifier = Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState())) {
+        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+          FeedIcon(
+            icon = feed.icon,
+            homepageLink = feed.homepageLink,
+            showFeedFavIcon = !(feed.useFeedIcon),
+            contentDescription = null,
+            modifier = Modifier.requiredSize(80.dp),
+          )
+        }
+
+        Spacer(Modifier.requiredHeight(24.dp))
+
+        Text(
+          text = feed.name,
+          style = MaterialTheme.typography.headlineSmall,
+          color = AppTheme.colorScheme.onSurface,
+          textAlign = TextAlign.Center,
+          modifier = Modifier.fillMaxWidth(),
+        )
+
+        Spacer(Modifier.requiredHeight(8.dp))
+
+        Text(
+          text = feed.link,
+          style = MaterialTheme.typography.labelMedium,
+          color = AppTheme.colorScheme.onSurfaceVariant,
+          textAlign = TextAlign.Center,
+          modifier = Modifier.fillMaxWidth(),
+        )
+
+        Spacer(Modifier.requiredHeight(16.dp))
+
+        Text(
+          text = feed.description,
+          style = MaterialTheme.typography.bodyLarge,
+          color = AppTheme.colorScheme.onSurfaceVariant,
+          textAlign = TextAlign.Justify,
+          modifier = Modifier.fillMaxWidth(),
+        )
+      }
+
+      Spacer(Modifier.requiredHeight(24.dp))
+
+      Button(
+        modifier = Modifier.fillMaxWidth().requiredHeight(56.dp),
+        onClick = onAddFeed,
+        enabled = !isAdded && !isLoading,
+      ) {
+        if (isAdded) {
+          Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+              imageVector = TwineIcons.Check,
+              contentDescription = null,
+              modifier = Modifier.requiredSize(24.dp),
+            )
+            Spacer(Modifier.requiredWidth(8.dp))
+            Text(
+              text = stringResource(Res.string.discoveryAdded),
+              style = MaterialTheme.typography.titleMedium,
+            )
+          }
+        } else if (isLoading) {
+          CircularProgressIndicator(
+            modifier = Modifier.requiredSize(24.dp),
+            color = AppTheme.colorScheme.onPrimary,
+            strokeWidth = 2.dp,
+          )
+        } else {
+          Text(
+            text = stringResource(Res.string.discoveryAddFeed),
+            style = MaterialTheme.typography.titleMedium,
+          )
+        }
+      }
+    }
+  }
+}
+
+@Preview(locale = "en")
+@Composable
+private fun DiscoveryPreview() {
+  AppTheme {
+    DiscoveryContent(
+      state = DiscoveryState.DEFAULT,
+      dispatch = {},
+      goBack = {},
+      showDoneButton = false,
+      onDone = {},
+    )
+  }
+}

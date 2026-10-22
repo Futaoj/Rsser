@@ -1,0 +1,693 @@
+/*
+ * Copyright 2026 Sasikanth Miriyampalli
+ *
+ * Licensed under the GPL, Version 3.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.gnu.org/licenses/gpl-3.0.en.html
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+package dev.sasikanth.rss.reader.data.sync.freshrss
+
+import co.touchlab.kermit.Logger
+import dev.sasikanth.rss.reader.core.base.widget.WidgetUpdater
+import dev.sasikanth.rss.reader.core.model.local.Post
+import dev.sasikanth.rss.reader.core.model.remote.FeedPayload
+import dev.sasikanth.rss.reader.core.model.remote.PostPayload
+import dev.sasikanth.rss.reader.core.network.FullArticleFetcher
+import dev.sasikanth.rss.reader.core.network.freshrss.FreshRssSource
+import dev.sasikanth.rss.reader.core.network.parser.common.ArticleHtmlParser
+import dev.sasikanth.rss.reader.core.network.utils.UrlUtils
+import dev.sasikanth.rss.reader.data.refreshpolicy.RefreshPolicy
+import dev.sasikanth.rss.reader.data.repository.RssRepository
+import dev.sasikanth.rss.reader.data.repository.SettingsRepository
+import dev.sasikanth.rss.reader.data.sync.SyncCoordinator
+import dev.sasikanth.rss.reader.data.sync.SyncState
+import dev.sasikanth.rss.reader.di.scopes.AppScope
+import dev.sasikanth.rss.reader.util.DispatchersProvider
+import dev.sasikanth.rss.reader.util.nameBasedUuidOf
+import kotlin.time.Clock
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Instant
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
+import me.tatarka.inject.annotations.Inject
+
+@Inject
+@AppScope
+class FreshRSSSyncCoordinator(
+  private val freshRssSource: FreshRssSource,
+  private val rssRepository: RssRepository,
+  private val dispatchersProvider: DispatchersProvider,
+  private val articleHtmlParser: ArticleHtmlParser,
+  private val refreshPolicy: RefreshPolicy,
+  private val settingsRepository: SettingsRepository,
+  private val fullArticleFetcher: FullArticleFetcher,
+  private val widgetUpdater: WidgetUpdater,
+) : SyncCoordinator {
+  private companion object {
+    private const val ARTICLE_PAGE_SIZE = 500
+    private const val LOCAL_POSTS_PAGE_SIZE = 1000
+    private const val STATUS_BATCH_SIZE = 500
+  }
+
+  private val syncMutex = Mutex()
+  private val _syncState = MutableStateFlow<SyncState>(SyncState.Idle)
+  override val syncState: StateFlow<SyncState> = _syncState.asStateFlow()
+
+  override suspend fun pull(): Boolean {
+    return syncMutex.withLock { pullInternal() }
+  }
+
+  override suspend fun pull(feedIds: List<String>): Boolean {
+    return withContext(dispatchersProvider.io) {
+      syncMutex.withLock {
+        feedIds.forEach { feedId -> pullFeedInternal(feedId) }
+        true
+      }
+    }
+  }
+
+  override suspend fun pull(feedId: String): Boolean {
+    return withContext(dispatchersProvider.io) { syncMutex.withLock { pullFeedInternal(feedId) } }
+  }
+
+  override suspend fun push(): Boolean {
+    return withContext(dispatchersProvider.io) {
+      syncMutex.withLock {
+        try {
+          pushChanges()
+          true
+        } catch (e: Exception) {
+          Logger.e(e) { "FreshRSS push failed" }
+          false
+        }
+      }
+    }
+  }
+
+  private suspend fun pullInternal(): Boolean {
+    return try {
+      val syncStartTime = Clock.System.now()
+      val isInitialSync = refreshPolicy.fetchLastSyncedAt() == null
+      updateSyncState(SyncState.InProgress(0f))
+
+      // 1. Push local changes
+      pushChanges(syncStartTime)
+
+      // 2. Sync Subscriptions
+      syncSubscriptions(syncStartTime)
+      updateSyncState(SyncState.InProgress(0.3f))
+
+      // 3. Sync Articles
+      val lastSyncedAt =
+        refreshPolicy.fetchLastSyncedAt()?.minus(24.hours) ?: syncStartTime.minus(14.days)
+      val newerThan = lastSyncedAt.epochSeconds
+
+      syncArticles(newerThan = newerThan)
+
+      // Always update lastSyncedAt after a successful sync. The 24-hour overlap
+      // when fetching articles handles cases where articles might be added to
+      // the server with older timestamps.
+      refreshPolicy.updateLastSyncedAt()
+
+      // After finishing feeds, categories and articles, we continue syncing statuses and bookmarks.
+      syncArticles(streamId = FreshRssSource.USER_STATE_STARRED)
+      syncStatuses(isInitialSync = isInitialSync)
+
+      updateSyncState(SyncState.Complete)
+      widgetUpdater.updateUnreadWidget()
+
+      true
+    } catch (e: Exception) {
+      Logger.e(e) { "FreshRSS pull failed" }
+      updateSyncState(SyncState.Error(e))
+      false
+    }
+  }
+
+  private suspend fun pullFeedInternal(feedId: String): Boolean {
+    return try {
+      updateSyncState(SyncState.InProgress(0f))
+
+      // Push local changes for this feed before pulling
+      pushChangesForFeed(feedId)
+
+      val feed = rssRepository.feed(feedId)
+      if (feed?.remoteId != null) {
+        syncArticles(streamId = feed.remoteId!!)
+        updateSyncState(SyncState.Complete)
+        widgetUpdater.updateUnreadWidget()
+      } else {
+        pullInternal()
+      }
+
+      true
+    } catch (e: Exception) {
+      Logger.e(e) { "FreshRSS pull failed for feed: $feedId" }
+      updateSyncState(SyncState.Error(e))
+      false
+    }
+  }
+
+  private suspend fun pushChanges(syncStartTime: Instant = Clock.System.now()) {
+    pushStatusChanges()
+    pushFeedChanges(syncStartTime)
+    pushGroupChanges(syncStartTime)
+    purgeDeletedSources()
+  }
+
+  private suspend fun pushChangesForFeed(feedId: String) {
+    pushStatusChanges(feedId)
+  }
+
+  private suspend fun purgeDeletedSources() {
+    val feedGroups = rssRepository.allFeedGroupsBlocking()
+    val feeds = rssRepository.allFeedsBlocking()
+    val localSources = feeds + feedGroups
+
+    val toDelete = localSources.filter { it.isDeleted }.toSet()
+    if (toDelete.isNotEmpty()) {
+      rssRepository.deleteSources(toDelete)
+    }
+  }
+
+  private suspend fun pushFeedChanges(syncStartTime: Instant) {
+    val localFeeds = rssRepository.allFeedsBlocking()
+    val lastSyncedAt = refreshPolicy.fetchLastSyncedAt() ?: Instant.DISTANT_PAST
+
+    // Early return if no feeds have been updated since last sync
+    val hasFeedsToPush =
+      localFeeds.any {
+        (it.lastUpdatedAt ?: Instant.DISTANT_PAST) > lastSyncedAt ||
+          (it.remoteId == null && !it.isDeleted && it.syncError != null)
+      }
+    if (!hasFeedsToPush) return
+
+    // 1. Handle deleted feeds
+    localFeeds
+      .filter {
+        it.isDeleted &&
+          it.remoteId != null &&
+          (it.lastUpdatedAt ?: Instant.DISTANT_PAST) > lastSyncedAt
+      }
+      .forEach { feed -> freshRssSource.deleteFeed(feed.remoteId!!) }
+
+    // 2. Handle new feeds
+    localFeeds
+      .filter {
+        !it.isDeleted &&
+          it.remoteId == null &&
+          ((it.lastUpdatedAt ?: Instant.DISTANT_PAST) > lastSyncedAt || it.syncError != null)
+      }
+      .forEach { feed ->
+        // The server fetches the feed itself when subscribing, so one it can't reach stays local
+        // instead of failing the whole sync.
+        val response =
+          try {
+            freshRssSource.addFeed(feed.link)
+          } catch (e: Exception) {
+            Logger.e(e) { "Failed to add feed to FreshRSS: ${feed.link}" }
+            rssRepository.updateFeedSyncError(
+              feed.id,
+              e.message?.takeIf { it.isNotBlank() } ?: e.toString(),
+            )
+            return@forEach
+          }
+
+        if (response != null) {
+          rssRepository.updateFeedRemoteId(response.streamId, feed.id, syncStartTime)
+          rssRepository.updateFeedSyncError(feed.id, null)
+        } else {
+          rssRepository.updateFeedSyncError(feed.id, "The server could not subscribe to this feed")
+        }
+      }
+
+    // 3. Handle renamed feeds
+    localFeeds
+      .filter {
+        !it.isDeleted &&
+          it.remoteId != null &&
+          (it.lastUpdatedAt ?: Instant.DISTANT_PAST) > lastSyncedAt
+      }
+      .forEach { feed ->
+        freshRssSource.editFeedName(feed.remoteId!!, feed.name)
+        rssRepository.updateFeedLastUpdatedAt(feed.id, syncStartTime)
+      }
+  }
+
+  private suspend fun pushGroupChanges(syncStartTime: Instant) {
+    val localGroups = rssRepository.allFeedGroupsBlocking()
+    val localFeeds = rssRepository.allFeedsBlocking()
+    val lastSyncedAt = refreshPolicy.fetchLastSyncedAt() ?: Instant.DISTANT_PAST
+
+    // Early return if no groups have been updated since last sync
+    val hasUpdatedGroups = localGroups.any { it.updatedAt > lastSyncedAt }
+    if (!hasUpdatedGroups) return
+
+    val subscriptions = freshRssSource.subscriptions().subscriptions
+
+    // 1. Handle deleted groups
+    localGroups
+      .filter { it.isDeleted && it.updatedAt > lastSyncedAt }
+      .forEach { group ->
+        if (group.remoteId != null) {
+          freshRssSource.deleteTag(group.remoteId!!)
+        }
+      }
+
+    // 2. Handle new/updated groups
+    val localFeedToGroupsMap = mutableMapOf<String, MutableSet<String>>()
+    val updatedTagIds = mutableSetOf<String>()
+    localGroups
+      .filter { !it.isDeleted }
+      .forEach { group ->
+        val isGroupUpdated = group.updatedAt > lastSyncedAt
+        var remoteTagId = group.remoteId ?: "user/-/label/${group.name}"
+
+        // If it's a new group, we might need to create it (though adding a feed is enough)
+        if (group.remoteId == null && isGroupUpdated) {
+          freshRssSource.addTag(group.name)
+          rssRepository.updateFeedGroupRemoteId(remoteTagId, group.id, syncStartTime)
+        } else if (group.remoteId != null && isGroupUpdated) {
+          // Check for rename
+          val remoteTagName = group.remoteId!!.replace("user/-/label/", "")
+          if (remoteTagName != group.name) {
+            freshRssSource.editTag(group.remoteId!!, group.name)
+            remoteTagId = "user/-/label/${group.name}"
+            rssRepository.updateFeedGroupRemoteId(remoteTagId, group.id, syncStartTime)
+          }
+        }
+
+        if (isGroupUpdated) {
+          updatedTagIds.add(remoteTagId)
+          group.feedIds.forEach { feedId ->
+            localFeedToGroupsMap.getOrPut(feedId) { mutableSetOf() }.add(remoteTagId)
+          }
+        }
+      }
+
+    // 3. Sync feeds tags
+    if (updatedTagIds.isEmpty()) return
+    val remoteFeedsMap = subscriptions.associateBy { it.id }
+    localFeeds
+      .filter { !it.isDeleted && it.remoteId != null }
+      .forEach { localFeed ->
+        val remoteFeedId = localFeed.remoteId!!
+        val remoteSub = remoteFeedsMap[remoteFeedId]
+        if (remoteSub != null) {
+          val targetTags = localFeedToGroupsMap[localFeed.id].orEmpty()
+          val currentTags =
+            remoteSub.categories
+              .map { it.id }
+              .filter { it.startsWith("user/-/label/") && it in updatedTagIds }
+              .toSet()
+
+          // Add missing tags
+          (targetTags - currentTags).forEach { tagId ->
+            freshRssSource.addTagToFeed(remoteFeedId, tagId)
+          }
+        }
+      }
+  }
+
+  private suspend fun syncSubscriptions(syncStartTime: Instant): Boolean {
+    val subscriptions = freshRssSource.subscriptions().subscriptions
+    val localFeeds = rssRepository.allFeedsBlocking()
+    val localGroups = rssRepository.allFeedGroupsBlocking()
+    var hasNewSubscriptions = false
+
+    // 1. Handle remote deletions
+    val remoteIds = subscriptions.map { it.id }.toSet()
+    val remoteUrls = subscriptions.map { it.url }.toSet()
+
+    localFeeds.forEach { localFeed ->
+      if (
+        !localFeed.isDeleted &&
+          localFeed.remoteId != null &&
+          localFeed.remoteId !in remoteIds &&
+          localFeed.link !in remoteUrls
+      ) {
+        rssRepository.removeFeed(localFeed.id)
+      }
+    }
+
+    // 2. Handle remote group deletions
+    val remoteTagIds = freshRssSource.tags().tags.map { it.id }.toSet()
+
+    localGroups.forEach { localGroup ->
+      if (
+        !localGroup.isDeleted && localGroup.remoteId != null && localGroup.remoteId !in remoteTagIds
+      ) {
+        rssRepository.markSourcesAsDeleted(setOf(localGroup))
+      }
+    }
+
+    // 3. Handle new/updated subscriptions from remote
+    val localFeedsByLink = localFeeds.associateBy { it.link }
+    val localFeedsByRemoteId =
+      localFeeds.filter { it.remoteId != null }.associateBy { it.remoteId!! }
+    val localGroupsByRemoteId =
+      localGroups.filter { it.remoteId != null }.associateBy { it.remoteId!! }
+    val localGroupsByName = localGroups.associateBy { it.name }
+
+    subscriptions.forEach { subscription ->
+      val localFeed = localFeedsByRemoteId[subscription.id] ?: localFeedsByLink[subscription.url]
+
+      val feedId =
+        if (localFeed != null) {
+          // Locally resolved icons (YouTube channel avatars, etc.) are better than the server's
+          // favicon lookup, so only fall back to the remote icon when we don't have one.
+          val resolvedIcon = localFeed.icon.ifBlank { subscription.iconUrl }
+          if (
+            localFeed.remoteId != subscription.id ||
+              localFeed.name != subscription.title ||
+              localFeed.homepageLink != subscription.htmlUrl ||
+              localFeed.icon != resolvedIcon
+          ) {
+            rssRepository.upsertFeeds(
+              listOf(
+                localFeed.copy(
+                  name = subscription.title,
+                  homepageLink = subscription.htmlUrl,
+                  remoteId = subscription.id,
+                  lastUpdatedAt = syncStartTime,
+                  isDeleted = false,
+                  icon = resolvedIcon,
+                )
+              )
+            )
+          }
+          localFeed.id
+        } else {
+          rssRepository
+            .upsertFeedWithPosts(
+              feedPayload =
+                FeedPayload(
+                  name = subscription.title,
+                  icon = subscription.iconUrl,
+                  description = "",
+                  homepageLink = subscription.htmlUrl,
+                  link = subscription.url,
+                  posts = emptyFlow(),
+                ),
+              updateFeed = true,
+            )
+            .also {
+              hasNewSubscriptions = true
+              rssRepository.updateFeedRemoteId(subscription.id, it, syncStartTime)
+            }
+        }
+
+      // Sync categories (groups)
+      subscription.categories.forEach { category ->
+        if (category.id.startsWith("user/-/label/")) {
+          val tagName = category.id.replace("user/-/label/", "")
+          val localGroup = localGroupsByRemoteId[category.id] ?: localGroupsByName[tagName]
+
+          val groupId =
+            if (localGroup != null) {
+              if (localGroup.remoteId != category.id || localGroup.name != tagName) {
+                rssRepository.upsertGroup(
+                  id = localGroup.id,
+                  name = tagName,
+                  pinnedAt = localGroup.pinnedAt,
+                  updatedAt = syncStartTime,
+                  isDeleted = false,
+                  remoteId = category.id,
+                )
+              }
+              localGroup.id
+            } else {
+              rssRepository.upsertGroup(
+                id = nameBasedUuidOf(tagName).toString(),
+                name = tagName,
+                pinnedAt = null,
+                updatedAt = syncStartTime,
+                isDeleted = false,
+                remoteId = category.id,
+              )
+              rssRepository.feedGroupByRemoteId(category.id)!!.id
+            }
+
+          // Remove feed from all groups except the target group
+          val groupsContainingFeed =
+            localGroups.filter { it.feedIds.contains(feedId) && it.id != groupId }
+          if (groupsContainingFeed.isNotEmpty()) {
+            rssRepository.removeFeedIdsFromGroups(
+              groupIds = groupsContainingFeed.map { it.id }.toSet(),
+              feedIds = listOf(feedId),
+            )
+          }
+
+          // Add feed to the correct group
+          val isFeedInGroup =
+            localGroups.find { it.id == groupId }?.feedIds?.contains(feedId) ?: false
+          if (!isFeedInGroup) {
+            rssRepository.addFeedIdsToGroups(setOf(groupId), listOf(feedId))
+          }
+        }
+      }
+    }
+
+    purgeDeletedSources()
+
+    return hasNewSubscriptions
+  }
+
+  private suspend fun syncArticles(
+    streamId: String = "user/-/state/com.google/reading-list",
+    newerThan: Long? = null,
+  ): Boolean {
+    var hasNewArticles = false
+    var continuation: String? = null
+    val downloadFullContent = settingsRepository.downloadFullContent.first()
+    do {
+      val articlesPayload =
+        freshRssSource.articles(
+          streamId = streamId,
+          limit = ARTICLE_PAGE_SIZE,
+          newerThan = newerThan,
+          continuation = continuation,
+        )
+      val items = articlesPayload.items
+      if (items.isEmpty()) break
+
+      val remoteIds = items.map { it.id }.toSet()
+      val urls =
+        items
+          .map { item ->
+            item.canonical.firstOrNull()?.href ?: item.alternate.firstOrNull()?.href ?: item.id
+          }
+          .toSet()
+      val feedRemoteIds = items.map { it.origin.streamId }.toSet()
+
+      val existingPostsByRemoteId =
+        rssRepository.postsByRemoteIds(remoteIds).associateBy { it.remoteId }
+      val existingPostsByLink = rssRepository.postsByLinks(urls).associateBy { it.link }
+      val existingFeeds = rssRepository.feedsByRemoteIds(feedRemoteIds).associateBy { it.remoteId }
+
+      val postsToUpsertByFeed = mutableMapOf<String, MutableList<PostPayload>>()
+
+      items.asReversed().forEach { item ->
+        val remoteId = item.id
+        val postLink =
+          item.canonical.firstOrNull()?.href ?: item.alternate.firstOrNull()?.href ?: item.id
+        val localPost = existingPostsByRemoteId[remoteId] ?: existingPostsByLink[postLink]
+
+        if (localPost != null) {
+          if (localPost.remoteId != remoteId) {
+            rssRepository.updatePostRemoteId(remoteId, localPost.id)
+          }
+        } else {
+          // Insert new post
+          val feedRemoteId = item.origin.streamId
+          val feed = existingFeeds[feedRemoteId]
+
+          if (feed != null) {
+            val htmlContent = articleHtmlParser.parse(item.summary.content)
+            val isVideoPost = UrlUtils.youTubeVideoId(postLink) != null
+            val fullContent =
+              if (downloadFullContent && postLink.isNotBlank() && !isVideoPost) {
+                fullArticleFetcher.fetch(postLink).getOrNull()
+              } else {
+                null
+              }
+            val postPayload =
+              PostPayload(
+                title = item.title,
+                link = postLink,
+                description = htmlContent?.textContent ?: "",
+                rawContent = htmlContent?.cleanedHtml ?: item.summary.content,
+                imageUrl =
+                  UrlUtils.upgradeYouTubeThumbnail(htmlContent?.heroImage)
+                    ?: UrlUtils.youTubeThumbnail(postLink),
+                audioUrl = item.enclosure.firstOrNull()?.href ?: htmlContent?.audioUrl,
+                date = item.published * 1000, // FreshRSS uses seconds, we use millis
+                commentsLink = null,
+                fullContent = fullContent,
+                isDateParsedCorrectly = true,
+                remoteId = remoteId,
+              )
+
+            postsToUpsertByFeed.getOrPut(feed.id) { mutableListOf() }.add(postPayload)
+            hasNewArticles = true
+          }
+        }
+      }
+
+      postsToUpsertByFeed.forEach { (feedId, posts) ->
+        val feed = existingFeeds.values.find { it.id == feedId }!!
+        rssRepository.upsertFeedWithPosts(
+          feedPayload =
+            FeedPayload(
+              name = feed.name,
+              icon = feed.icon,
+              description = feed.description,
+              homepageLink = feed.homepageLink,
+              link = feed.link,
+              posts = flowOf(*posts.toTypedArray()),
+            ),
+          feedId = feed.id,
+          updateFeed = false,
+        )
+      }
+
+      continuation = articlesPayload.continuation
+    } while (continuation != null && articlesPayload.items.isNotEmpty())
+
+    return hasNewArticles
+  }
+
+  private suspend fun syncStatuses(isInitialSync: Boolean = false) {
+    val unreadIds = freshRssSource.unreadIds().toSet()
+    val bookmarkIds = freshRssSource.bookmarkIds().toSet()
+    var offset = 0L
+    var localPosts: List<Post> = emptyList()
+    do {
+      localPosts =
+        rssRepository.postsWithRemoteIdPaged(
+          limit = LOCAL_POSTS_PAGE_SIZE.toLong(),
+          offset = offset,
+        )
+
+      val toMarkRead = mutableSetOf<String>()
+      val toMarkUnread = mutableSetOf<String>()
+      val toBookmark = mutableSetOf<String>()
+      val toUnbookmark = mutableSetOf<String>()
+      val toUpdateSyncedAt = mutableSetOf<String>()
+
+      localPosts.forEach { post ->
+        val remoteRead = post.remoteId !in unreadIds
+        val remoteBookmarked = post.remoteId in bookmarkIds
+
+        // If local is synced (no pending changes), remote is source of truth
+        if (post.syncedAt >= post.updatedAt) {
+          var changed = false
+          if (post.read != remoteRead) {
+            if (remoteRead) toMarkRead.add(post.id) else toMarkUnread.add(post.id)
+            changed = true
+          }
+          if (post.bookmarked != remoteBookmarked) {
+            if (remoteBookmarked) toBookmark.add(post.id) else toUnbookmark.add(post.id)
+            changed = true
+          }
+
+          if (changed) {
+            toUpdateSyncedAt.add(post.id)
+          }
+        }
+      }
+
+      if (toMarkRead.isNotEmpty()) {
+        rssRepository.updatePostReadStatus(toMarkRead, read = true, recordHistory = !isInitialSync)
+      }
+      if (toMarkUnread.isNotEmpty()) {
+        rssRepository.updatePostReadStatus(
+          toMarkUnread,
+          read = false,
+          recordHistory = !isInitialSync,
+        )
+      }
+      if (toBookmark.isNotEmpty()) rssRepository.updateBookmarkStatus(toBookmark, bookmarked = true)
+      if (toUnbookmark.isNotEmpty())
+        rssRepository.updateBookmarkStatus(toUnbookmark, bookmarked = false)
+      if (toUpdateSyncedAt.isNotEmpty())
+        rssRepository.updatePostSyncedAt(toUpdateSyncedAt, Clock.System.now())
+
+      offset += localPosts.size
+    } while (localPosts.size >= LOCAL_POSTS_PAGE_SIZE)
+  }
+
+  private suspend fun pushStatusChanges(feedId: String? = null) {
+    while (true) {
+      val dirtyPosts =
+        if (feedId != null) {
+          rssRepository.postsWithLocalChangesForFeedPaged(
+            feedId = feedId,
+            limit = LOCAL_POSTS_PAGE_SIZE.toLong(),
+            offset = 0,
+          )
+        } else {
+          rssRepository.postsWithLocalChangesPaged(
+            limit = LOCAL_POSTS_PAGE_SIZE.toLong(),
+            offset = 0,
+          )
+        }
+
+      if (dirtyPosts.isEmpty()) return
+
+      val toMarkRead = mutableListOf<String>()
+      val toMarkUnread = mutableListOf<String>()
+      val toBookmark = mutableListOf<String>()
+      val toUnbookmark = mutableListOf<String>()
+
+      dirtyPosts.forEach { post ->
+        val remoteId = post.remoteId ?: return@forEach
+
+        if (post.read) {
+          toMarkRead.add(remoteId)
+        } else {
+          toMarkUnread.add(remoteId)
+        }
+
+        if (post.bookmarked) {
+          toBookmark.add(remoteId)
+        } else {
+          toUnbookmark.add(remoteId)
+        }
+      }
+
+      toMarkRead.chunked(STATUS_BATCH_SIZE).forEach { ids ->
+        freshRssSource.markArticlesAsRead(ids)
+      }
+      toMarkUnread.chunked(STATUS_BATCH_SIZE).forEach { ids ->
+        freshRssSource.markArticlesAsUnRead(ids)
+      }
+      toBookmark.chunked(STATUS_BATCH_SIZE).forEach { ids -> freshRssSource.addBookmarks(ids) }
+      toUnbookmark.chunked(STATUS_BATCH_SIZE).forEach { ids -> freshRssSource.removeBookmarks(ids) }
+
+      rssRepository.updatePostSyncedAt(dirtyPosts)
+    }
+  }
+
+  private fun updateSyncState(newState: SyncState) {
+    _syncState.value = newState
+  }
+}

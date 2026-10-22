@@ -1,0 +1,163 @@
+/*
+ * Copyright 2026 Sasikanth Miriyampalli
+ *
+ * Licensed under the GPL, Version 3.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.gnu.org/licenses/gpl-3.0.en.html
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+@file:OptIn(ExperimentalFoundationApi::class)
+
+package dev.sasikanth.rss.reader.home.ui
+
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.window.core.layout.WindowSizeClass
+import dev.sasikanth.rss.reader.core.model.local.ResolvedPost
+import dev.sasikanth.rss.reader.ui.AppTheme
+import dev.sasikanth.rss.reader.utils.Constants
+import dev.sasikanth.rss.reader.utils.LocalWindowSizeClass
+import dev.sasikanth.rss.reader.utils.formatRelativeTime
+
+private val featuredItemPadding: PaddingValues
+  @Composable
+  @ReadOnlyComposable
+  get() {
+    val sizeClass = LocalWindowSizeClass.current
+    return when {
+      sizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_EXPANDED_LOWER_BOUND) ->
+        PaddingValues(horizontal = 64.dp)
+      else -> PaddingValues(0.dp)
+    }
+  }
+
+@Composable
+internal fun FeaturedPostItem(
+  item: ResolvedPost,
+  contentAlphaProvider: () -> Float,
+  onClick: () -> Unit,
+  onBookmarkClick: () -> Unit,
+  onCommentsClick: () -> Unit,
+  onSourceClick: () -> Unit,
+  updateReadStatus: (updatedReadStatus: Boolean) -> Unit,
+  modifier: Modifier = Modifier,
+  featuredImage: @Composable () -> Unit,
+) {
+  var readStatus by remember(item.read) { mutableStateOf(item.read) }
+  val alpha by
+    animateFloatAsState(if (readStatus) Constants.ITEM_READ_ALPHA else Constants.ITEM_UNREAD_ALPHA)
+  var showDropdown by remember { mutableStateOf(false) }
+
+  Column(
+    modifier =
+      Modifier.then(modifier)
+        .padding(featuredItemPadding)
+        .clip(MaterialTheme.shapes.extraLarge)
+        .combinedClickable(onClick = onClick, onLongClick = { showDropdown = true })
+        .graphicsLayer { this.alpha = alpha * contentAlphaProvider.invoke() }
+  ) {
+    val density = LocalDensity.current
+    val titleTextStyle = MaterialTheme.typography.titleLarge
+    val titleMaxLines = 2
+    var dynamicTitlePadding by remember(item.link) { mutableStateOf(0.dp) }
+
+    featuredImage()
+
+    Spacer(Modifier.height(16.dp))
+
+    val isDarkTheme = AppTheme.isDark
+    Text(
+      modifier =
+        Modifier.graphicsLayer {
+          blendMode =
+            if (isDarkTheme) {
+              BlendMode.Screen
+            } else {
+              BlendMode.Multiply
+            }
+        },
+      text = item.title.ifBlank { item.description },
+      style = titleTextStyle,
+      color = AppTheme.colorScheme.onSurface,
+      maxLines = titleMaxLines,
+      overflow = TextOverflow.Ellipsis,
+      onTextLayout = { textLayoutResult ->
+        val numberOfLines = textLayoutResult.lineCount
+        if (numberOfLines < titleMaxLines) {
+          val lineHeight = with(density) { titleTextStyle.lineHeight.toDp() }
+          dynamicTitlePadding = lineHeight * (titleMaxLines - numberOfLines)
+        }
+      },
+    )
+
+    Spacer(Modifier.height(8.dp))
+
+    Text(
+      text = item.description,
+      style = MaterialTheme.typography.bodyMedium,
+      color = AppTheme.colorScheme.onSurfaceVariant,
+      minLines = 2,
+      maxLines = 2,
+      overflow = TextOverflow.Ellipsis,
+    )
+
+    Spacer(Modifier.requiredHeight(dynamicTitlePadding))
+
+    Spacer(modifier = Modifier.requiredHeight(4.dp))
+
+    val relativeTimestamp = item.date.formatRelativeTime()
+    PostActionBar(
+      feedName = item.feedName,
+      feedIcon = item.feedIcon,
+      feedHomepageLink = item.feedHomepageLink,
+      showFeedFavIcon = item.showFeedFavIcon,
+      postRead = readStatus,
+      postRelativeTimestamp = relativeTimestamp,
+      postLink = item.link,
+      postBookmarked = item.bookmarked,
+      commentsLink = item.commentsLink,
+      postReadingTimeEstimate = item.feedContentReadingTime ?: 0,
+      onBookmarkClick = onBookmarkClick,
+      onCommentsClick = onCommentsClick,
+      onTogglePostReadClick = {
+        readStatus = !readStatus
+        updateReadStatus(readStatus)
+      },
+      showDropdown = showDropdown,
+      onDropdownChange = { showDropdown = it },
+      onSourceClick = onSourceClick,
+    )
+
+    Spacer(Modifier.requiredHeight(16.dp))
+  }
+}

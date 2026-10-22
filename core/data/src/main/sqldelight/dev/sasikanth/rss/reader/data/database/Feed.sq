@@ -1,0 +1,204 @@
+import kotlin.Boolean;
+import kotlin.time.Duration;
+import kotlin.time.Instant;
+
+CREATE TABLE feed(
+  id TEXT NOT NULL PRIMARY KEY,
+  name TEXT NOT NULL,
+  icon TEXT NOT NULL,
+  description TEXT NOT NULL,
+  link TEXT NOT NULL,
+  homepageLink TEXT NOT NULL,
+  createdAt INTEGER AS Instant NOT NULL,
+  pinnedAt INTEGER AS Instant,
+  lastCleanUpAt INTEGER AS Instant,
+  alwaysFetchSourceArticle INTEGER AS Boolean NOT NULL DEFAULT 0,
+  pinnedPosition REAL NOT NULL DEFAULT 0.0,
+  showFeedFavIcon INTEGER AS Boolean NOT NULL DEFAULT 1,
+  lastUpdatedAt INTEGER AS Instant,
+  refreshInterval TEXT NOT NULL DEFAULT '1h',
+  isDeleted INTEGER AS Boolean NOT NULL DEFAULT 0,
+  hideFromAllFeeds INTEGER AS Boolean NOT NULL DEFAULT 0,
+  remoteId TEXT,
+  enableNotifications INTEGER AS Boolean NOT NULL DEFAULT 1,
+  consecutiveFetchErrors INTEGER NOT NULL DEFAULT 0,
+  syncError TEXT
+);
+
+CREATE INDEX feed_link_index ON feed(link);
+CREATE INDEX feed_pinned_at ON feed(pinnedAt);
+CREATE INDEX feed_pinned_position ON feed(pinnedPosition);
+CREATE INDEX feed_pinned_name ON feed(pinnedAt DESC, name);
+CREATE INDEX feed_isDeleted_hideFromAllFeeds_index ON feed(isDeleted, hideFromAllFeeds);
+CREATE INDEX feed_remoteId_index ON feed(remoteId) WHERE remoteId IS NOT NULL;
+
+upsert:
+INSERT INTO feed(id, name, icon, description, homepageLink, createdAt, link, alwaysFetchSourceArticle, showFeedFavIcon, lastUpdatedAt, enableNotifications)
+VALUES (:id, :name, :icon, :description, :homepageLink, :createdAt, :link, :alwaysFetchSourceArticle, :showFeedFavIcon, :lastUpdatedAt, :enableNotifications)
+ON CONFLICT(id) DO
+UPDATE SET
+icon = excluded.icon,
+name = excluded.name,
+description = excluded.description,
+homepageLink = excluded.homepageLink,
+alwaysFetchSourceArticle = excluded.alwaysFetchSourceArticle,
+showFeedFavIcon = excluded.showFeedFavIcon,
+enableNotifications = excluded.enableNotifications,
+isDeleted = 0,
+lastUpdatedAt = :lastUpdatedAt;
+
+markAsDeleted:
+UPDATE feed SET isDeleted = 1, pinnedAt = NULL, pinnedPosition = 0.0, lastUpdatedAt = :lastUpdatedAt WHERE id = :id;
+
+remove:
+DELETE FROM feed WHERE id = :id;
+
+feeds:
+SELECT * FROM feed
+WHERE isDeleted = 0
+ORDER BY pinnedAt DESC, createdAt DESC;
+
+feed:
+SELECT * FROM feed
+WHERE id = :id AND isDeleted = 0
+ORDER BY pinnedAt DESC, createdAt DESC LIMIT 1;
+
+feedWithUnreadPostsCount:
+SELECT
+  f.id,
+  f.name,
+  f.icon,
+  f.description,
+  f.link,
+  f.homepageLink,
+  f.createdAt,
+  f.pinnedAt,
+  f.lastCleanUpAt,
+  f.alwaysFetchSourceArticle,
+  f.pinnedPosition,
+  COUNT(CASE WHEN (p.flags & 2) == 0 AND (p.flags & 4) == 0 THEN 1 ELSE NULL END) AS numberOfUnreadPosts,
+  f.showFeedFavIcon,
+  f.hideFromAllFeeds,
+  f.isDeleted,
+  f.enableNotifications,
+  f.remoteId,
+  f.syncError
+FROM feed f
+LEFT JOIN post p ON f.id = p.sourceId AND p.postDate > :postsAfter AND p.createdAt < :postsUpperBound
+WHERE f.id = :id AND f.isDeleted = 0
+ORDER BY pinnedAt DESC, f.createdAt DESC LIMIT 1;
+
+updateFeedName:
+UPDATE feed SET name = :newFeedName, lastUpdatedAt = :lastUpdatedAt WHERE id = :id;
+
+hasFeed:
+SELECT EXISTS(SELECT 1 FROM feed WHERE id = :id AND isDeleted = 0);
+
+updatePinnedAt:
+UPDATE feed SET pinnedAt = :pinnedAt, pinnedPosition = 0.0, lastUpdatedAt = :lastUpdatedAt WHERE id = :id;
+
+numberOfFeeds:
+SELECT COUNT(*) FROM feed WHERE isDeleted = 0;
+
+updateLastCleanUpAt:
+UPDATE feed SET lastCleanUpAt = :lastCleanUpAt WHERE id = :id;
+
+updateAlwaysFetchSourceArticle:
+UPDATE feed SET alwaysFetchSourceArticle = :alwaysFetchSourceArticle WHERE id = :id;
+
+updateShowFeedFavIcon:
+UPDATE feed SET showFeedFavIcon = :showFeedFavIcon WHERE id = :id;
+
+updateHideFromAllFeeds:
+UPDATE feed SET hideFromAllFeeds = :hideFromAllFeeds, lastUpdatedAt = :lastUpdatedAt WHERE id = :id;
+
+updateEnableNotifications:
+UPDATE feed SET enableNotifications = :enableNotifications, lastUpdatedAt = :lastUpdatedAt WHERE id = :id;
+
+disableNotifications:
+UPDATE feed SET enableNotifications = 0, lastUpdatedAt = :lastUpdatedAt;
+
+feedsInGroupPaginatedCount:
+SELECT COUNT(*) FROM feed
+WHERE id IN :feedIds AND isDeleted = 0;
+
+feedsInGroupPaginated:
+SELECT
+  f.id,
+  f.name,
+  f.icon,
+  f.description,
+  f.link,
+  f.homepageLink,
+  f.createdAt,
+  f.pinnedAt,
+  f.lastCleanUpAt,
+  f.alwaysFetchSourceArticle,
+  f.pinnedPosition,
+  0 AS numberOfUnreadPosts,
+  f.showFeedFavIcon,
+  f.hideFromAllFeeds,
+  f.isDeleted,
+  f.enableNotifications,
+  f.remoteId,
+  f.syncError
+FROM feed f
+WHERE f.id IN :feedIds AND f.isDeleted = 0
+ORDER BY
+  CASE WHEN :orderBy = 'latest' THEN f.createdAt END DESC,
+  CASE WHEN :orderBy = 'oldest' THEN f.createdAt END ASC,
+  CASE WHEN :orderBy = 'alphabetical' THEN f.name END ASC,
+  f.createdAt DESC
+LIMIT :limit OFFSET :offset;
+
+updatedPinnedPosition:
+UPDATE feed SET pinnedPosition = :pinnedPosition, lastUpdatedAt = :lastUpdatedAt WHERE id = :id;
+
+updateLastUpdatedAt:
+UPDATE feed SET lastUpdatedAt = :lastUpdatedAt WHERE id = :id;
+
+updateRefreshInterval:
+UPDATE feed SET refreshInterval = :refreshInterval WHERE id = :id;
+
+updateFeedRemoteId:
+UPDATE feed SET remoteId = :remoteId, lastUpdatedAt = :lastUpdatedAt WHERE id = :id;
+
+feedByRemoteId:
+SELECT * FROM feed WHERE remoteId = :remoteId AND isDeleted = 0;
+
+feedsByRemoteIds:
+SELECT * FROM feed WHERE remoteId IN :remoteIds AND isDeleted = 0;
+
+allFeedsBlocking:
+SELECT * FROM feed;
+
+deleteAll:
+DELETE FROM feed;
+
+upsertSyncFeed:
+INSERT INTO feed(id, name, icon, description, link, homepageLink, createdAt, pinnedAt, lastCleanUpAt, alwaysFetchSourceArticle, lastUpdatedAt, isDeleted, hideFromAllFeeds, enableNotifications, remoteId)
+VALUES (:id, :name, :icon, :description, :link, :homepageLink, :createdAt, :pinnedAt, :lastCleanUpAt, :alwaysFetchSourceArticle, :lastUpdatedAt, :isDeleted, :hideFromAllFeeds, :enableNotifications, :remoteId)
+ON CONFLICT(id) DO
+UPDATE SET
+    name = excluded.name,
+    icon = excluded.icon,
+    description = excluded.description,
+    homepageLink = excluded.homepageLink,
+    pinnedAt = excluded.pinnedAt,
+    lastCleanUpAt = excluded.lastCleanUpAt,
+    alwaysFetchSourceArticle = excluded.alwaysFetchSourceArticle,
+    lastUpdatedAt = excluded.lastUpdatedAt,
+    isDeleted = excluded.isDeleted,
+    hideFromAllFeeds = excluded.hideFromAllFeeds,
+    enableNotifications = excluded.enableNotifications,
+    remoteId = excluded.remoteId
+WHERE excluded.lastUpdatedAt > feed.lastUpdatedAt OR feed.lastUpdatedAt IS NULL OR feed.remoteId IS NULL;
+
+incrementFetchErrors:
+UPDATE feed SET consecutiveFetchErrors = consecutiveFetchErrors + 1 WHERE id = :id;
+
+resetFetchErrors:
+UPDATE feed SET consecutiveFetchErrors = 0 WHERE id = :id AND consecutiveFetchErrors > 0;
+
+updateSyncError:
+UPDATE feed SET syncError = :syncError WHERE id = :id AND syncError IS NOT :syncError;
