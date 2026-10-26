@@ -19,7 +19,7 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.UnGroup: ImageVector
+val RsserIcons.UnGroup: ImageVector
   get() = rsserUnGroup
 private val rsserUnGroup by lazy {
   rsserIcon("UnGroup", "M3 3H10V10H3ZM14 14H21V21H14ZM15 3H21V9M3 15V21H9")

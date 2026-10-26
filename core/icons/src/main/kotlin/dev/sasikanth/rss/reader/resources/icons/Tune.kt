@@ -19,7 +19,7 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.Tune: ImageVector
+val RsserIcons.Tune: ImageVector
   get() = rsserTune
 
 private val rsserTune by lazy { rsserIcon("Tune", "M4 7H20M4 17H20M8 4V10M16 14V20") }

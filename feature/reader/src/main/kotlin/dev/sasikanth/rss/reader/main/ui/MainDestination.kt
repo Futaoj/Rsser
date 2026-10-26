@@ -23,42 +23,49 @@ import dev.sasikanth.rss.reader.resources.icons.BookmarkFilled
 import dev.sasikanth.rss.reader.resources.icons.Home
 import dev.sasikanth.rss.reader.resources.icons.HomeFilled
 import dev.sasikanth.rss.reader.resources.icons.Newsstand
+import dev.sasikanth.rss.reader.resources.icons.RSS
 import dev.sasikanth.rss.reader.resources.icons.Search
 import dev.sasikanth.rss.reader.resources.icons.Settings
 import dev.sasikanth.rss.reader.resources.icons.SettingsFilled
-import dev.sasikanth.rss.reader.resources.icons.TwineIcons
+import dev.sasikanth.rss.reader.resources.icons.RsserIcons
 import org.jetbrains.compose.resources.StringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.bookmarks
-import twine.shared.generated.resources.discoveryTitle
-import twine.shared.generated.resources.postsSearchHint
-import twine.shared.generated.resources.screenHome
-import twine.shared.generated.resources.settings
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.bookmarks
+import rsser.shared.generated.resources.discoveryTitle
+import rsser.shared.generated.resources.feeds
+import rsser.shared.generated.resources.postsSearchHint
+import rsser.shared.generated.resources.screenHome
+import rsser.shared.generated.resources.settings
 
 internal enum class MainDestination(
   val icon: ImageVector,
   val selectedIcon: ImageVector,
   val label: StringResource,
 ) {
-  Home(icon = TwineIcons.Home, selectedIcon = TwineIcons.HomeFilled, label = Res.string.screenHome),
+  Home(icon = RsserIcons.Home, selectedIcon = RsserIcons.HomeFilled, label = Res.string.screenHome),
+  Subscriptions(
+    icon = RsserIcons.RSS,
+    selectedIcon = RsserIcons.RSS,
+    label = Res.string.feeds,
+  ),
   Search(
-    icon = TwineIcons.Search,
-    selectedIcon = TwineIcons.Search,
+    icon = RsserIcons.Search,
+    selectedIcon = RsserIcons.Search,
     label = Res.string.postsSearchHint,
   ),
   Discovery(
-    icon = TwineIcons.Newsstand,
-    selectedIcon = TwineIcons.Newsstand,
+    icon = RsserIcons.Newsstand,
+    selectedIcon = RsserIcons.Newsstand,
     label = Res.string.discoveryTitle,
   ),
   Bookmarks(
-    icon = TwineIcons.Bookmark,
-    selectedIcon = TwineIcons.BookmarkFilled,
+    icon = RsserIcons.Bookmark,
+    selectedIcon = RsserIcons.BookmarkFilled,
     label = Res.string.bookmarks,
   ),
   Settings(
-    icon = TwineIcons.Settings,
-    selectedIcon = TwineIcons.SettingsFilled,
+    icon = RsserIcons.Settings,
+    selectedIcon = RsserIcons.SettingsFilled,
     label = Res.string.settings,
   ),
 }

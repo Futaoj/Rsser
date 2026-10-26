@@ -47,9 +47,9 @@ import com.mikepenz.markdown.model.markdownPadding
 import dev.sasikanth.rss.reader.components.ModalSheet
 import dev.sasikanth.rss.reader.ui.AppTheme
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.changelogTitle
-import twine.shared.generated.resources.changelogVersion
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.changelogTitle
+import rsser.shared.generated.resources.changelogVersion
 
 @Composable
 internal fun ChangelogSheet(

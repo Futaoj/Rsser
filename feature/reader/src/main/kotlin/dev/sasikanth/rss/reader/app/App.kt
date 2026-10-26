@@ -273,11 +273,11 @@ fun App(
     LaunchedEffect(Unit) {
       ExternalUriHandler.uri.collect { uri ->
         if (uri != null) {
-          if (uri.startsWith("twine://oauth") || uri.startsWith("com.googleusercontent.apps.")) {
+          if (uri.startsWith("rsser://oauth") || uri.startsWith("com.googleusercontent.apps.")) {
             appViewModel.onOAuthRedirect(uri, linkHandler)
-          } else if (uri == "twine://bookmarks") {
+          } else if (uri == "rsser://bookmarks") {
             navigator.navigateToMain(startTab = Screen.Main.TAB_BOOKMARKS)
-          } else if (uri == "twine://reader/currently-playing") {
+          } else if (uri == "rsser://reader/currently-playing") {
             val playingPostId = audioPlayer.playbackState.value.playingPostId
             if (playingPostId != null) {
               appViewModel.onCurrentlyPlayingDeepLink(playingPostId)

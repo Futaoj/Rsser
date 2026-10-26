@@ -19,6 +19,6 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.Sort: ImageVector
+val RsserIcons.Sort: ImageVector
   get() = rsserSort
 private val rsserSort by lazy { rsserIcon("Sort", "M4 5H20M4 12H15M4 19H10") }

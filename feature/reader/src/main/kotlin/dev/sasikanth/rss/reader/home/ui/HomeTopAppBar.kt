@@ -51,6 +51,8 @@ import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.font.FontWeight
 import dev.sasikanth.rss.reader.components.CircularIconButton
 import dev.sasikanth.rss.reader.components.TranslucentButton
 import dev.sasikanth.rss.reader.core.model.local.Feed
@@ -60,22 +62,22 @@ import dev.sasikanth.rss.reader.core.model.local.Source
 import dev.sasikanth.rss.reader.resources.icons.ArrowDown
 import dev.sasikanth.rss.reader.resources.icons.MarkAllAsRead
 import dev.sasikanth.rss.reader.resources.icons.Menu
-import dev.sasikanth.rss.reader.resources.icons.TwineIcons
+import dev.sasikanth.rss.reader.resources.icons.RsserIcons
 import dev.sasikanth.rss.reader.ui.AppTheme
 import dev.sasikanth.rss.reader.utils.smoothVerticalFade
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.appBarAllFeeds
-import twine.shared.generated.resources.buttonCancel
-import twine.shared.generated.resources.buttonConfirm
-import twine.shared.generated.resources.markAllAsRead
-import twine.shared.generated.resources.markAllAsReadDialogDesc
-import twine.shared.generated.resources.markAllAsReadDialogTitle
-import twine.shared.generated.resources.moreMenuOptions
-import twine.shared.generated.resources.postsAll
-import twine.shared.generated.resources.postsLast24Hours
-import twine.shared.generated.resources.postsToday
-import twine.shared.generated.resources.postsUnread
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.appBarAllFeeds
+import rsser.shared.generated.resources.buttonCancel
+import rsser.shared.generated.resources.buttonConfirm
+import rsser.shared.generated.resources.markAllAsRead
+import rsser.shared.generated.resources.markAllAsReadDialogDesc
+import rsser.shared.generated.resources.markAllAsReadDialogTitle
+import rsser.shared.generated.resources.moreMenuOptions
+import rsser.shared.generated.resources.postsAll
+import rsser.shared.generated.resources.postsLast24Hours
+import rsser.shared.generated.resources.postsToday
+import rsser.shared.generated.resources.postsUnread
 
 private const val APP_BAR_OPAQUE_THRESHOLD = 200f
 
@@ -129,7 +131,7 @@ internal fun HomeTopAppBar(
       if (onMenuClicked != null) {
         CircularIconButton(
           modifier = Modifier.padding(start = 12.dp),
-          icon = TwineIcons.Menu,
+          icon = RsserIcons.Menu,
           label = stringResource(Res.string.moreMenuOptions),
           onClick = onMenuClicked,
         )
@@ -151,7 +153,7 @@ internal fun HomeTopAppBar(
               Spacer(Modifier.width(12.dp))
 
               CircularIconButton(
-                icon = TwineIcons.MarkAllAsRead,
+                icon = RsserIcons.MarkAllAsRead,
                 label = stringResource(Res.string.markAllAsRead),
                 enabled = it,
                 backgroundColor = AppTheme.colorScheme.inverseSurface,
@@ -229,8 +231,8 @@ private fun SourceInfo(source: Source?, modifier: Modifier = Modifier) {
 
     Text(
       text = title,
-      fontFamily = androidx.compose.ui.text.font.FontFamily.Serif,
-      style = MaterialTheme.typography.titleLarge,
+      fontFamily = androidx.compose.ui.text.font.FontFamily.Default,
+      style = MaterialTheme.typography.titleLarge.copy(fontSize = 30.sp, fontWeight = FontWeight.Bold),
       color = AppTheme.colorScheme.onSurface,
       maxLines = 1,
     )
@@ -250,7 +252,7 @@ private fun PostTypePill(postsType: PostsType, onClick: () -> Unit, modifier: Mo
   TranslucentButton(
     modifier = modifier,
     text = getPostTypeLabel(postsType),
-    trailingIcon = TwineIcons.ArrowDown,
+    trailingIcon = RsserIcons.ArrowDown,
     onClick = onClick,
   )
 }

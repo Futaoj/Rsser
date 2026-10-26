@@ -51,7 +51,7 @@ fun <T : HttpClientEngineConfig> httpClient(
       socketTimeoutMillis = 60_000
     }
 
-    install(UserAgent) { agent = "Twine/${appInfo.versionName}" }
+    install(UserAgent) { agent = "Rsser/${appInfo.versionName}" }
 
     install(HttpCache)
 

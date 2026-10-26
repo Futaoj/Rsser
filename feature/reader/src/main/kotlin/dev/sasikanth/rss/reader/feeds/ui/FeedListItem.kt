@@ -61,13 +61,13 @@ import dev.sasikanth.rss.reader.resources.icons.MoreVert
 import dev.sasikanth.rss.reader.resources.icons.Pin
 import dev.sasikanth.rss.reader.resources.icons.PinFilled
 import dev.sasikanth.rss.reader.resources.icons.SyncError
-import dev.sasikanth.rss.reader.resources.icons.TwineIcons
+import dev.sasikanth.rss.reader.resources.icons.RsserIcons
 import dev.sasikanth.rss.reader.ui.AppTheme
 import dev.sasikanth.rss.reader.ui.LocalTranslucentStyles
 import kotlin.math.roundToInt
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.feedSyncErrorTitle
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.feedSyncErrorTitle
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -155,7 +155,7 @@ internal fun FeedListItem(
 
       if (feed.syncError != null && onSyncErrorClick != null && !isInMultiSelectMode) {
         IconButton(
-          icon = TwineIcons.SyncError,
+          icon = RsserIcons.SyncError,
           contentDescription = stringResource(Res.string.feedSyncErrorTitle),
           size = IconButtonSize.Small,
           tint = AppTheme.colorScheme.error,
@@ -179,7 +179,7 @@ internal fun FeedListItem(
 
       if (!isInMultiSelectMode) {
         if (onPinClick != null) {
-          val pinIcon = if (feed.pinnedAt != null) TwineIcons.PinFilled else TwineIcons.Pin
+          val pinIcon = if (feed.pinnedAt != null) RsserIcons.PinFilled else RsserIcons.Pin
 
           IconButton(icon = pinIcon, contentDescription = null) { onPinClick(feed) }
         }
@@ -188,7 +188,7 @@ internal fun FeedListItem(
       if (!isInMultiSelectMode && dropdownMenuContent != null) {
         Box {
           IconButton(
-            icon = TwineIcons.MoreVert,
+            icon = RsserIcons.MoreVert,
             contentDescription = null,
             onClick = {
               contextMenuOffset = null

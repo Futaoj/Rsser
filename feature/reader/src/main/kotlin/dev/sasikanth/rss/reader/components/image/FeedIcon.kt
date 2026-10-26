@@ -37,7 +37,7 @@ import coil3.size.Dimension
 import coil3.size.Size
 import dev.sasikanth.rss.reader.favicons.FavIconImageLoader
 import dev.sasikanth.rss.reader.resources.icons.RSS
-import dev.sasikanth.rss.reader.resources.icons.TwineIcons
+import dev.sasikanth.rss.reader.resources.icons.RsserIcons
 import dev.sasikanth.rss.reader.ui.AppTheme
 import dev.sasikanth.rss.reader.utils.LocalBlockImage
 import dev.sasikanth.rss.reader.utils.LocalShowFeedFavIconSetting
@@ -109,5 +109,5 @@ internal fun FeedIcon(
 
 @Composable
 private fun PlaceHolderIcon() {
-  Icon(imageVector = TwineIcons.RSS, contentDescription = null, tint = AppTheme.colorScheme.primary)
+  Icon(imageVector = RsserIcons.RSS, contentDescription = null, tint = AppTheme.colorScheme.primary)
 }

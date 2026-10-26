@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.sasikanth.rss.reader.resources.icons.AiChat
 import dev.sasikanth.rss.reader.resources.icons.ArrowUp
-import dev.sasikanth.rss.reader.resources.icons.TwineIcons
+import dev.sasikanth.rss.reader.resources.icons.RsserIcons
 import dev.sasikanth.rss.reader.utils.BOTTOM_BAR_MAX_WIDTH
 
 @Composable
@@ -44,7 +44,7 @@ internal fun AiEntryBottomBar(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(14.dp),
       ) {
-        Icon(TwineIcons.AiChat, null, tint = colors.primary)
+        Icon(RsserIcons.AiChat, null, tint = colors.primary)
         Column(Modifier.weight(1f)) {
           Text("和 Rsser 聊聊", style = MaterialTheme.typography.titleSmall)
           Text(
@@ -53,7 +53,7 @@ internal fun AiEntryBottomBar(
             color = colors.onSurfaceVariant,
           )
         }
-        Icon(TwineIcons.ArrowUp, null, Modifier.size(20.dp), tint = colors.onSurfaceVariant)
+        Icon(RsserIcons.ArrowUp, null, Modifier.size(20.dp), tint = colors.onSurfaceVariant)
       }
       nowPlayingChip?.invoke(this)
     }

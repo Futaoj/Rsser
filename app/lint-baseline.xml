@@ -29,7 +29,7 @@
         errorLine1="distributionUrl=https\://services.gradle.org/distributions/gradle-9.4.1-bin.zip"
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="$HOME/Projects/twine/gradle/wrapper/gradle-wrapper.properties"
+            file="$HOME/Projects/rsser/gradle/wrapper/gradle-wrapper.properties"
             line="20"
             column="17"/>
     </issue>
@@ -40,7 +40,7 @@
         errorLine1="kotlinx_immutable_collections = &quot;0.5.0&quot;"
         errorLine2="                                ~~~~~~~">
         <location
-            file="$HOME/Projects/twine/gradle/libs.versions.toml"
+            file="$HOME/Projects/rsser/gradle/libs.versions.toml"
             line="16"
             column="33"/>
     </issue>
@@ -51,7 +51,7 @@
         errorLine1="spotless = &quot;8.7.0&quot;"
         errorLine2="           ~~~~~~~">
         <location
-            file="$HOME/Projects/twine/gradle/libs.versions.toml"
+            file="$HOME/Projects/rsser/gradle/libs.versions.toml"
             line="30"
             column="12"/>
     </issue>
@@ -62,7 +62,7 @@
         errorLine1="xmlutil = &quot;0.91.3&quot;"
         errorLine2="          ~~~~~~~~">
         <location
-            file="$HOME/Projects/twine/gradle/libs.versions.toml"
+            file="$HOME/Projects/rsser/gradle/libs.versions.toml"
             line="40"
             column="11"/>
     </issue>
@@ -73,7 +73,7 @@
         errorLine1="xmlutil = &quot;0.91.3&quot;"
         errorLine2="          ~~~~~~~~">
         <location
-            file="$HOME/Projects/twine/gradle/libs.versions.toml"
+            file="$HOME/Projects/rsser/gradle/libs.versions.toml"
             line="40"
             column="11"/>
     </issue>
@@ -84,7 +84,7 @@
         errorLine1="filekit = &quot;0.8.8&quot;"
         errorLine2="          ~~~~~~~">
         <location
-            file="$HOME/Projects/twine/gradle/libs.versions.toml"
+            file="$HOME/Projects/rsser/gradle/libs.versions.toml"
             line="50"
             column="11"/>
     </issue>
@@ -95,7 +95,7 @@
         errorLine1="revenuecat = &quot;3.1.0&quot;"
         errorLine2="             ~~~~~~~">
         <location
-            file="$HOME/Projects/twine/gradle/libs.versions.toml"
+            file="$HOME/Projects/rsser/gradle/libs.versions.toml"
             line="53"
             column="14"/>
     </issue>
@@ -106,7 +106,7 @@
         errorLine1="revenuecat = &quot;3.1.0&quot;"
         errorLine2="             ~~~~~~~">
         <location
-            file="$HOME/Projects/twine/gradle/libs.versions.toml"
+            file="$HOME/Projects/rsser/gradle/libs.versions.toml"
             line="53"
             column="14"/>
     </issue>
@@ -117,7 +117,7 @@
         errorLine1="landscapist = &quot;2.10.0&quot;"
         errorLine2="              ~~~~~~~~">
         <location
-            file="$HOME/Projects/twine/gradle/libs.versions.toml"
+            file="$HOME/Projects/rsser/gradle/libs.versions.toml"
             line="54"
             column="15"/>
     </issue>
@@ -128,7 +128,7 @@
         errorLine1="landscapist = &quot;2.10.0&quot;"
         errorLine2="              ~~~~~~~~">
         <location
-            file="$HOME/Projects/twine/gradle/libs.versions.toml"
+            file="$HOME/Projects/rsser/gradle/libs.versions.toml"
             line="54"
             column="15"/>
     </issue>
@@ -139,7 +139,7 @@
         errorLine1="landscapist = &quot;2.10.0&quot;"
         errorLine2="              ~~~~~~~~">
         <location
-            file="$HOME/Projects/twine/gradle/libs.versions.toml"
+            file="$HOME/Projects/rsser/gradle/libs.versions.toml"
             line="54"
             column="15"/>
     </issue>

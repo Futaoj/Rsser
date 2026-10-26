@@ -91,7 +91,7 @@ private fun OnboardingContent(
       horizontalAlignment = Alignment.CenterHorizontally,
     ) {
       Surface(shape = RoundedCornerShape(24.dp), color = colors.primaryContainer) {
-        Icon(TwineIcons.RsserMark, null, Modifier.padding(24.dp).size(48.dp), tint = colors.primary)
+        Icon(RsserIcons.RsserMark, null, Modifier.padding(24.dp).size(48.dp), tint = colors.primary)
       }
       Spacer(Modifier.height(28.dp))
       Text("Rsser", style = MaterialTheme.typography.displayLarge, fontFamily = FontFamily.Serif)

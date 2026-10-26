@@ -19,7 +19,7 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.CustomTypography: ImageVector
+val RsserIcons.CustomTypography: ImageVector
   get() = rsserCustomTypography
 private val rsserCustomTypography by lazy {
   rsserIcon("CustomTypography", "M3 20L10 4L17 20M6 14H14M18 9V20M15 9H21")

@@ -18,6 +18,6 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.Bookmarks: ImageVector
+val RsserIcons.Bookmarks: ImageVector
   get() = rsserBookmarks
 private val rsserBookmarks by lazy { rsserIcon("Bookmarks", "M6 3H18V21L12 17L6 21Z", false) }

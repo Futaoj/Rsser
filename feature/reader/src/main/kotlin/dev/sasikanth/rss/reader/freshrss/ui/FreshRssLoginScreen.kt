@@ -71,21 +71,21 @@ import dev.sasikanth.rss.reader.ui.AppTheme
 import dev.sasikanth.rss.reader.utils.Constants
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.buttonCancel
-import twine.shared.generated.resources.freshRssClearDataDesc
-import twine.shared.generated.resources.freshRssClearDataPositive
-import twine.shared.generated.resources.freshRssClearDataTitle
-import twine.shared.generated.resources.freshRssErrorLoginFailed
-import twine.shared.generated.resources.freshRssErrorUnknown
-import twine.shared.generated.resources.freshRssLoginButton
-import twine.shared.generated.resources.freshRssLoginTitle
-import twine.shared.generated.resources.freshRssPassword
-import twine.shared.generated.resources.freshRssServerUrl
-import twine.shared.generated.resources.freshRssUsername
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.buttonCancel
+import rsser.shared.generated.resources.freshRssClearDataDesc
+import rsser.shared.generated.resources.freshRssClearDataPositive
+import rsser.shared.generated.resources.freshRssClearDataTitle
+import rsser.shared.generated.resources.freshRssErrorLoginFailed
+import rsser.shared.generated.resources.freshRssErrorUnknown
+import rsser.shared.generated.resources.freshRssLoginButton
+import rsser.shared.generated.resources.freshRssLoginTitle
+import rsser.shared.generated.resources.freshRssPassword
+import rsser.shared.generated.resources.freshRssServerUrl
+import rsser.shared.generated.resources.freshRssUsername
 
 val FRESH_RSS_LOGIN_SUCCESS_KEY =
-  NavResultKey<Boolean>("dev.sasikanth.twine.FRESH_RSS_LOGIN_SUCCESS")
+  NavResultKey<Boolean>("dev.sasikanth.rsser.FRESH_RSS_LOGIN_SUCCESS")
 
 @Composable
 fun FreshRssLoginScreen(

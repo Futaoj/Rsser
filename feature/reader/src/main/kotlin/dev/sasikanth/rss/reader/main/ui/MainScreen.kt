@@ -19,16 +19,25 @@ package dev.sasikanth.rss.reader.main.ui
 
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.focusable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -39,6 +48,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
@@ -61,6 +71,11 @@ import dev.sasikanth.rss.reader.app.Screen
 import dev.sasikanth.rss.reader.feeds.FeedsEvent
 import dev.sasikanth.rss.reader.feeds.FeedsViewModel
 import dev.sasikanth.rss.reader.ui.AppTheme
+import dev.sasikanth.rss.reader.resources.icons.RsserIcons
+import dev.sasikanth.rss.reader.resources.icons.Bookmark
+import dev.sasikanth.rss.reader.resources.icons.Home
+import dev.sasikanth.rss.reader.resources.icons.Newsstand
+import dev.sasikanth.rss.reader.resources.icons.RSS
 import dev.sasikanth.rss.reader.utils.LocalRootWindowSizeClass
 import dev.sasikanth.rss.reader.utils.ShortcutHandler
 import kotlinx.coroutines.launch
@@ -78,6 +93,7 @@ internal fun MainScreen(
   bookmarksContent: @Composable (openDrawer: () -> Unit) -> Unit,
   settingsContent: @Composable (openDrawer: () -> Unit) -> Unit,
   discoveryContent: @Composable (openDrawer: () -> Unit) -> Unit,
+  subscriptionsContent: @Composable (onSourceSelected: () -> Unit) -> Unit,
   openFeedInfoSheet: (id: String) -> Unit,
   openGroupScreen: (id: String) -> Unit,
   openGroupSelectionSheet: () -> Unit,
@@ -113,15 +129,20 @@ internal fun MainScreen(
   val selectedDestination =
     when (currentDestination) {
       is Screen.MainHome -> MainDestination.Home
+      is Screen.MainSubscriptions -> MainDestination.Subscriptions
       is Screen.MainSearch -> MainDestination.Search
       is Screen.MainBookmarks -> MainDestination.Bookmarks
       is Screen.MainSettings -> MainDestination.Settings
       is Screen.MainDiscovery -> MainDestination.Discovery
       else -> MainDestination.Home
     }
+  var phoneDestinationOverride by remember { mutableStateOf<MainDestination?>(null) }
+  LaunchedEffect(selectedDestination) { phoneDestinationOverride = selectedDestination }
+  val displayedDestination = phoneDestinationOverride ?: selectedDestination
 
   LaunchedEffect(startTab) {
     if (startTab == Screen.Main.TAB_BOOKMARKS) {
+      phoneDestinationOverride = MainDestination.Bookmarks
       navigator.popUpTo(Screen.MainHome::class, inclusive = true)
       navigator.navigate(Screen.MainBookmarks)
     }
@@ -178,17 +199,20 @@ internal fun MainScreen(
   }
 
   val goBackToHome = {
+    phoneDestinationOverride = MainDestination.Home
     if (selectedDestination != MainDestination.Home) {
       navigator.popUpTo(Screen.MainHome::class, inclusive = false)
     }
   }
 
   val navigateToDestination = { destination: MainDestination ->
+    phoneDestinationOverride = destination
     if (selectedDestination != destination) {
       navigator.popUpTo(Screen.MainHome::class, inclusive = false)
       val route =
         when (destination) {
           MainDestination.Home -> null
+          MainDestination.Subscriptions -> Screen.MainSubscriptions
           MainDestination.Search -> Screen.MainSearch
           MainDestination.Bookmarks -> Screen.MainBookmarks
           MainDestination.Settings -> Screen.MainSettings
@@ -252,12 +276,14 @@ internal fun MainScreen(
         feedsViewModel = feedsViewModel,
         selectedDestination = selectedDestination,
         onDestinationSelected = {
+          phoneDestinationOverride = it
           if (it == MainDestination.Home && selectedDestination == MainDestination.Home) {
             feedsViewModel.dispatch(FeedsEvent.OnHomeSelected)
           } else {
             val route =
               when (it) {
                 MainDestination.Home -> Screen.MainHome
+                MainDestination.Subscriptions -> Screen.MainSubscriptions
                 MainDestination.Search -> Screen.MainSearch
                 MainDestination.Bookmarks -> Screen.MainBookmarks
                 MainDestination.Settings -> Screen.MainSettings
@@ -313,6 +339,10 @@ internal fun MainScreen(
             bookmarksContent = { bookmarksContent(goBackToHome) },
             settingsContent = { settingsContent(goBackToHome) },
             discoveryContent = { discoveryContent(goBackToHome) },
+            subscriptionsContent = subscriptionsContent,
+            selectedDestination = selectedDestination,
+            onDestinationSelected = navigateToDestination,
+            showPhoneNavigation = false,
           )
         }
       }
@@ -342,6 +372,10 @@ internal fun MainScreen(
           bookmarksContent = { bookmarksContent(goBackToHome) },
           settingsContent = { settingsContent(goBackToHome) },
           discoveryContent = { discoveryContent(goBackToHome) },
+          subscriptionsContent = subscriptionsContent,
+          selectedDestination = displayedDestination,
+          onDestinationSelected = navigateToDestination,
+          showPhoneNavigation = true,
         )
       }
     }
@@ -360,19 +394,78 @@ private fun MainScreenContent(
   bookmarksContent: @Composable () -> Unit,
   settingsContent: @Composable () -> Unit,
   discoveryContent: @Composable () -> Unit,
+  subscriptionsContent: @Composable (onSourceSelected: () -> Unit) -> Unit,
+  selectedDestination: MainDestination,
+  onDestinationSelected: (MainDestination) -> Unit,
+  showPhoneNavigation: Boolean,
 ) {
   val entryProvider =
     entryProvider<NavKey> {
       entry<Screen.MainHome> { homeContent() }
+      entry<Screen.MainSubscriptions> {
+        subscriptionsContent { onDestinationSelected(MainDestination.Home) }
+      }
       entry<Screen.MainSearch> { searchContent() }
       entry<Screen.MainBookmarks> { bookmarksContent() }
       entry<Screen.MainSettings> { settingsContent() }
       entry<Screen.MainDiscovery> { discoveryContent() }
     }
 
-  NavDisplay(
-    backStack = navigator.backStack,
-    entryProvider = entryProvider,
-    onBack = { navigator.goBack() },
-  )
+  Scaffold(
+    bottomBar = {
+      if (showPhoneNavigation) {
+        val destinations =
+          listOf(
+            Triple(MainDestination.Home, RsserIcons.Home, "阅读"),
+            Triple(MainDestination.Subscriptions, RsserIcons.RSS, "订阅"),
+            Triple(MainDestination.Discovery, RsserIcons.Newsstand, "发现"),
+            Triple(MainDestination.Bookmarks, RsserIcons.Bookmark, "收藏"),
+          )
+        NavigationBar(
+          containerColor = AppTheme.colorScheme.backdrop,
+          contentColor = AppTheme.colorScheme.onSurface,
+        ) {
+          destinations.forEach { (destination, icon, label) ->
+            val selected = selectedDestination == destination
+            NavigationBarItem(
+              selected = selected,
+              onClick = { onDestinationSelected(destination) },
+              icon = {
+                Box(
+                  modifier =
+                    Modifier.requiredWidth(64.dp)
+                      .height(32.dp)
+                      .background(
+                        if (selected) AppTheme.colorScheme.primaryContainer else Color.Transparent,
+                        androidx.compose.foundation.shape.RoundedCornerShape(50),
+                      ),
+                  contentAlignment = androidx.compose.ui.Alignment.Center,
+                ) {
+                  Icon(imageVector = icon, contentDescription = null)
+                }
+              },
+              label = { Text(label) },
+              colors =
+                NavigationBarItemDefaults.colors(
+                  selectedIconColor = AppTheme.colorScheme.primary,
+                  selectedTextColor = AppTheme.colorScheme.primary,
+                  unselectedIconColor = AppTheme.colorScheme.onSurfaceVariant,
+                  unselectedTextColor = AppTheme.colorScheme.onSurfaceVariant,
+                  indicatorColor = Color.Transparent,
+                ),
+            )
+          }
+        }
+      }
+    },
+    containerColor = AppTheme.colorScheme.backdrop,
+  ) { insets ->
+    Box(Modifier.fillMaxSize().padding(bottom = insets.calculateBottomPadding())) {
+      NavDisplay(
+        backStack = navigator.backStack,
+        entryProvider = entryProvider,
+        onBack = { navigator.goBack() },
+      )
+    }
+  }
 }

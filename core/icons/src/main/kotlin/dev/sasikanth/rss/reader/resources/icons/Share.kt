@@ -18,7 +18,7 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.Share: ImageVector
+val RsserIcons.Share: ImageVector
   get() = rsserShare
 
 private val rsserShare by lazy { rsserIcon("Share", "M12 16V3M7 8L12 3L17 8M5 13V21H19V13") }

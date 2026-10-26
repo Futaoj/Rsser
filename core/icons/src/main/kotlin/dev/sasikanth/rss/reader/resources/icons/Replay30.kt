@@ -27,7 +27,7 @@ import androidx.compose.ui.graphics.vector.group
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
-public val TwineIcons.Replay30: ImageVector
+public val RsserIcons.Replay30: ImageVector
   get() {
     if (_replay30 != null) {
       return _replay30!!

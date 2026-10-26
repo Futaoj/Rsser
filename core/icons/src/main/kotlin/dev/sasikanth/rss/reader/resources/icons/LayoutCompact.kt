@@ -19,6 +19,6 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.LayoutCompact: ImageVector
+val RsserIcons.LayoutCompact: ImageVector
   get() = rsserLayoutCompact
 private val rsserLayoutCompact by lazy { rsserIcon("LayoutCompact", "M4 5H20M4 12H20M4 19H20") }

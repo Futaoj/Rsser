@@ -37,12 +37,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import dev.sasikanth.rss.reader.resources.icons.Close
 import dev.sasikanth.rss.reader.resources.icons.Platform
-import dev.sasikanth.rss.reader.resources.icons.TwineIcons
+import dev.sasikanth.rss.reader.resources.icons.RsserIcons
 import dev.sasikanth.rss.reader.resources.icons.platform
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.buttonClose
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.buttonClose
 
 /**
  * A [ModalBottomSheet] that swaps the drag handle for a full width row with an end aligned close

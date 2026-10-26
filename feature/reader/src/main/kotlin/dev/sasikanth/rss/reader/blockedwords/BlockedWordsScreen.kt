@@ -69,22 +69,22 @@ import dev.sasikanth.rss.reader.components.SimpleTopAppBar
 import dev.sasikanth.rss.reader.core.model.local.BlockedWord
 import dev.sasikanth.rss.reader.resources.icons.Check
 import dev.sasikanth.rss.reader.resources.icons.DeleteOutline
-import dev.sasikanth.rss.reader.resources.icons.TwineIcons
+import dev.sasikanth.rss.reader.resources.icons.RsserIcons
 import dev.sasikanth.rss.reader.ui.AppTheme
 import dev.sasikanth.rss.reader.ui.LocalTranslucentStyles
 import dev.sasikanth.rss.reader.utils.KeyboardState
 import dev.sasikanth.rss.reader.utils.keyboardVisibilityAsState
 import dev.sasikanth.rss.reader.utils.restrictContentWidth
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.blockedWords
-import twine.shared.generated.resources.blockedWordsDesc
-import twine.shared.generated.resources.blockedWordsEmpty
-import twine.shared.generated.resources.blockedWordsHint
-import twine.shared.generated.resources.buttonAdd
-import twine.shared.generated.resources.delete
-import twine.shared.generated.resources.readLess
-import twine.shared.generated.resources.readMore
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.blockedWords
+import rsser.shared.generated.resources.blockedWordsDesc
+import rsser.shared.generated.resources.blockedWordsEmpty
+import rsser.shared.generated.resources.blockedWordsHint
+import rsser.shared.generated.resources.buttonAdd
+import rsser.shared.generated.resources.delete
+import rsser.shared.generated.resources.readLess
+import rsser.shared.generated.resources.readMore
 
 @Composable
 fun BlockedWordsScreen(
@@ -167,7 +167,7 @@ fun BlockedWordsScreen(
               exit = fadeOut() + shrinkHorizontally(shrinkTowards = Alignment.Start),
             ) {
               IconButton(
-                icon = TwineIcons.Check,
+                icon = RsserIcons.Check,
                 contentDescription = stringResource(Res.string.buttonAdd),
                 onClick = {
                   viewModel.dispatch(
@@ -289,7 +289,7 @@ private fun BlockedWordItem(
     )
 
     IconButton(
-      icon = TwineIcons.DeleteOutline,
+      icon = RsserIcons.DeleteOutline,
       contentDescription = stringResource(Res.string.delete),
       onClick = removeClicked,
     )

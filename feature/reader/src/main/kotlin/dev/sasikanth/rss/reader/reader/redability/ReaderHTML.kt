@@ -17,7 +17,7 @@
 
 package dev.sasikanth.rss.reader.reader.redability
 
-import twine.shared.generated.resources.Res
+import rsser.shared.generated.resources.Res
 
 object ReaderHTML {
 

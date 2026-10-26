@@ -56,13 +56,13 @@ import dev.sasikanth.rss.reader.home.ui.PostListItem
 import dev.sasikanth.rss.reader.home.ui.PostMetadataConfig
 import dev.sasikanth.rss.reader.platform.LocalLinkHandler
 import dev.sasikanth.rss.reader.resources.icons.BookmarkStacks
-import dev.sasikanth.rss.reader.resources.icons.TwineIcons
+import dev.sasikanth.rss.reader.resources.icons.RsserIcons
 import dev.sasikanth.rss.reader.ui.AppTheme
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.bookmarks
-import twine.shared.generated.resources.bookmarksPlaceholder
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.bookmarks
+import rsser.shared.generated.resources.bookmarksPlaceholder
 
 @Composable
 internal fun BookmarksScreen(
@@ -172,7 +172,7 @@ private fun BookmarksContent(
         ) {
           Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Icon(
-              imageVector = TwineIcons.BookmarkStacks,
+              imageVector = RsserIcons.BookmarkStacks,
               contentDescription = null,
               modifier = Modifier.size(80.dp),
               tint = AppTheme.colorScheme.onSurface,

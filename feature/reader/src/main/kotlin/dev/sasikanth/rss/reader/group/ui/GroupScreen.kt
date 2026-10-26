@@ -72,7 +72,7 @@ import dev.sasikanth.rss.reader.resources.icons.ArrowBack
 import dev.sasikanth.rss.reader.resources.icons.Delete
 import dev.sasikanth.rss.reader.resources.icons.NewGroup
 import dev.sasikanth.rss.reader.resources.icons.RemoveFeed
-import dev.sasikanth.rss.reader.resources.icons.TwineIcons
+import dev.sasikanth.rss.reader.resources.icons.RsserIcons
 import dev.sasikanth.rss.reader.resources.icons.UnGroup
 import dev.sasikanth.rss.reader.ui.AppTheme
 import dev.sasikanth.rss.reader.utils.removeLineBreaks
@@ -80,13 +80,13 @@ import dev.sasikanth.rss.reader.utils.restrictContentWidth
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.actionDelete
-import twine.shared.generated.resources.actionMoveTo
-import twine.shared.generated.resources.actionUngroup
-import twine.shared.generated.resources.buttonGoBack
-import twine.shared.generated.resources.feedOptionRemove
-import twine.shared.generated.resources.groupNameHint
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.actionDelete
+import rsser.shared.generated.resources.actionMoveTo
+import rsser.shared.generated.resources.actionUngroup
+import rsser.shared.generated.resources.buttonGoBack
+import rsser.shared.generated.resources.feedOptionRemove
+import rsser.shared.generated.resources.groupNameHint
 
 @Composable
 fun GroupScreen(
@@ -145,7 +145,7 @@ private fun GroupContent(
             navigationIcon = {
               CircularIconButton(
                 modifier = Modifier.padding(start = 12.dp),
-                icon = TwineIcons.ArrowBack,
+                icon = RsserIcons.ArrowBack,
                 label = stringResource(Res.string.buttonGoBack),
                 onClick = { goBack() },
               )
@@ -175,21 +175,21 @@ private fun GroupContent(
         ) {
           ContextActionItem(
             modifier = Modifier.weight(1f),
-            icon = TwineIcons.NewGroup,
+            icon = RsserIcons.NewGroup,
             label = stringResource(Res.string.actionMoveTo),
             onClick = { openGroupSelection() },
           )
 
           ContextActionItem(
             modifier = Modifier.weight(1f),
-            icon = TwineIcons.Delete,
+            icon = RsserIcons.Delete,
             label = stringResource(Res.string.actionDelete),
             onClick = { dispatch(GroupEvent.OnDeleteSelectedFeedsClicked) },
           )
 
           ContextActionItem(
             modifier = Modifier.weight(1f),
-            icon = TwineIcons.UnGroup,
+            icon = RsserIcons.UnGroup,
             label = stringResource(Res.string.actionUngroup),
             onClick = { dispatch(GroupEvent.OnUngroupClicked) },
           )
@@ -227,7 +227,7 @@ private fun GroupContent(
             dropdownMenuContent = { onDismiss ->
               DropdownMenuItem(
                 text = stringResource(Res.string.actionMoveTo),
-                leadingIcon = TwineIcons.NewGroup,
+                leadingIcon = RsserIcons.NewGroup,
                 onClick = {
                   dispatch(GroupEvent.OnFeedSelected(feed))
                   openGroupSelection()
@@ -237,7 +237,7 @@ private fun GroupContent(
 
               DropdownMenuItem(
                 text = stringResource(Res.string.actionUngroup),
-                leadingIcon = TwineIcons.UnGroup,
+                leadingIcon = RsserIcons.UnGroup,
                 onClick = {
                   dispatch(GroupEvent.OnFeedSelected(feed))
                   dispatch(GroupEvent.OnUngroupClicked)
@@ -249,7 +249,7 @@ private fun GroupContent(
 
               DropdownMenuItem(
                 text = stringResource(Res.string.feedOptionRemove),
-                leadingIcon = TwineIcons.RemoveFeed,
+                leadingIcon = RsserIcons.RemoveFeed,
                 onClick = {
                   dispatch(GroupEvent.OnFeedSelected(feed))
                   dispatch(GroupEvent.OnDeleteSelectedFeedsClicked)

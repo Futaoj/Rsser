@@ -53,7 +53,7 @@ class SourcesOpmlTest {
       <?xml version="1.0" encoding="UTF-8"?>
       <opml version="2.0">
         <head>
-          <title>Twine RSS Feeds</title>
+          <title>Rsser RSS Feeds</title>
         </head>
         <body>
           <outline title="Tech" text="Tech">
@@ -78,7 +78,7 @@ class SourcesOpmlTest {
       <?xml version="1.0" encoding="UTF-8"?>
       <opml version="2.0">
         <head>
-          <title>Twine RSS Feeds</title>
+          <title>Rsser RSS Feeds</title>
         </head>
         <body>
           <outline title="Tech">

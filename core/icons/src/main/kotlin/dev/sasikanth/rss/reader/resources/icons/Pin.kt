@@ -18,6 +18,6 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.Pin: ImageVector
+val RsserIcons.Pin: ImageVector
   get() = rsserPin
 private val rsserPin by lazy { rsserIcon("Pin", "M8 3H16L15 9L19 13V15H5V13L9 9ZM12 15V22") }

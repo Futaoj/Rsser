@@ -19,9 +19,9 @@ package dev.sasikanth.rss.reader.data.utils
 
 object Constants {
   const val APP_GROUP = "group.dev.sasikanth.rss.reader"
-  const val DATA_STORE_FILE_NAME = "twine.preferences_pb"
+  const val DATA_STORE_FILE_NAME = "rsser.preferences_pb"
   const val NUMBER_OF_FEATURED_POSTS = 6L
-  const val BACKUP_FILE_NAME = "twine_backup"
+  const val BACKUP_FILE_NAME = "rsser_backup"
   const val BACKUP_FILE_EXTENSION = "opml"
   const val GROUP_CONCAT_SEPARATOR = "::"
 }

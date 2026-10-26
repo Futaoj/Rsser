@@ -47,6 +47,6 @@ Use direct Android client calls to DeepSeek's OpenAI-compatible chat completions
 
 ## Constraints
 
-- Project root: `/Users/wanghan/Projects/git_clone/twine_a`.
+- Project root: `/Users/wanghan/Projects/git_clone/rsser_a`.
 - This directory is not a Git repository, so the design cannot be committed here.
 - Current project localization is Simplified Chinese; new user-facing strings should be Chinese.

@@ -21,7 +21,7 @@ import dev.sasikanth.rss.reader.core.model.DiscoveryGroup
 import dev.sasikanth.rss.reader.di.scopes.AppScope
 import kotlinx.serialization.json.Json
 import me.tatarka.inject.annotations.Inject
-import twine.shared.generated.resources.Res
+import rsser.shared.generated.resources.Res
 
 @Inject
 @AppScope

@@ -71,6 +71,8 @@ import dev.sasikanth.rss.reader.groupselection.ui.SELECTED_GROUPS_KEY
 import dev.sasikanth.rss.reader.home.HomeViewModel
 import dev.sasikanth.rss.reader.home.ui.HomeScreen
 import dev.sasikanth.rss.reader.main.ui.MainScreen
+import dev.sasikanth.rss.reader.main.ui.MainDestination
+import dev.sasikanth.rss.reader.main.ui.NavigationDrawerContent
 import dev.sasikanth.rss.reader.miniflux.MinifluxLoginViewModel
 import dev.sasikanth.rss.reader.miniflux.ui.MINIFLUX_LOGIN_SUCCESS_KEY
 import dev.sasikanth.rss.reader.miniflux.ui.MinifluxLoginScreen
@@ -105,8 +107,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.readerPanePlaceholder
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.readerPanePlaceholder
 
 fun EntryProviderScope<NavKey>.placeholderScreen(
   modifier: Modifier = Modifier,
@@ -315,6 +317,23 @@ fun EntryProviderScope<NavKey>.mainScreen(
             modifier = screenModifier,
           )
         },
+        subscriptionsContent = { onSourceSelected ->
+          NavigationDrawerContent(
+            feedsViewModel = feedsViewModel,
+            selectedDestination = MainDestination.Subscriptions,
+            onDestinationSelected = {},
+            openFeedInfoSheet = { feedId -> navigator.navigate(Modals.FeedInfo(feedId)) },
+            openGroupScreen = { groupId -> navigator.navigate(Screen.FeedGroup(groupId)) },
+            openGroupSelectionSheet = { feedsViewModel.dispatch(FeedsEvent.OnAddToGroupClicked) },
+            openAddFeedScreen = { navigator.navigate(Screen.AddFeed) },
+            closeDrawer = {},
+            showCloseIcon = false,
+            dismissOnSelection = false,
+            managementPage = true,
+            onSourceSelected = onSourceSelected,
+            modifier = screenModifier,
+          )
+        },
         openFeedInfoSheet = { feedId -> navigator.navigate(Modals.FeedInfo(feedId)) },
         openGroupScreen = { groupId -> navigator.navigate(Screen.FeedGroup(groupId)) },
         openGroupSelectionSheet = { feedsViewModel.dispatch(FeedsEvent.OnAddToGroupClicked) },
@@ -497,7 +516,7 @@ fun EntryProviderScope<NavKey>.readerScreen(
     // A quick hack is to inject ReaderScreenArgs or just let KMP viewModel provide an empty handle
     // and rely on a workaround, or better:
     // With entry<Screen.Reader>, `route` is already the decoded Screen.Reader object!
-    // Since twine expects ReaderScreenArgs in the ViewModel from SavedStateHandle... wait!
+    // Since rsser expects ReaderScreenArgs in the ViewModel from SavedStateHandle... wait!
     // `val viewModel = viewModel { readerViewModel(it.savedStateHandle) }`
     // We can create a fake SavedStateHandle containing ReaderScreenArgs:
     val savedStateHandle = SavedStateHandle(mapOf("readerScreenArgs" to route.readerScreenArgs))

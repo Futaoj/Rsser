@@ -21,7 +21,7 @@ kotlin {
 }
 
 compose.resources {
-  packageOfResClass = "twine.shared.generated.resources"
+  packageOfResClass = "rsser.shared.generated.resources"
   publicResClass = true
   generateResClass = always
 }

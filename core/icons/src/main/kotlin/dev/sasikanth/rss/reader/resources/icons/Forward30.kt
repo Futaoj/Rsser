@@ -27,7 +27,7 @@ import androidx.compose.ui.graphics.vector.group
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
-public val TwineIcons.Forward30: ImageVector
+public val RsserIcons.Forward30: ImageVector
   get() {
     if (_forward30 != null) {
       return _forward30!!

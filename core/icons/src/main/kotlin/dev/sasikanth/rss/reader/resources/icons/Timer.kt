@@ -19,7 +19,7 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.Timer: ImageVector
+val RsserIcons.Timer: ImageVector
   get() = rsserTimer
 private val rsserTimer by lazy {
   rsserIcon("Timer", "M7 2H17M12 2V5M19 5L21 3M21 14A9 9 0 1 1 3 14A9 9 0 1 1 21 14ZM12 9V14L15 16")

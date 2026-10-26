@@ -19,7 +19,7 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.NewGroup: ImageVector
+val RsserIcons.NewGroup: ImageVector
   get() = rsserNewGroup
 private val rsserNewGroup by lazy {
   rsserIcon("NewGroup", "M3 6H10L12 8H21V21H3ZM12 11V18M8.5 14.5H15.5")

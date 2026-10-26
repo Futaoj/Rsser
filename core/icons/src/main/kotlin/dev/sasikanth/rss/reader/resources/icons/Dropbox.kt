@@ -27,7 +27,7 @@ import androidx.compose.ui.graphics.vector.ImageVector.Builder
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
-public val TwineIcons.Dropbox: ImageVector
+public val RsserIcons.Dropbox: ImageVector
   get() {
     if (_dropbox != null) {
       return _dropbox!!

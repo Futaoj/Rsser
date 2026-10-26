@@ -35,7 +35,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import dev.sasikanth.rss.reader.resources.icons.RSS
-import dev.sasikanth.rss.reader.resources.icons.TwineIcons
+import dev.sasikanth.rss.reader.resources.icons.RsserIcons
 import dev.sasikanth.rss.reader.ui.AppTheme
 import dev.sasikanth.rss.reader.ui.LocalTranslucentStyles
 
@@ -45,7 +45,7 @@ internal fun SettingsNavigationItem(
   subtitle: String?,
   onClick: () -> Unit,
   modifier: Modifier = Modifier,
-  icon: ImageVector = TwineIcons.RSS,
+  icon: ImageVector = RsserIcons.RSS,
 ) {
   Box(modifier = modifier.clickable(onClick = onClick)) {
     Row(modifier = Modifier.padding(all = 16.dp), verticalAlignment = Alignment.CenterVertically) {

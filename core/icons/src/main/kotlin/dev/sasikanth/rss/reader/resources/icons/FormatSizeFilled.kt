@@ -19,7 +19,7 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.FormatSize: ImageVector
+val RsserIcons.FormatSize: ImageVector
   get() = rsserFormatSize
 private val rsserFormatSize by lazy {
   rsserIcon("FormatSize", "M3 7V4H15V7M9 4V20M5 20H13M15 12V10H23V12M19 10V20M16 20H22")

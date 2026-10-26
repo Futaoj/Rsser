@@ -43,7 +43,7 @@ class MediaService : MediaSessionService() {
       CacheDataSource.Factory()
         .setCache(AudioCacheProvider.cache)
         .setUpstreamDataSourceFactory(
-          DefaultHttpDataSource.Factory().setAllowCrossProtocolRedirects(true).setUserAgent("Twine")
+          DefaultHttpDataSource.Factory().setAllowCrossProtocolRedirects(true).setUserAgent("Rsser")
         )
 
     val player =
@@ -59,7 +59,7 @@ class MediaService : MediaSessionService() {
         .build()
 
     val sessionActivityIntent =
-      Intent(Intent.ACTION_VIEW, Uri.parse("twine://reader/currently-playing")).apply {
+      Intent(Intent.ACTION_VIEW, Uri.parse("rsser://reader/currently-playing")).apply {
         setPackage(packageName)
         resolveDeepLinkComponent(this)?.let { component = it }
       }

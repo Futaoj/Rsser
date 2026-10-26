@@ -19,6 +19,6 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.ArrowDown: ImageVector
+val RsserIcons.ArrowDown: ImageVector
   get() = rsserArrowDown
 private val rsserArrowDown by lazy { rsserIcon("ArrowDown", "M6 9L12 15L18 9") }

@@ -26,7 +26,7 @@ import androidx.compose.ui.graphics.vector.ImageVector.Builder
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
-public val TwineIcons.Miniflux: ImageVector
+public val RsserIcons.Miniflux: ImageVector
   get() {
     if (_miniflux != null) {
       return _miniflux!!

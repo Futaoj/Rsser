@@ -53,16 +53,16 @@ import dev.sasikanth.rss.reader.data.opml.OpmlResult
 import dev.sasikanth.rss.reader.feeds.ui.SelectedCheckIndicator
 import dev.sasikanth.rss.reader.ui.AppTheme
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.buttonCancel
-import twine.shared.generated.resources.settingsHeaderOpml
-import twine.shared.generated.resources.settingsOpmlCancel
-import twine.shared.generated.resources.settingsOpmlExport
-import twine.shared.generated.resources.settingsOpmlExporting
-import twine.shared.generated.resources.settingsOpmlImport
-import twine.shared.generated.resources.settingsOpmlImporting
-import twine.shared.generated.resources.settingsOpmlSelectionSubtitle
-import twine.shared.generated.resources.settingsOpmlSelectionTitle
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.buttonCancel
+import rsser.shared.generated.resources.settingsHeaderOpml
+import rsser.shared.generated.resources.settingsOpmlCancel
+import rsser.shared.generated.resources.settingsOpmlExport
+import rsser.shared.generated.resources.settingsOpmlExporting
+import rsser.shared.generated.resources.settingsOpmlImport
+import rsser.shared.generated.resources.settingsOpmlImporting
+import rsser.shared.generated.resources.settingsOpmlSelectionSubtitle
+import rsser.shared.generated.resources.settingsOpmlSelectionTitle
 
 @Composable
 internal fun OPMLSettingItem(

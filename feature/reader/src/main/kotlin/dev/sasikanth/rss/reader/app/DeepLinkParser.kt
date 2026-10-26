@@ -23,15 +23,15 @@ import kotlinx.serialization.json.Json
 object DeepLinkParser {
 
   fun parse(uriString: String): Screen? {
-    if (uriString == "twine://add") {
+    if (uriString == "rsser://add") {
       return Screen.AddFeed
     }
-    if (uriString == "twine://bookmarks") {
+    if (uriString == "rsser://bookmarks") {
       return Screen.Main(startTab = Screen.Main.TAB_BOOKMARKS)
     }
-    if (uriString.startsWith("twine://reader/")) {
+    if (uriString.startsWith("rsser://reader/")) {
       try {
-        val jsonStr = uriString.removePrefix("twine://reader/")
+        val jsonStr = uriString.removePrefix("rsser://reader/")
         // In Navigation 2, Reader arguments were passed as a JSON string in the route
         val args = Json.decodeFromString(ReaderScreenArgs.serializer(), jsonStr)
         return Screen.Reader(args)

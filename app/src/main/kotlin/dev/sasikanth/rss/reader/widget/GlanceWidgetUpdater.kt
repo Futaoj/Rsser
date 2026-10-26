@@ -30,9 +30,9 @@ object GlanceWidgetUpdater {
 
   fun update(context: Context) {
     scope.launch {
-      TwineUnreadSmallWidget().updateAll(context)
-      TwineUnreadMediumWidget().updateAll(context)
-      TwineUnreadLargeWidget().updateAll(context)
+      RsserUnreadSmallWidget().updateAll(context)
+      RsserUnreadMediumWidget().updateAll(context)
+      RsserUnreadLargeWidget().updateAll(context)
     }
   }
 }

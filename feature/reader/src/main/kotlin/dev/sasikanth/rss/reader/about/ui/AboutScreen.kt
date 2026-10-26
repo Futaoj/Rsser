@@ -59,7 +59,7 @@ import dev.sasikanth.rss.reader.components.SimpleTopAppBar
 import dev.sasikanth.rss.reader.platform.LocalLinkHandler
 import dev.sasikanth.rss.reader.resources.icons.GitHub
 import dev.sasikanth.rss.reader.resources.icons.Threads
-import dev.sasikanth.rss.reader.resources.icons.TwineIcons
+import dev.sasikanth.rss.reader.resources.icons.RsserIcons
 import dev.sasikanth.rss.reader.resources.icons.Twitter
 import dev.sasikanth.rss.reader.resources.icons.Website
 import dev.sasikanth.rss.reader.ui.AppTheme
@@ -67,14 +67,14 @@ import dev.sasikanth.rss.reader.utils.Constants
 import dev.sasikanth.rss.reader.utils.restrictContentWidth
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.about
-import twine.shared.generated.resources.aboutRoleDesigner
-import twine.shared.generated.resources.aboutRoleDeveloper
-import twine.shared.generated.resources.aboutSocialGitHub
-import twine.shared.generated.resources.aboutSocialThreads
-import twine.shared.generated.resources.aboutSocialTwitter
-import twine.shared.generated.resources.aboutSocialWebsite
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.about
+import rsser.shared.generated.resources.aboutRoleDesigner
+import rsser.shared.generated.resources.aboutRoleDeveloper
+import rsser.shared.generated.resources.aboutSocialGitHub
+import rsser.shared.generated.resources.aboutSocialThreads
+import rsser.shared.generated.resources.aboutSocialTwitter
+import rsser.shared.generated.resources.aboutSocialWebsite
 
 @Composable
 fun AboutScreen(goBack: () -> Unit, modifier: Modifier = Modifier) {
@@ -96,22 +96,22 @@ fun AboutScreen(goBack: () -> Unit, modifier: Modifier = Modifier) {
             Social(
               service = aboutSocialThreads,
               link = Constants.ABOUT_SASI_THREADS,
-              icon = TwineIcons.Threads,
+              icon = RsserIcons.Threads,
             ),
             Social(
               service = aboutSocialTwitter,
               link = Constants.ABOUT_SASI_TWITTER,
-              icon = TwineIcons.Twitter,
+              icon = RsserIcons.Twitter,
             ),
             Social(
               service = aboutSocialGitHub,
               link = Constants.ABOUT_SASI_GITHUB,
-              icon = TwineIcons.GitHub,
+              icon = RsserIcons.GitHub,
             ),
             Social(
               service = aboutSocialWebsite,
               link = Constants.ABOUT_SASI_WEBSITE,
-              icon = TwineIcons.Website,
+              icon = RsserIcons.Website,
             ),
           ),
       ),
@@ -124,12 +124,12 @@ fun AboutScreen(goBack: () -> Unit, modifier: Modifier = Modifier) {
             Social(
               service = aboutSocialThreads,
               link = Constants.ABOUT_ED_THREADS,
-              icon = TwineIcons.Threads,
+              icon = RsserIcons.Threads,
             ),
             Social(
               service = aboutSocialTwitter,
               link = Constants.ABOUT_ED_TWITTER,
-              icon = TwineIcons.Twitter,
+              icon = RsserIcons.Twitter,
             ),
           ),
       ),
@@ -172,7 +172,7 @@ private fun AboutContent(persons: List<Person>, goBack: () -> Unit, modifier: Mo
               )
               Spacer(Modifier.height(20.dp))
               Text(
-                "基于 Twine 开源项目修改，遵循 GPLv3 许可。以下为原项目贡献者。",
+                "Rsser · 2026 年 10 月修订版 · GPLv3。贡献者名单如下。",
                 style = MaterialTheme.typography.bodySmall,
                 color = AppTheme.colorScheme.onSurfaceVariant,
               )

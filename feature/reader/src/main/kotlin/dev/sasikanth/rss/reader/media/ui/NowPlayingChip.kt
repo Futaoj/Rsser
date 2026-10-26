@@ -70,17 +70,17 @@ import dev.sasikanth.rss.reader.components.image.AsyncImage
 import dev.sasikanth.rss.reader.media.PlaybackState
 import dev.sasikanth.rss.reader.resources.icons.Pause
 import dev.sasikanth.rss.reader.resources.icons.Play
-import dev.sasikanth.rss.reader.resources.icons.TwineIcons
+import dev.sasikanth.rss.reader.resources.icons.RsserIcons
 import dev.sasikanth.rss.reader.ui.AppTheme
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.nowPlayingOpenEpisode
-import twine.shared.generated.resources.nowPlayingStop
-import twine.shared.generated.resources.pause
-import twine.shared.generated.resources.play
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.nowPlayingOpenEpisode
+import rsser.shared.generated.resources.nowPlayingStop
+import rsser.shared.generated.resources.pause
+import rsser.shared.generated.resources.play
 
 @Immutable
 private data class NowPlayingChipState(
@@ -386,7 +386,7 @@ private fun PlayPauseButton(
   ) {
     Icon(
       modifier = Modifier.requiredSize(if (isPlaying) 22.dp else 26.dp),
-      imageVector = if (isPlaying) TwineIcons.Pause else TwineIcons.Play,
+      imageVector = if (isPlaying) RsserIcons.Pause else RsserIcons.Play,
       contentDescription = null,
       tint = contentColor,
     )

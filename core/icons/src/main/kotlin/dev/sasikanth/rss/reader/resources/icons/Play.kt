@@ -19,6 +19,6 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.Play: ImageVector
+val RsserIcons.Play: ImageVector
   get() = rsserPlay
 private val rsserPlay by lazy { rsserIcon("Play", "M7 4L20 12L7 20Z") }

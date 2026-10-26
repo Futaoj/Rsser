@@ -74,29 +74,6 @@ internal fun PostHeader(
     val description = readerPost.description
     val postImage = readerPost.imageUrl
 
-    if (!postImage.isNullOrBlank()) {
-      Box(
-        modifier =
-          Modifier.padding(horizontal = 16.dp).align(Alignment.CenterHorizontally).clickable {
-            onImageClick(postImage)
-          }
-      ) {
-        FeaturedImage(
-          imageUrl = postImage,
-          unlockAspectRatio = UrlUtils.isUnconstrainedMedia(postImage),
-          alignment =
-            remember(page) {
-              ParallaxAlignment(
-                horizontalBias = { pagerState.getOffsetFractionForPage(page) },
-                multiplier = 2f,
-              )
-            },
-        )
-      }
-
-      Spacer(modifier = Modifier.requiredHeight(8.dp))
-    }
-
     Column(modifier = Modifier.padding(horizontal = 24.dp)) {
       Text(
         modifier =
@@ -113,7 +90,7 @@ internal fun PostHeader(
         text = title.ifBlank { description },
         style = MaterialTheme.typography.headlineMedium,
         fontWeight = FontWeight.Bold,
-        color = AppTheme.colorScheme.secondary,
+        color = AppTheme.colorScheme.onSurface,
         overflow = TextOverflow.Ellipsis,
       )
 
@@ -160,6 +137,26 @@ internal fun PostHeader(
           onDropdownChange = { showDropdown = it },
           onSourceClick = {
             // no-op
+          },
+        )
+      }
+    }
+
+    if (!postImage.isNullOrBlank()) {
+      Spacer(modifier = Modifier.requiredHeight(20.dp))
+      Box(
+        modifier = Modifier.padding(horizontal = 16.dp).align(Alignment.CenterHorizontally).clickable {
+          onImageClick(postImage)
+        }
+      ) {
+        FeaturedImage(
+          imageUrl = postImage,
+          unlockAspectRatio = UrlUtils.isUnconstrainedMedia(postImage),
+          alignment = remember(page) {
+            ParallaxAlignment(
+              horizontalBias = { pagerState.getOffsetFractionForPage(page) },
+              multiplier = 2f,
+            )
           },
         )
       }

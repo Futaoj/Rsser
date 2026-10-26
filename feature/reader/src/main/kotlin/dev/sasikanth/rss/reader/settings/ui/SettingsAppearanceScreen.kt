@@ -71,7 +71,7 @@ import dev.sasikanth.rss.reader.home.ui.CompactPostListItem
 import dev.sasikanth.rss.reader.home.ui.PostListItem
 import dev.sasikanth.rss.reader.home.ui.SimplePostListItem
 import dev.sasikanth.rss.reader.resources.icons.ArrowDown
-import dev.sasikanth.rss.reader.resources.icons.TwineIcons
+import dev.sasikanth.rss.reader.resources.icons.RsserIcons
 import dev.sasikanth.rss.reader.resources.icons.platform
 import dev.sasikanth.rss.reader.settings.SettingsEvent
 import dev.sasikanth.rss.reader.settings.SettingsState
@@ -84,35 +84,35 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.homeViewMode
-import twine.shared.generated.resources.homeViewModeCompact
-import twine.shared.generated.resources.homeViewModeDefault
-import twine.shared.generated.resources.homeViewModeSimple
-import twine.shared.generated.resources.other
-import twine.shared.generated.resources.settingsAppearanceAndLayout
-import twine.shared.generated.resources.settingsHeaderTheme
-import twine.shared.generated.resources.settingsShowFeaturedSectionSubtitle
-import twine.shared.generated.resources.settingsShowFeaturedSectionTitle
-import twine.shared.generated.resources.settingsShowUnreadCountSubtitle
-import twine.shared.generated.resources.settingsShowUnreadCountTitle
-import twine.shared.generated.resources.settingsThemeAuto
-import twine.shared.generated.resources.settingsThemeDark
-import twine.shared.generated.resources.settingsThemeLight
-import twine.shared.generated.resources.showFeedFavIconDesc
-import twine.shared.generated.resources.showFeedFavIconTitle
-import twine.shared.generated.resources.themeVariantAmber
-import twine.shared.generated.resources.themeVariantCoral
-import twine.shared.generated.resources.themeVariantDynamic
-import twine.shared.generated.resources.themeVariantForest
-import twine.shared.generated.resources.themeVariantLavender
-import twine.shared.generated.resources.themeVariantParchment
-import twine.shared.generated.resources.themeVariantRaspberry
-import twine.shared.generated.resources.themeVariantSepia
-import twine.shared.generated.resources.themeVariantSkyline
-import twine.shared.generated.resources.themeVariantSlate
-import twine.shared.generated.resources.themeVariantSolarized
-import twine.shared.generated.resources.themeVariantSystemDynamic
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.homeViewMode
+import rsser.shared.generated.resources.homeViewModeCompact
+import rsser.shared.generated.resources.homeViewModeDefault
+import rsser.shared.generated.resources.homeViewModeSimple
+import rsser.shared.generated.resources.other
+import rsser.shared.generated.resources.settingsAppearanceAndLayout
+import rsser.shared.generated.resources.settingsHeaderTheme
+import rsser.shared.generated.resources.settingsShowFeaturedSectionSubtitle
+import rsser.shared.generated.resources.settingsShowFeaturedSectionTitle
+import rsser.shared.generated.resources.settingsShowUnreadCountSubtitle
+import rsser.shared.generated.resources.settingsShowUnreadCountTitle
+import rsser.shared.generated.resources.settingsThemeAuto
+import rsser.shared.generated.resources.settingsThemeDark
+import rsser.shared.generated.resources.settingsThemeLight
+import rsser.shared.generated.resources.showFeedFavIconDesc
+import rsser.shared.generated.resources.showFeedFavIconTitle
+import rsser.shared.generated.resources.themeVariantAmber
+import rsser.shared.generated.resources.themeVariantCoral
+import rsser.shared.generated.resources.themeVariantDynamic
+import rsser.shared.generated.resources.themeVariantForest
+import rsser.shared.generated.resources.themeVariantLavender
+import rsser.shared.generated.resources.themeVariantParchment
+import rsser.shared.generated.resources.themeVariantRaspberry
+import rsser.shared.generated.resources.themeVariantSepia
+import rsser.shared.generated.resources.themeVariantSkyline
+import rsser.shared.generated.resources.themeVariantSlate
+import rsser.shared.generated.resources.themeVariantSolarized
+import rsser.shared.generated.resources.themeVariantSystemDynamic
 
 @Composable
 internal fun SettingsAppearanceScreen(
@@ -245,7 +245,7 @@ private fun ThemeModeSelector(
   Box {
     TranslucentButton(
       text = appThemeMode.displayName(),
-      trailingIcon = TwineIcons.ArrowDown,
+      trailingIcon = RsserIcons.ArrowDown,
       onClick = { showDropdown = true },
     )
 

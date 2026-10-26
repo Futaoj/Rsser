@@ -103,6 +103,7 @@ import com.mikepenz.markdown.compose.elements.MarkdownHighlightedCodeFence
 import dev.sasikanth.rss.reader.components.CircularIconButton
 import dev.sasikanth.rss.reader.components.HorizontalPageIndicators
 import dev.sasikanth.rss.reader.components.PageIndicatorState
+import dev.sasikanth.rss.reader.share.LocalShareHandler
 import dev.sasikanth.rss.reader.core.model.local.ResolvedPost
 import dev.sasikanth.rss.reader.core.model.local.ThemeVariant
 import dev.sasikanth.rss.reader.data.repository.ReaderFont
@@ -125,7 +126,7 @@ import dev.sasikanth.rss.reader.resources.icons.ArrowBack
 import dev.sasikanth.rss.reader.resources.icons.Close
 import dev.sasikanth.rss.reader.resources.icons.CollapseContent
 import dev.sasikanth.rss.reader.resources.icons.ExpandContent
-import dev.sasikanth.rss.reader.resources.icons.TwineIcons
+import dev.sasikanth.rss.reader.resources.icons.RsserIcons
 import dev.sasikanth.rss.reader.ui.AppColorScheme
 import dev.sasikanth.rss.reader.ui.AppTheme
 import dev.sasikanth.rss.reader.ui.ComicNeueFontFamily
@@ -154,12 +155,12 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import org.intellij.markdown.MarkdownTokenTypes
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.buttonClose
-import twine.shared.generated.resources.buttonGoBack
-import twine.shared.generated.resources.readerCollapseScreen
-import twine.shared.generated.resources.readerExpandScreen
-import twine.shared.generated.resources.readerPageCount
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.buttonClose
+import rsser.shared.generated.resources.buttonGoBack
+import rsser.shared.generated.resources.readerCollapseScreen
+import rsser.shared.generated.resources.readerExpandScreen
+import rsser.shared.generated.resources.readerPageCount
 
 @OptIn(ExperimentalComposeUiApi::class, FlowPreview::class)
 @Composable
@@ -379,7 +380,7 @@ internal fun ReaderScreen(
             navigationIcon = {
               CircularIconButton(
                 modifier = Modifier.padding(start = 12.dp),
-                icon = if (showCloseNavIcon) TwineIcons.Close else TwineIcons.ArrowBack,
+                icon = if (showCloseNavIcon) RsserIcons.Close else RsserIcons.ArrowBack,
                 label =
                   stringResource(
                     if (showCloseNavIcon) Res.string.buttonClose else Res.string.buttonGoBack
@@ -427,9 +428,9 @@ internal fun ReaderScreen(
                   modifier = Modifier.padding(end = 12.dp),
                   icon =
                     if (isReaderPaneExpanded) {
-                      TwineIcons.CollapseContent
+                      RsserIcons.CollapseContent
                     } else {
-                      TwineIcons.ExpandContent
+                      RsserIcons.ExpandContent
                     },
                   label =
                     stringResource(
@@ -639,6 +640,7 @@ internal fun ReaderScreen(
               null
             }
           if (settledPost != null) {
+            val shareHandler = LocalShareHandler.current
             val settledPageViewModel = pageViewModelFactory.invoke(settledPost)
             val showFullArticle by
               settledPageViewModel.showFullArticle.collectAsStateWithLifecycle()
@@ -654,6 +656,7 @@ internal fun ReaderScreen(
               isAudioPlayerAvailable = settledPageViewModel.audioPlayer.isAvailable,
               playbackState = viewModel.playbackState,
               settledPostId = settledPost.id,
+              isBookmarked = settledPost.bookmarked,
               selectedFont = state.selectedReaderFont,
               selectedThemeVariant = state.selectedThemeVariant,
               fontScaleFactor = state.readerFontScaleFactor,
@@ -663,6 +666,11 @@ internal fun ReaderScreen(
                 coroutineScope.launch { linkHandler.openLink(settledPost.link) }
               },
               loadFullArticleClick = { settledPageViewModel.toggleFullArticle() },
+              bookmarkClick = {
+                viewModel.dispatch(ReaderEvent.TogglePostBookmark(settledPost.id, settledPost.bookmarked))
+              },
+              readLaterClick = { viewModel.dispatch(ReaderEvent.OnMarkAsUnread(settledPost.id)) },
+              shareClick = { shareHandler.share(settledPost.link) },
               watchVideoClick = {
                 val videoLink = settledPageViewModel.videoLink
                 if (videoLink != null) {
@@ -713,12 +721,16 @@ private fun ReaderActionsPanel(
   isAudioPlayerAvailable: Boolean,
   playbackState: StateFlow<PlaybackState>,
   settledPostId: String,
+  isBookmarked: Boolean,
   selectedFont: ReaderFont,
   selectedThemeVariant: ThemeVariant,
   fontScaleFactor: Float,
   fontLineHeightFactor: Float,
   openInBrowserClick: () -> Unit,
   loadFullArticleClick: () -> Unit,
+  bookmarkClick: () -> Unit,
+  readLaterClick: () -> Unit,
+  shareClick: () -> Unit,
   watchVideoClick: () -> Unit,
   openReaderViewSettings: () -> Unit,
   openPlayer: () -> Unit,
@@ -744,15 +756,7 @@ private fun ReaderActionsPanel(
     modifier = Modifier.fillMaxWidth().wrapContentHeight().then(modifier),
     contentAlignment = Alignment.BottomCenter,
   ) {
-    val (shadowColor1, shadowColor2) =
-      remember(isDarkTheme) {
-        if (isDarkTheme) {
-          Pair(Color.Black.copy(alpha = 0.6f), Color.Black.copy(alpha = 0.24f))
-        } else {
-          Pair(Color.Black.copy(alpha = 0.4f), Color.Black.copy(alpha = 0.16f))
-        }
-      }
-    val backgroundShape = RoundedCornerShape(36.dp)
+    val backgroundShape = RoundedCornerShape(0.dp)
 
     val density = LocalDensity.current
     val recoil = remember { Animatable(0f) }
@@ -777,7 +781,6 @@ private fun ReaderActionsPanel(
       modifier =
         Modifier.graphicsLayer { translationY = recoil.value }
           .padding(bottom = readerActionsPanelBottomInset())
-          .padding(horizontal = 16.dp)
           .widthIn(max = 640.dp)
           .pointerInput(Unit) {}
           .pointerInput(panelContent, isAudioPost) {
@@ -797,16 +800,6 @@ private fun ReaderActionsPanel(
             ) { _, dragAmount ->
               dragTotal += dragAmount
             }
-          }
-          .dropShadow(shape = backgroundShape) {
-            offset = Offset(x = 0f, y = 16.dp.toPx())
-            radius = 32.dp.toPx()
-            color = shadowColor1
-          }
-          .dropShadow(shape = backgroundShape) {
-            offset = Offset(x = 0f, y = 4.dp.toPx())
-            radius = 8.dp.toPx()
-            color = shadowColor2
           }
           .clip(backgroundShape)
           .drawBehind { drawRect(colorScheme.bottomSheet) }
@@ -874,8 +867,12 @@ private fun ReaderActionsPanel(
                 isAudioPost = isAudioPost && isAudioPlayerAvailable,
                 playbackState = playbackState,
                 settledPostId = settledPostId,
+                isBookmarked = isBookmarked,
                 openInBrowserClick = openInBrowserClick,
                 loadFullArticleClick = loadFullArticleClick,
+                bookmarkClick = bookmarkClick,
+                readLaterClick = readLaterClick,
+                shareClick = shareClick,
                 watchVideoClick = watchVideoClick,
                 openReaderViewSettings = openReaderViewSettings,
                 openPlayer = openPlayer,
@@ -899,8 +896,12 @@ private fun ReaderPanelActions(
   isAudioPost: Boolean,
   playbackState: StateFlow<PlaybackState>,
   settledPostId: String,
+  isBookmarked: Boolean,
   openInBrowserClick: () -> Unit,
   loadFullArticleClick: () -> Unit,
+  bookmarkClick: () -> Unit,
+  readLaterClick: () -> Unit,
+  shareClick: () -> Unit,
   watchVideoClick: () -> Unit,
   openReaderViewSettings: () -> Unit,
   openPlayer: () -> Unit,
@@ -952,6 +953,10 @@ private fun ReaderPanelActions(
       loadFullArticle = loadFullArticle,
       openInBrowserClick = openInBrowserClick,
       loadFullArticleClick = loadFullArticleClick,
+      isBookmarked = isBookmarked,
+      bookmarkClick = bookmarkClick,
+      readLaterClick = readLaterClick,
+      shareClick = shareClick,
       openReaderViewSettings = openReaderViewSettings,
     )
   }

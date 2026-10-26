@@ -59,13 +59,13 @@ import androidx.compose.ui.unit.dp
 import dev.sasikanth.rss.reader.components.image.FeedIcon
 import dev.sasikanth.rss.reader.core.model.local.UnreadSinceLastSync
 import dev.sasikanth.rss.reader.resources.icons.ArrowUp
-import dev.sasikanth.rss.reader.resources.icons.TwineIcons
+import dev.sasikanth.rss.reader.resources.icons.RsserIcons
 import dev.sasikanth.rss.reader.ui.AppTheme
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.newArticles
-import twine.shared.generated.resources.scrollToTop
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.newArticles
+import rsser.shared.generated.resources.scrollToTop
 
 @Composable
 internal fun BoxScope.NewArticlesScrollToTopButton(
@@ -173,7 +173,7 @@ internal fun BoxScope.NewArticlesScrollToTopButton(
               },
           ) {
             IconButton(
-              icon = TwineIcons.ArrowUp,
+              icon = RsserIcons.ArrowUp,
               contentDescription = stringResource(Res.string.scrollToTop),
               onClick = { coroutineScope.launch { onScrollToTopClick() } },
             )

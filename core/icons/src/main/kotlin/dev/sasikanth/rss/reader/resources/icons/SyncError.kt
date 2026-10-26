@@ -19,7 +19,7 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.SyncError: ImageVector
+val RsserIcons.SyncError: ImageVector
   get() = rsserSyncError
 private val rsserSyncError by lazy {
   rsserIcon(

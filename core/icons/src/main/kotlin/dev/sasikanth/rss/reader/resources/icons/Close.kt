@@ -19,7 +19,7 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.Close: ImageVector
+val RsserIcons.Close: ImageVector
   get() = rsserClose
 
 private val rsserClose by lazy { rsserIcon("Close", "M6 6L18 18M6 18L18 6") }

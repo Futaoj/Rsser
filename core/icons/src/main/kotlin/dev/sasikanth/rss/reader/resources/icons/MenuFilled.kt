@@ -19,7 +19,7 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.Menu: ImageVector
+val RsserIcons.Menu: ImageVector
   get() = rsserMenu
 
 private val rsserMenu by lazy { rsserIcon("Menu", "M4 5H20V19H4ZM9 5V19") }

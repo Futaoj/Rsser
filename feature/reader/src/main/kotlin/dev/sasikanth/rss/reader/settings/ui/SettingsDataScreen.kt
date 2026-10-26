@@ -78,15 +78,15 @@ import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlinx.datetime.todayIn
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.settingsYourInsights
-import twine.shared.generated.resources.statisticsDailyAverage
-import twine.shared.generated.resources.statisticsFirstPlace
-import twine.shared.generated.resources.statisticsLess
-import twine.shared.generated.resources.statisticsMore
-import twine.shared.generated.resources.statisticsNoData
-import twine.shared.generated.resources.statisticsTotalRead
-import twine.shared.generated.resources.statisticsYourTopFeeds
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.settingsYourInsights
+import rsser.shared.generated.resources.statisticsDailyAverage
+import rsser.shared.generated.resources.statisticsFirstPlace
+import rsser.shared.generated.resources.statisticsLess
+import rsser.shared.generated.resources.statisticsMore
+import rsser.shared.generated.resources.statisticsNoData
+import rsser.shared.generated.resources.statisticsTotalRead
+import rsser.shared.generated.resources.statisticsYourTopFeeds
 
 @Composable
 internal fun SettingsDataScreen(

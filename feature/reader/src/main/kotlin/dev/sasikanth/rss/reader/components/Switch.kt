@@ -25,7 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.sasikanth.rss.reader.resources.icons.Check
 import dev.sasikanth.rss.reader.resources.icons.Close
-import dev.sasikanth.rss.reader.resources.icons.TwineIcons
+import dev.sasikanth.rss.reader.resources.icons.RsserIcons
 import dev.sasikanth.rss.reader.ui.AppTheme
 
 @Composable
@@ -43,7 +43,7 @@ fun Switch(checked: Boolean, modifier: Modifier = Modifier, onCheckedChange: (Bo
       modifier = modifier,
       checked = checked,
       thumbContent = {
-        val icon = if (checked) TwineIcons.Check else TwineIcons.Close
+        val icon = if (checked) RsserIcons.Check else RsserIcons.Close
         Icon(modifier = Modifier.size(16.dp), imageVector = icon, contentDescription = null)
       },
       onCheckedChange = onCheckedChange,

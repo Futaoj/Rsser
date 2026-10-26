@@ -19,7 +19,7 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.LightMode: ImageVector
+val RsserIcons.LightMode: ImageVector
   get() = rsserLightMode
 private val rsserLightMode by lazy {
   rsserIcon(

@@ -58,26 +58,26 @@ import dev.sasikanth.rss.reader.resources.icons.Freshrss
 import dev.sasikanth.rss.reader.resources.icons.GoogleDrive
 import dev.sasikanth.rss.reader.resources.icons.Miniflux
 import dev.sasikanth.rss.reader.resources.icons.Sync
-import dev.sasikanth.rss.reader.resources.icons.TwineIcons
+import dev.sasikanth.rss.reader.resources.icons.RsserIcons
 import dev.sasikanth.rss.reader.settings.SettingsState
 import dev.sasikanth.rss.reader.ui.AppTheme
 import dev.sasikanth.rss.reader.ui.LocalTranslucentStyles
 import dev.sasikanth.rss.reader.utils.formatRelativeTime
 import kotlin.time.Instant
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.settingSyncLabel
-import twine.shared.generated.resources.settingsSyncBazQux
-import twine.shared.generated.resources.settingsSyncDropbox
-import twine.shared.generated.resources.settingsSyncFreshRSS
-import twine.shared.generated.resources.settingsSyncGoogleDrive
-import twine.shared.generated.resources.settingsSyncMiniflux
-import twine.shared.generated.resources.settingsSyncSignIn
-import twine.shared.generated.resources.settingsSyncSignOut
-import twine.shared.generated.resources.settingsSyncStatusFailure
-import twine.shared.generated.resources.settingsSyncStatusIdle
-import twine.shared.generated.resources.settingsSyncStatusSuccess
-import twine.shared.generated.resources.settingsSyncStatusSyncing
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.settingSyncLabel
+import rsser.shared.generated.resources.settingsSyncBazQux
+import rsser.shared.generated.resources.settingsSyncDropbox
+import rsser.shared.generated.resources.settingsSyncFreshRSS
+import rsser.shared.generated.resources.settingsSyncGoogleDrive
+import rsser.shared.generated.resources.settingsSyncMiniflux
+import rsser.shared.generated.resources.settingsSyncSignIn
+import rsser.shared.generated.resources.settingsSyncSignOut
+import rsser.shared.generated.resources.settingsSyncStatusFailure
+import rsser.shared.generated.resources.settingsSyncStatusIdle
+import rsser.shared.generated.resources.settingsSyncStatusSuccess
+import rsser.shared.generated.resources.settingsSyncStatusSyncing
 
 @Composable
 internal fun CloudSyncSettingItem(
@@ -119,11 +119,11 @@ internal fun CloudSyncSettingItem(
       Row(verticalAlignment = Alignment.CenterVertically) {
         val icon =
           when (provider.cloudService) {
-            ServiceType.FRESH_RSS -> TwineIcons.Freshrss
-            ServiceType.MINIFLUX -> TwineIcons.Miniflux
-            ServiceType.DROPBOX -> TwineIcons.Dropbox
-            ServiceType.GOOGLE_DRIVE -> TwineIcons.GoogleDrive
-            ServiceType.BAZQUX -> TwineIcons.Bazqux
+            ServiceType.FRESH_RSS -> RsserIcons.Freshrss
+            ServiceType.MINIFLUX -> RsserIcons.Miniflux
+            ServiceType.DROPBOX -> RsserIcons.Dropbox
+            ServiceType.GOOGLE_DRIVE -> RsserIcons.GoogleDrive
+            ServiceType.BAZQUX -> RsserIcons.Bazqux
           }
 
         Box(modifier = Modifier.size(40.dp), contentAlignment = Alignment.Center) {
@@ -202,7 +202,7 @@ internal fun CloudSyncSettingItem(
 
           CircularIconButton(
             modifier = Modifier.rotate(syncRotation),
-            icon = TwineIcons.Sync,
+            icon = RsserIcons.Sync,
             label = stringResource(Res.string.settingSyncLabel),
             onClick = { onSyncClicked(provider) },
             enabled = !isSyncing,

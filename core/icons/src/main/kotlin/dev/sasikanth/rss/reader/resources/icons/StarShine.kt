@@ -19,7 +19,7 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.StarShine: ImageVector
+val RsserIcons.StarShine: ImageVector
   get() = rsserStarShine
 private val rsserStarShine by lazy {
   rsserIcon("StarShine", "M12 3L14.5 9.5L21 12L14.5 14.5L12 21L9.5 14.5L3 12L9.5 9.5Z")

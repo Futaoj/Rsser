@@ -43,7 +43,7 @@
       android:largeHeap="true"
       android:networkSecurityConfig="@xml/network_security_config"
       android:supportsRtl="true"
-      android:theme="@style/Theme.Twine.App"
+      android:theme="@style/Theme.Rsser.App"
       android:usesCleartextTraffic="true"
       tools:targetApi="tiramisu">
 
@@ -71,7 +71,7 @@
 
         <data
             android:host="reader"
-            android:scheme="twine" />
+            android:scheme="rsser" />
       </intent-filter>
 
       <intent-filter>
@@ -82,7 +82,7 @@
 
         <data
             android:host="add"
-            android:scheme="twine" />
+            android:scheme="rsser" />
       </intent-filter>
 
       <intent-filter>
@@ -93,7 +93,7 @@
 
         <data
             android:host="oauth"
-            android:scheme="twine" />
+            android:scheme="rsser" />
       </intent-filter>
 
       <!-- Google OAuth redirect: reversed client ID of the Android Google Drive OAuth client -->
@@ -114,7 +114,7 @@
 
         <data
             android:host="bookmarks"
-            android:scheme="twine" />
+            android:scheme="rsser" />
       </intent-filter>
     </activity>
 
@@ -381,7 +381,7 @@
 
 
     <receiver
-        android:name=".widget.TwineUnreadSmallWidgetReceiver"
+        android:name=".widget.RsserUnreadSmallWidgetReceiver"
         android:label="@string/widget_unread_recent_name"
         android:exported="true">
       <intent-filter>
@@ -389,11 +389,11 @@
       </intent-filter>
       <meta-data
           android:name="android.appwidget.provider"
-          android:resource="@xml/twine_unread_small_widget_info" />
+          android:resource="@xml/rsser_unread_small_widget_info" />
     </receiver>
 
     <receiver
-        android:name=".widget.TwineUnreadMediumWidgetReceiver"
+        android:name=".widget.RsserUnreadMediumWidgetReceiver"
         android:label="@string/widget_unread_recent_medium_name"
         android:exported="true">
       <intent-filter>
@@ -401,11 +401,11 @@
       </intent-filter>
       <meta-data
           android:name="android.appwidget.provider"
-          android:resource="@xml/twine_unread_medium_widget_info" />
+          android:resource="@xml/rsser_unread_medium_widget_info" />
     </receiver>
 
     <receiver
-        android:name=".widget.TwineUnreadLargeWidgetReceiver"
+        android:name=".widget.RsserUnreadLargeWidgetReceiver"
         android:label="@string/widget_unread_recent_large_name"
         android:exported="true">
       <intent-filter>
@@ -413,7 +413,7 @@
       </intent-filter>
       <meta-data
           android:name="android.appwidget.provider"
-          android:resource="@xml/twine_unread_large_widget_info" />
+          android:resource="@xml/rsser_unread_large_widget_info" />
     </receiver>
 
     <provider

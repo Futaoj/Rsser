@@ -19,7 +19,7 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.VisibilityOff: ImageVector
+val RsserIcons.VisibilityOff: ImageVector
   get() = rsserVisibilityOff
 private val rsserVisibilityOff by lazy {
   rsserIcon(

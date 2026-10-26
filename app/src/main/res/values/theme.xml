@@ -16,7 +16,7 @@
   -->
 
 <resources>
-    <style name="Theme.Twine.App" parent="Theme.AppCompat.NoActionBar">
+    <style name="Theme.Rsser.App" parent="Theme.AppCompat.NoActionBar">
         <item name="android:windowBackground">@color/window_background_color</item>
     </style>
 </resources>

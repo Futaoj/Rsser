@@ -35,23 +35,23 @@ import androidx.compose.ui.unit.dp
 import dev.sasikanth.rss.reader.components.ModalSheet
 import dev.sasikanth.rss.reader.ui.AppTheme
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.keyboardShortcutsAddFeed
-import twine.shared.generated.resources.keyboardShortcutsClose
-import twine.shared.generated.resources.keyboardShortcutsMarkAsUnread
-import twine.shared.generated.resources.keyboardShortcutsNextPost
-import twine.shared.generated.resources.keyboardShortcutsOpenInBrowser
-import twine.shared.generated.resources.keyboardShortcutsOpenPost
-import twine.shared.generated.resources.keyboardShortcutsPreviousPost
-import twine.shared.generated.resources.keyboardShortcutsRefresh
-import twine.shared.generated.resources.keyboardShortcutsSearch
-import twine.shared.generated.resources.keyboardShortcutsSectionGlobal
-import twine.shared.generated.resources.keyboardShortcutsSectionPostList
-import twine.shared.generated.resources.keyboardShortcutsSectionReader
-import twine.shared.generated.resources.keyboardShortcutsSettings
-import twine.shared.generated.resources.keyboardShortcutsShowShortcuts
-import twine.shared.generated.resources.keyboardShortcutsTitle
-import twine.shared.generated.resources.keyboardShortcutsToggleBookmark
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.keyboardShortcutsAddFeed
+import rsser.shared.generated.resources.keyboardShortcutsClose
+import rsser.shared.generated.resources.keyboardShortcutsMarkAsUnread
+import rsser.shared.generated.resources.keyboardShortcutsNextPost
+import rsser.shared.generated.resources.keyboardShortcutsOpenInBrowser
+import rsser.shared.generated.resources.keyboardShortcutsOpenPost
+import rsser.shared.generated.resources.keyboardShortcutsPreviousPost
+import rsser.shared.generated.resources.keyboardShortcutsRefresh
+import rsser.shared.generated.resources.keyboardShortcutsSearch
+import rsser.shared.generated.resources.keyboardShortcutsSectionGlobal
+import rsser.shared.generated.resources.keyboardShortcutsSectionPostList
+import rsser.shared.generated.resources.keyboardShortcutsSectionReader
+import rsser.shared.generated.resources.keyboardShortcutsSettings
+import rsser.shared.generated.resources.keyboardShortcutsShowShortcuts
+import rsser.shared.generated.resources.keyboardShortcutsTitle
+import rsser.shared.generated.resources.keyboardShortcutsToggleBookmark
 
 @Composable
 internal fun KeyboardShortcutsSheet(onDismiss: () -> Unit) {

@@ -115,7 +115,7 @@ import dev.sasikanth.rss.reader.resources.icons.Close
 import dev.sasikanth.rss.reader.resources.icons.FilterList
 import dev.sasikanth.rss.reader.resources.icons.RadioUnselected
 import dev.sasikanth.rss.reader.resources.icons.Sort
-import dev.sasikanth.rss.reader.resources.icons.TwineIcons
+import dev.sasikanth.rss.reader.resources.icons.RsserIcons
 import dev.sasikanth.rss.reader.search.SearchEvent
 import dev.sasikanth.rss.reader.search.SearchState
 import dev.sasikanth.rss.reader.search.SearchViewModel
@@ -127,19 +127,19 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.bookmarks
-import twine.shared.generated.resources.buttonAll
-import twine.shared.generated.resources.buttonGoBack
-import twine.shared.generated.resources.feeds
-import twine.shared.generated.resources.filter
-import twine.shared.generated.resources.postsSearchHint
-import twine.shared.generated.resources.postsUnread
-import twine.shared.generated.resources.searchResultsCount
-import twine.shared.generated.resources.searchSortNewest
-import twine.shared.generated.resources.searchSortNewestFirst
-import twine.shared.generated.resources.searchSortOldest
-import twine.shared.generated.resources.searchSortOldestFirst
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.bookmarks
+import rsser.shared.generated.resources.buttonAll
+import rsser.shared.generated.resources.buttonGoBack
+import rsser.shared.generated.resources.feeds
+import rsser.shared.generated.resources.filter
+import rsser.shared.generated.resources.postsSearchHint
+import rsser.shared.generated.resources.postsUnread
+import rsser.shared.generated.resources.searchResultsCount
+import rsser.shared.generated.resources.searchSortNewest
+import rsser.shared.generated.resources.searchSortNewestFirst
+import rsser.shared.generated.resources.searchSortOldest
+import rsser.shared.generated.resources.searchSortOldestFirst
 
 @Composable
 internal fun SearchScreen(
@@ -357,7 +357,7 @@ private fun SourceFilterChips(
         label = stringResource(Res.string.buttonAll),
         icon = {
           Icon(
-            imageVector = TwineIcons.All,
+            imageVector = RsserIcons.All,
             contentDescription = null,
             modifier = Modifier.requiredSize(16.dp),
           )
@@ -385,7 +385,7 @@ private fun SourceFilterChips(
           label = stringResource(Res.string.filter),
           icon = {
             Icon(
-              imageVector = TwineIcons.FilterList,
+              imageVector = RsserIcons.FilterList,
               contentDescription = null,
               modifier = Modifier.requiredSize(16.dp),
             )
@@ -401,7 +401,7 @@ private fun SourceFilterChips(
         label = stringResource(Res.string.bookmarks),
         icon = {
           Icon(
-            imageVector = TwineIcons.Bookmarked,
+            imageVector = RsserIcons.Bookmarked,
             contentDescription = null,
             modifier = Modifier.requiredSize(16.dp),
           )
@@ -416,7 +416,7 @@ private fun SourceFilterChips(
         label = stringResource(Res.string.postsUnread),
         icon = {
           Icon(
-            imageVector = TwineIcons.RadioUnselected,
+            imageVector = RsserIcons.RadioUnselected,
             contentDescription = null,
             modifier = Modifier.requiredSize(16.dp),
           )
@@ -463,7 +463,7 @@ private fun SourceChip(
     )
     if (onTrailingIconClick != null) {
       IconButton(onClick = onTrailingIconClick, modifier = Modifier.requiredSize(18.dp)) {
-        Icon(imageVector = TwineIcons.Close, contentDescription = null, tint = contentColor)
+        Icon(imageVector = RsserIcons.Close, contentDescription = null, tint = contentColor)
       }
     }
   }
@@ -578,7 +578,7 @@ private fun SearchBar(
       verticalAlignment = Alignment.CenterVertically,
     ) {
       CircularIconButton(
-        icon = TwineIcons.ArrowBack,
+        icon = RsserIcons.ArrowBack,
         label = stringResource(Res.string.buttonGoBack),
         onClick = onBackClick,
       )
@@ -656,7 +656,7 @@ private fun SearchSortButton(
         color = colorScheme.onSurface,
       )
       Spacer(Modifier.requiredWidth(8.dp))
-      Icon(imageVector = TwineIcons.Sort, contentDescription = null, tint = colorScheme.onSurface)
+      Icon(imageVector = RsserIcons.Sort, contentDescription = null, tint = colorScheme.onSurface)
       Spacer(Modifier.requiredWidth(4.dp))
     }
 
@@ -694,7 +694,7 @@ private fun SortDropdownMenu(
 
 @Composable
 private fun ClearSearchQueryButton(onClearClick: () -> Unit) {
-  IconButton(icon = TwineIcons.Close, contentDescription = null, onClick = onClearClick)
+  IconButton(icon = RsserIcons.Close, contentDescription = null, onClick = onClearClick)
 }
 
 @Preview(locale = "en")

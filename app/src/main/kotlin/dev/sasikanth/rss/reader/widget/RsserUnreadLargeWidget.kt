@@ -83,7 +83,7 @@ import kotlin.time.Instant
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class TwineUnreadLargeWidget : GlanceAppWidget() {
+class RsserUnreadLargeWidget : GlanceAppWidget() {
 
   override val sizeMode: SizeMode = SizeMode.Exact
 
@@ -200,7 +200,7 @@ class TwineUnreadLargeWidget : GlanceAppWidget() {
               val deepLinkIntent =
                 Intent(
                     Intent.ACTION_VIEW,
-                    "twine://bookmarks".toUri(),
+                    "rsser://bookmarks".toUri(),
                     context,
                     MainActivity::class.java,
                   )

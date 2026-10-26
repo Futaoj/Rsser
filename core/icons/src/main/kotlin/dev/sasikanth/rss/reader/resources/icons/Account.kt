@@ -19,7 +19,7 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.Account: ImageVector
+val RsserIcons.Account: ImageVector
   get() = rsserAccount
 
 private val rsserAccount by lazy {

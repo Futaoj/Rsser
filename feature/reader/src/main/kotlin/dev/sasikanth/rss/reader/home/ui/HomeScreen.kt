@@ -97,7 +97,7 @@ import dev.sasikanth.rss.reader.media.ui.NowPlayingChip
 import dev.sasikanth.rss.reader.platform.LocalLinkHandler
 import dev.sasikanth.rss.reader.resources.icons.ArrowUp
 import dev.sasikanth.rss.reader.resources.icons.Newsstand
-import dev.sasikanth.rss.reader.resources.icons.TwineIcons
+import dev.sasikanth.rss.reader.resources.icons.RsserIcons
 import dev.sasikanth.rss.reader.ui.AppTheme
 import dev.sasikanth.rss.reader.ui.LocalDynamicColorState
 import dev.sasikanth.rss.reader.ui.getOverriddenColorScheme
@@ -121,12 +121,12 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.noFeeds
-import twine.shared.generated.resources.noNewPosts
-import twine.shared.generated.resources.noNewPostsSubtitle
-import twine.shared.generated.resources.swipeLeftGetStarted
-import twine.shared.generated.resources.swipeRightGetStarted
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.noFeeds
+import rsser.shared.generated.resources.noNewPosts
+import rsser.shared.generated.resources.noNewPostsSubtitle
+import rsser.shared.generated.resources.swipeLeftGetStarted
+import rsser.shared.generated.resources.swipeRightGetStarted
 
 private const val BOTTOM_SCRIM_FRACTION = 0.15f
 
@@ -277,7 +277,7 @@ private fun HomeContent(
       }
     }
 
-  val canShowBottomBar = true
+  val canShowBottomBar = false
   val systemDynamicDarkColors =
     if (state.themeVariant == ThemeVariant.SystemDynamic) {
       systemDynamicColorScheme(true)
@@ -786,7 +786,7 @@ private fun NoFeeds(onNoFeedsSwipe: () -> Unit) {
     Spacer(Modifier.requiredHeight(12.dp))
 
     Icon(
-      imageVector = TwineIcons.ArrowUp,
+      imageVector = RsserIcons.ArrowUp,
       contentDescription = null,
       tint = AppTheme.colorScheme.primary,
       modifier = Modifier.graphicsLayer { rotationZ = if (isRtl) -90f else 90f },
@@ -803,7 +803,7 @@ private fun NoNewPosts() {
     verticalArrangement = Arrangement.Center,
   ) {
     Icon(
-      imageVector = TwineIcons.Newsstand,
+      imageVector = RsserIcons.Newsstand,
       contentDescription = null,
       tint = AppTheme.colorScheme.onSurface,
       modifier = Modifier.requiredSize(80.dp),

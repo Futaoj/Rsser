@@ -19,7 +19,7 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.DataUsageRoundedFilled: ImageVector
+val RsserIcons.DataUsageRoundedFilled: ImageVector
   get() = rsserDataUsageRoundedFilled
 private val rsserDataUsageRoundedFilled by lazy {
   rsserIcon("DataUsageRoundedFilled", "M4 20V13M10 20V8M16 20V3M22 20V10")

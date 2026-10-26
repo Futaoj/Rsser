@@ -19,7 +19,7 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.FormatLineSpacing: ImageVector
+val RsserIcons.FormatLineSpacing: ImageVector
   get() = rsserFormatLineSpacing
 private val rsserFormatLineSpacing by lazy {
   rsserIcon("FormatLineSpacing", "M4 3V21M1 6L4 3L7 6M1 18L4 21L7 18M11 5H22M11 12H22M11 19H22")

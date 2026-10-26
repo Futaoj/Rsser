@@ -19,7 +19,7 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.Changelog: ImageVector
+val RsserIcons.Changelog: ImageVector
   get() = rsserChangelog
 
 private val rsserChangelog by lazy {

@@ -64,23 +64,23 @@ import dev.sasikanth.rss.reader.resources.icons.MarkAllAsRead
 import dev.sasikanth.rss.reader.resources.icons.NewGroup
 import dev.sasikanth.rss.reader.resources.icons.RemoveFeed
 import dev.sasikanth.rss.reader.resources.icons.Sort
-import dev.sasikanth.rss.reader.resources.icons.TwineIcons
+import dev.sasikanth.rss.reader.resources.icons.RsserIcons
 import dev.sasikanth.rss.reader.ui.AppTheme
 import dev.sasikanth.rss.reader.utils.bottomPaddingOfSourceItem
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.actionAddTo
-import twine.shared.generated.resources.actionSelect
-import twine.shared.generated.resources.allFeeds
-import twine.shared.generated.resources.buttonAddFeed
-import twine.shared.generated.resources.edit
-import twine.shared.generated.resources.feedOptionRemove
-import twine.shared.generated.resources.feedsSortAlphabetical
-import twine.shared.generated.resources.feedsSortLatest
-import twine.shared.generated.resources.feedsSortOldest
-import twine.shared.generated.resources.markAllAsRead
-import twine.shared.generated.resources.sort
-import twine.shared.generated.resources.sourcesCount
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.actionAddTo
+import rsser.shared.generated.resources.actionSelect
+import rsser.shared.generated.resources.allFeeds
+import rsser.shared.generated.resources.buttonAddFeed
+import rsser.shared.generated.resources.edit
+import rsser.shared.generated.resources.feedOptionRemove
+import rsser.shared.generated.resources.feedsSortAlphabetical
+import rsser.shared.generated.resources.feedsSortLatest
+import rsser.shared.generated.resources.feedsSortOldest
+import rsser.shared.generated.resources.markAllAsRead
+import rsser.shared.generated.resources.sort
+import rsser.shared.generated.resources.sourcesCount
 
 internal fun LazyListScope.allSources(
   numberOfFeedGroups: Int,
@@ -157,7 +157,7 @@ internal fun LazyListScope.allSources(
                 dropdownMenuContent = { onDismiss ->
                   DropdownMenuItem(
                     text = stringResource(Res.string.markAllAsRead),
-                    leadingIcon = TwineIcons.MarkAllAsRead,
+                    leadingIcon = RsserIcons.MarkAllAsRead,
                     enabled = source.numberOfUnreadPosts > 0,
                     onClick = {
                       onMarkAsReadClick(source)
@@ -167,7 +167,7 @@ internal fun LazyListScope.allSources(
 
                   DropdownMenuItem(
                     text = stringResource(Res.string.edit),
-                    leadingIcon = TwineIcons.Edit,
+                    leadingIcon = RsserIcons.Edit,
                     onClick = {
                       onSourceEditClick(source)
                       onDismiss()
@@ -176,7 +176,7 @@ internal fun LazyListScope.allSources(
 
                   DropdownMenuItem(
                     text = stringResource(Res.string.actionSelect),
-                    leadingIcon = TwineIcons.Check,
+                    leadingIcon = RsserIcons.Check,
                     onClick = {
                       onToggleSourceSelection(source)
                       onDismiss()
@@ -187,7 +187,7 @@ internal fun LazyListScope.allSources(
 
                   DropdownMenuItem(
                     text = stringResource(Res.string.feedOptionRemove),
-                    leadingIcon = TwineIcons.RemoveFeed,
+                    leadingIcon = RsserIcons.RemoveFeed,
                     onClick = {
                       onRemoveSourceClick(source)
                       onDismiss()
@@ -236,7 +236,7 @@ internal fun LazyListScope.allSources(
                 dropdownMenuContent = { onDismiss ->
                   DropdownMenuItem(
                     text = stringResource(Res.string.markAllAsRead),
-                    leadingIcon = TwineIcons.MarkAllAsRead,
+                    leadingIcon = RsserIcons.MarkAllAsRead,
                     enabled = source.numberOfUnreadPosts > 0,
                     onClick = {
                       onMarkAsReadClick(source)
@@ -246,7 +246,7 @@ internal fun LazyListScope.allSources(
 
                   DropdownMenuItem(
                     text = stringResource(Res.string.actionAddTo),
-                    leadingIcon = TwineIcons.NewGroup,
+                    leadingIcon = RsserIcons.NewGroup,
                     onClick = {
                       onAddToGroupClick(source)
                       onDismiss()
@@ -255,7 +255,7 @@ internal fun LazyListScope.allSources(
 
                   DropdownMenuItem(
                     text = stringResource(Res.string.edit),
-                    leadingIcon = TwineIcons.Edit,
+                    leadingIcon = RsserIcons.Edit,
                     onClick = {
                       onSourceEditClick(source)
                       onDismiss()
@@ -264,7 +264,7 @@ internal fun LazyListScope.allSources(
 
                   DropdownMenuItem(
                     text = stringResource(Res.string.actionSelect),
-                    leadingIcon = TwineIcons.Check,
+                    leadingIcon = RsserIcons.Check,
                     onClick = {
                       onToggleSourceSelection(source)
                       onDismiss()
@@ -275,7 +275,7 @@ internal fun LazyListScope.allSources(
 
                   DropdownMenuItem(
                     text = stringResource(Res.string.feedOptionRemove),
-                    leadingIcon = TwineIcons.RemoveFeed,
+                    leadingIcon = RsserIcons.RemoveFeed,
                     onClick = {
                       onRemoveSourceClick(source)
                       onDismiss()
@@ -337,7 +337,7 @@ internal fun AllFeedsHeader(
 
         Box {
           CircularIconButton(
-            icon = TwineIcons.Sort,
+            icon = RsserIcons.Sort,
             label = stringResource(Res.string.sort),
             onClick = { showSortDropdown = true },
           )
@@ -380,7 +380,7 @@ internal fun AllFeedsHeader(
       Spacer(Modifier.width(12.dp))
 
       CircularIconButton(
-        icon = TwineIcons.Add,
+        icon = RsserIcons.Add,
         label = stringResource(Res.string.buttonAddFeed),
         backgroundColor = AppTheme.colorScheme.inverseSurface,
         contentColor = AppTheme.colorScheme.inverseOnSurface,

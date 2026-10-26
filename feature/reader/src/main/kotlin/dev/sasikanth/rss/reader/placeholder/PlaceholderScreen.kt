@@ -46,9 +46,9 @@ import dev.sasikanth.rss.reader.ui.AppTheme
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.databaseMaintainenceSubtitle
-import twine.shared.generated.resources.databaseMaintainenceTitle
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.databaseMaintainenceSubtitle
+import rsser.shared.generated.resources.databaseMaintainenceTitle
 
 @Composable
 fun PlaceholderScreen(

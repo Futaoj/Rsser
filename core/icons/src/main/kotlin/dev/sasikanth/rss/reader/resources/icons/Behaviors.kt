@@ -19,7 +19,7 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.Behaviors: ImageVector
+val RsserIcons.Behaviors: ImageVector
   get() = rsserBehaviors
 
 private val rsserBehaviors by lazy { rsserIcon("Behaviors", "M4 7H20M4 17H20M8 4V10M16 14V20") }

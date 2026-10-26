@@ -63,7 +63,7 @@ import dev.sasikanth.rss.reader.core.model.local.FeedGroup
 import dev.sasikanth.rss.reader.core.model.local.Source
 import dev.sasikanth.rss.reader.feeds.ui.FeedGroupIconGrid
 import dev.sasikanth.rss.reader.resources.icons.Remove
-import dev.sasikanth.rss.reader.resources.icons.TwineIcons
+import dev.sasikanth.rss.reader.resources.icons.RsserIcons
 import dev.sasikanth.rss.reader.ui.AppTheme
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
@@ -207,7 +207,7 @@ private fun PinnedSourceItem(
           contentColor = AppTheme.colorScheme.inverseOnSurface,
         ) {
           Icon(
-            imageVector = TwineIcons.Remove,
+            imageVector = RsserIcons.Remove,
             contentDescription = null,
             modifier = Modifier.padding(4.dp),
           )

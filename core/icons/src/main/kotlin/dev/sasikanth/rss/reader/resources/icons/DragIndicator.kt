@@ -19,7 +19,7 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.DragIndicator: ImageVector
+val RsserIcons.DragIndicator: ImageVector
   get() = rsserDragIndicator
 private val rsserDragIndicator by lazy {
   rsserIcon("DragIndicator", "M9 5H9.1M15 5H15.1M9 12H9.1M15 12H15.1M9 19H9.1M15 19H15.1")

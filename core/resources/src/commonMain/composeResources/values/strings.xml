@@ -407,4 +407,9 @@
   <string name="keyboardShortcutsOpenInBrowser">Open in browser</string>
   <string name="keyboardShortcutsClose">Close reader</string>
   <string name="keyboardShortcutsOpenPost">Open article</string>
+  <string name="readerSave">Save</string>
+  <string name="readerReadLater">Read later</string>
+  <string name="readerShare">Share</string>
+  <string name="readerOpenWebsite">Open website</string>
+  <string name="readerLoadFullArticle">Load full article</string>
 </resources>

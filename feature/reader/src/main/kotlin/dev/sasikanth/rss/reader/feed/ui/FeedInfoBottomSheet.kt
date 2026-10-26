@@ -85,7 +85,7 @@ import dev.sasikanth.rss.reader.resources.icons.Check
 import dev.sasikanth.rss.reader.resources.icons.CopyLink
 import dev.sasikanth.rss.reader.resources.icons.DeleteOutline
 import dev.sasikanth.rss.reader.resources.icons.Platform
-import dev.sasikanth.rss.reader.resources.icons.TwineIcons
+import dev.sasikanth.rss.reader.resources.icons.RsserIcons
 import dev.sasikanth.rss.reader.resources.icons.Website
 import dev.sasikanth.rss.reader.resources.icons.platform
 import dev.sasikanth.rss.reader.ui.AppTheme
@@ -99,20 +99,20 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.actionDelete
-import twine.shared.generated.resources.alwaysFetchSourceArticle
-import twine.shared.generated.resources.enableNotifications
-import twine.shared.generated.resources.feedOptionCopyLink
-import twine.shared.generated.resources.feedOptionWebsite
-import twine.shared.generated.resources.feedSyncErrorDescription
-import twine.shared.generated.resources.feedSyncErrorTitle
-import twine.shared.generated.resources.feedTitleHint
-import twine.shared.generated.resources.hidePostsFromHome
-import twine.shared.generated.resources.markAsRead
-import twine.shared.generated.resources.noUnreadPostsInFeed
-import twine.shared.generated.resources.numberOfUnreadPostsInFeed
-import twine.shared.generated.resources.showFeedFavIconTitle
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.actionDelete
+import rsser.shared.generated.resources.alwaysFetchSourceArticle
+import rsser.shared.generated.resources.enableNotifications
+import rsser.shared.generated.resources.feedOptionCopyLink
+import rsser.shared.generated.resources.feedOptionWebsite
+import rsser.shared.generated.resources.feedSyncErrorDescription
+import rsser.shared.generated.resources.feedSyncErrorTitle
+import rsser.shared.generated.resources.feedTitleHint
+import rsser.shared.generated.resources.hidePostsFromHome
+import rsser.shared.generated.resources.markAsRead
+import rsser.shared.generated.resources.noUnreadPostsInFeed
+import rsser.shared.generated.resources.numberOfUnreadPostsInFeed
+import rsser.shared.generated.resources.showFeedFavIconTitle
 
 private val HORIZONTAL_PADDING = 24.dp
 
@@ -309,7 +309,7 @@ private fun FeedUnreadCount(
     ) {
       Icon(
         modifier = Modifier.requiredSize(18.dp),
-        imageVector = TwineIcons.Check,
+        imageVector = RsserIcons.Check,
         contentDescription = null,
       )
 
@@ -420,21 +420,21 @@ private fun FeedOptions(feed: Feed, onRemoveFeedClick: () -> Unit, modifier: Mod
 
   Row(modifier = modifier) {
     ContextActionItem(
-      icon = TwineIcons.CopyLink,
+      icon = RsserIcons.CopyLink,
       label = stringResource(Res.string.feedOptionCopyLink),
       modifier = Modifier.weight(1f),
       onClick = { coroutineScope.launch { clipboard.setClipEntry(feed.link.toClipEntry()) } },
     )
 
     ContextActionItem(
-      icon = TwineIcons.Website,
+      icon = RsserIcons.Website,
       label = stringResource(Res.string.feedOptionWebsite),
       modifier = Modifier.weight(1f),
       onClick = { coroutineScope.launch { linkHandler.openLink(feed.link) } },
     )
 
     ContextActionItem(
-      icon = TwineIcons.DeleteOutline,
+      icon = RsserIcons.DeleteOutline,
       label = stringResource(Res.string.actionDelete),
       modifier = Modifier.weight(1f),
       onClick = { showConfirmDialog = true },

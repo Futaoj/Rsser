@@ -88,7 +88,7 @@ android {
 
   packaging {
     resources { excludes.add("/META-INF/{AL2.0,LGPL2.1}") }
-    if (project.findProperty("twine.isFoss")?.toString()?.toBoolean() == true) {
+    if (project.findProperty("rsser.isFoss")?.toString()?.toBoolean() == true) {
       jniLibs { keepDebugSymbols.add("**/*.so") }
     }
   }

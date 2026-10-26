@@ -26,7 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.sasikanth.rss.reader.resources.icons.RadioSelected
 import dev.sasikanth.rss.reader.resources.icons.RadioUnselected
-import dev.sasikanth.rss.reader.resources.icons.TwineIcons
+import dev.sasikanth.rss.reader.resources.icons.RsserIcons
 import dev.sasikanth.rss.reader.ui.AppTheme
 
 @Composable
@@ -37,9 +37,9 @@ fun SelectedCheckIndicator(
 ) {
   val icon =
     if (selected) {
-      TwineIcons.RadioSelected
+      RsserIcons.RadioSelected
     } else {
-      TwineIcons.RadioUnselected
+      RsserIcons.RadioUnselected
     }
 
   val tint =

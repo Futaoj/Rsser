@@ -27,7 +27,7 @@ import androidx.compose.ui.graphics.vector.ImageVector.Builder
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
-public val TwineIcons.Bazqux: ImageVector
+public val RsserIcons.Bazqux: ImageVector
   get() {
     if (_bazqux != null) {
       return _bazqux!!

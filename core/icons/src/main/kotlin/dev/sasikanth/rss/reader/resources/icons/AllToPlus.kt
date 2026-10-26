@@ -26,7 +26,7 @@ import androidx.compose.ui.graphics.vector.group
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
-fun TwineIcons.allToPlus(progress: Float): ImageVector {
+fun RsserIcons.allToPlus(progress: Float): ImageVector {
   return ImageVector.Builder(
       name = "all_to_plus",
       defaultWidth = 24.0.dp,

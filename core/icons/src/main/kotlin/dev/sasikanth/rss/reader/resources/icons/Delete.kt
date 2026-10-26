@@ -19,7 +19,7 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.Delete: ImageVector
+val RsserIcons.Delete: ImageVector
   get() = rsserDelete
 
 private val rsserDelete by lazy {

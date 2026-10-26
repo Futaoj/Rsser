@@ -19,7 +19,7 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.CalendarClock: ImageVector
+val RsserIcons.CalendarClock: ImageVector
   get() = rsserCalendarClock
 private val rsserCalendarClock by lazy {
   rsserIcon("CalendarClock", "M3 5H21V21H3ZM7 2V8M17 2V8M3 10H21M12 13V17H16")

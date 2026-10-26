@@ -19,7 +19,7 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.LayoutDefault: ImageVector
+val RsserIcons.LayoutDefault: ImageVector
   get() = rsserLayoutDefault
 private val rsserLayoutDefault by lazy {
   rsserIcon("LayoutDefault", "M4 3H20V11H4ZM4 15H13M4 20H13M17 15H20V20H17Z")

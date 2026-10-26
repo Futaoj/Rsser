@@ -21,11 +21,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import dev.sasikanth.rss.reader.components.AlertDialog
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.buttonCancel
-import twine.shared.generated.resources.delete
-import twine.shared.generated.resources.removeSources
-import twine.shared.generated.resources.removeSourcesDesc
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.buttonCancel
+import rsser.shared.generated.resources.delete
+import rsser.shared.generated.resources.removeSources
+import rsser.shared.generated.resources.removeSourcesDesc
 
 @Composable
 fun DeleteConfirmationDialog(

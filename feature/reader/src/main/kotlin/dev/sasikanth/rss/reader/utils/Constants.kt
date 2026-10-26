@@ -25,7 +25,7 @@ object Constants {
   // Keeps forms and lists readable on wide windows; full-window screens center
   // their content within this width.
   val MAX_CONTENT_WIDTH = 640.dp
-  const val REPORT_ISSUE_LINK = "https://github.com/msasikanth/twine/issues"
+  const val REPORT_ISSUE_LINK = "https://github.com/msasikanth/rsser/issues"
 
   const val ABOUT_SASI_NAME = "Sasikanth Miriyampalli"
   const val ABOUT_ED_NAME = "Eduardo Pratti"

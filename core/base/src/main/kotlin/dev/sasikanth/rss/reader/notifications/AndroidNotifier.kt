@@ -40,8 +40,8 @@ class AndroidNotifier(private val context: Context) : Notifier {
     context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
   companion object {
-    private const val CHANNEL_ID = "twine_notifications"
-    private const val CHANNEL_NAME = "Twine Notifications"
+    private const val CHANNEL_ID = "rsser_notifications"
+    private const val CHANNEL_NAME = "Rsser Notifications"
   }
 
   init {

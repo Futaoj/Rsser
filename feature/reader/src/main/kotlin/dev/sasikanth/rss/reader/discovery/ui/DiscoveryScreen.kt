@@ -81,19 +81,19 @@ import dev.sasikanth.rss.reader.resources.icons.ArrowUp
 import dev.sasikanth.rss.reader.resources.icons.Check
 import dev.sasikanth.rss.reader.resources.icons.Close
 import dev.sasikanth.rss.reader.resources.icons.Refresh
-import dev.sasikanth.rss.reader.resources.icons.TwineIcons
+import dev.sasikanth.rss.reader.resources.icons.RsserIcons
 import dev.sasikanth.rss.reader.ui.AppTheme
 import dev.sasikanth.rss.reader.utils.Constants
 import dev.sasikanth.rss.reader.utils.restrictContentWidth
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.buttonChange
-import twine.shared.generated.resources.discoveryAddFeed
-import twine.shared.generated.resources.discoveryAdded
-import twine.shared.generated.resources.discoveryOnboardingHint
-import twine.shared.generated.resources.discoveryRefresh
-import twine.shared.generated.resources.discoverySearchHint
-import twine.shared.generated.resources.discoveryTitle
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.buttonChange
+import rsser.shared.generated.resources.discoveryAddFeed
+import rsser.shared.generated.resources.discoveryAdded
+import rsser.shared.generated.resources.discoveryOnboardingHint
+import rsser.shared.generated.resources.discoveryRefresh
+import rsser.shared.generated.resources.discoverySearchHint
+import rsser.shared.generated.resources.discoveryTitle
 
 @Composable
 fun DiscoveryScreen(
@@ -146,7 +146,7 @@ private fun DiscoveryContent(
             val refreshButtonPaddingEnd = if (showDoneButton) 0.dp else 12.dp
             CircularIconButton(
               modifier = Modifier.padding(end = refreshButtonPaddingEnd),
-              icon = TwineIcons.Refresh,
+              icon = RsserIcons.Refresh,
               label = stringResource(Res.string.discoveryRefresh),
               onClick = { dispatch(DiscoveryEvent.Refresh) },
             )
@@ -156,7 +156,7 @@ private fun DiscoveryContent(
 
               CircularIconButton(
                 modifier = Modifier.padding(end = 12.dp),
-                icon = TwineIcons.Check,
+                icon = RsserIcons.Check,
                 label = stringResource(Res.string.buttonChange),
                 enabled = state.addedFeedLinks.size >= 3,
                 onClick = onDone,
@@ -180,7 +180,7 @@ private fun DiscoveryContent(
             hint = stringResource(Res.string.discoverySearchHint),
             trailingIcon = {
               if (state.searchQuery.text.isNotBlank()) {
-                IconButton(icon = TwineIcons.Close, contentDescription = null) {
+                IconButton(icon = RsserIcons.Close, contentDescription = null) {
                   dispatch(DiscoveryEvent.SearchQueryChanged(TextFieldValue()))
                 }
               }
@@ -308,7 +308,7 @@ private fun DiscoveryGroupHeader(
     Spacer(Modifier.weight(1f))
 
     Icon(
-      imageVector = if (isCollapsed) TwineIcons.ArrowDown else TwineIcons.ArrowUp,
+      imageVector = if (isCollapsed) RsserIcons.ArrowDown else RsserIcons.ArrowUp,
       contentDescription = null,
       tint = AppTheme.colorScheme.onSurfaceVariant,
       modifier = Modifier.requiredSize(20.dp),
@@ -373,7 +373,7 @@ private fun DiscoveryFeedItem(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
       ) {
         Icon(
-          imageVector = TwineIcons.Check,
+          imageVector = RsserIcons.Check,
           contentDescription = null,
           modifier = Modifier.requiredSize(16.dp),
           tint = AppTheme.colorScheme.onSurfaceVariant,
@@ -483,7 +483,7 @@ private fun DiscoveryFeedInfoBottomSheet(
         if (isAdded) {
           Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
-              imageVector = TwineIcons.Check,
+              imageVector = RsserIcons.Check,
               contentDescription = null,
               modifier = Modifier.requiredSize(24.dp),
             )

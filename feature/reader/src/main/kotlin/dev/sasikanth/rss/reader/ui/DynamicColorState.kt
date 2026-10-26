@@ -32,7 +32,7 @@ import kotlinx.coroutines.withContext
 internal fun rememberDynamicColorState(
   defaultLightAppColorScheme: AppColorValues,
   defaultDarkAppColorScheme: AppColorValues,
-  scheme: TwineDynamicColors.Scheme = TwineDynamicColors.Scheme.TonalSpot,
+  scheme: RsserDynamicColors.Scheme = RsserDynamicColors.Scheme.TonalSpot,
 ): DynamicColorState {
   return remember(defaultLightAppColorScheme, defaultDarkAppColorScheme, scheme) {
     DynamicColorState(
@@ -47,7 +47,7 @@ internal fun rememberDynamicColorState(
 internal class DynamicColorState(
   private val defaultLightValues: AppColorValues,
   private val defaultDarkValues: AppColorValues,
-  private val scheme: TwineDynamicColors.Scheme,
+  private val scheme: RsserDynamicColors.Scheme,
 ) {
   val lightAppColorScheme = AppColorScheme(defaultLightValues)
   val darkAppColorScheme = AppColorScheme(defaultDarkValues)
@@ -80,7 +80,7 @@ internal class DynamicColorState(
 
         startLight =
           cache["light_$fromSeedColor"]
-            ?: TwineDynamicColors.calculateColorScheme(
+            ?: RsserDynamicColors.calculateColorScheme(
                 seedColor = fromSeedColor ?: defaultLightSeedColor,
                 useDarkTheme = false,
                 scheme = scheme,
@@ -89,7 +89,7 @@ internal class DynamicColorState(
 
         startDark =
           cache["dark_$fromSeedColor"]
-            ?: TwineDynamicColors.calculateColorScheme(
+            ?: RsserDynamicColors.calculateColorScheme(
                 seedColor = fromSeedColor ?: defaultLightSeedColor,
                 useDarkTheme = true,
                 scheme = scheme,
@@ -98,7 +98,7 @@ internal class DynamicColorState(
 
         endLight =
           cache["light_$toSeedColor"]
-            ?: TwineDynamicColors.calculateColorScheme(
+            ?: RsserDynamicColors.calculateColorScheme(
                 seedColor = toSeedColor ?: defaultDarkSeedColor,
                 useDarkTheme = false,
                 scheme = scheme,
@@ -107,7 +107,7 @@ internal class DynamicColorState(
 
         endDark =
           cache["dark_$toSeedColor"]
-            ?: TwineDynamicColors.calculateColorScheme(
+            ?: RsserDynamicColors.calculateColorScheme(
                 seedColor = toSeedColor ?: defaultDarkSeedColor,
                 useDarkTheme = true,
                 scheme = scheme,
@@ -169,6 +169,6 @@ internal val LocalDynamicColorState =
     DynamicColorState(
       defaultLightValues = lightAppColorScheme(),
       defaultDarkValues = darkAppColorScheme(),
-      scheme = TwineDynamicColors.Scheme.TonalSpot,
+      scheme = RsserDynamicColors.Scheme.TonalSpot,
     )
   }

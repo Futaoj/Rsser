@@ -27,7 +27,7 @@ import androidx.compose.ui.graphics.vector.ImageVector.Builder
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
-val TwineIcons.Twitter: ImageVector
+val RsserIcons.Twitter: ImageVector
   get() {
     if (twitter != null) {
       return twitter!!

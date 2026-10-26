@@ -74,10 +74,10 @@ internal fun systemDynamicColorScheme(isDark: Boolean): AppColorScheme {
           surfaceContainerHighest = colorScheme.surfaceContainerHighest,
           inverseSurface = colorScheme.inverseSurface,
           inverseOnSurface = colorScheme.inverseOnSurface,
-          backdrop = TwineDynamicColors.backdrop.getColor(dynamicColorScheme),
-          bottomSheet = TwineDynamicColors.bottomSheet.getColor(dynamicColorScheme),
-          bottomSheetInverse = TwineDynamicColors.bottomSheetInverse.getColor(dynamicColorScheme),
-          bottomSheetBorder = TwineDynamicColors.bottomSheetBorder.getColor(dynamicColorScheme),
+          backdrop = RsserDynamicColors.backdrop.getColor(dynamicColorScheme),
+          bottomSheet = RsserDynamicColors.bottomSheet.getColor(dynamicColorScheme),
+          bottomSheetInverse = RsserDynamicColors.bottomSheetInverse.getColor(dynamicColorScheme),
+          bottomSheetBorder = RsserDynamicColors.bottomSheetBorder.getColor(dynamicColorScheme),
           error = colorScheme.error,
         )
       }
@@ -87,10 +87,10 @@ internal fun systemDynamicColorScheme(isDark: Boolean): AppColorScheme {
     // Fallback for older Android versions - use Forest theme as default
     val appColorValues =
       remember(isDark) {
-        TwineDynamicColors.calculateColorScheme(
+        RsserDynamicColors.calculateColorScheme(
           seedColor = Color(0xFF73D995),
           useDarkTheme = isDark,
-          scheme = TwineDynamicColors.Scheme.Vibrant,
+          scheme = RsserDynamicColors.Scheme.Vibrant,
         )
       }
 

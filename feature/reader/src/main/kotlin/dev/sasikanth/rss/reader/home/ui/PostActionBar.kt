@@ -72,7 +72,7 @@ import dev.sasikanth.rss.reader.resources.icons.Bookmarked
 import dev.sasikanth.rss.reader.resources.icons.Comments
 import dev.sasikanth.rss.reader.resources.icons.MoreHorizFilled
 import dev.sasikanth.rss.reader.resources.icons.Share
-import dev.sasikanth.rss.reader.resources.icons.TwineIcons
+import dev.sasikanth.rss.reader.resources.icons.RsserIcons
 import dev.sasikanth.rss.reader.resources.icons.Visibility
 import dev.sasikanth.rss.reader.resources.icons.VisibilityOff
 import dev.sasikanth.rss.reader.resources.icons.Website
@@ -83,16 +83,16 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.bookmark
-import twine.shared.generated.resources.comments
-import twine.shared.generated.resources.markAsRead
-import twine.shared.generated.resources.markAsUnRead
-import twine.shared.generated.resources.moreMenuOptions
-import twine.shared.generated.resources.openWebsite
-import twine.shared.generated.resources.readingTimeEstimate
-import twine.shared.generated.resources.share
-import twine.shared.generated.resources.unBookmark
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.bookmark
+import rsser.shared.generated.resources.comments
+import rsser.shared.generated.resources.markAsRead
+import rsser.shared.generated.resources.markAsUnRead
+import rsser.shared.generated.resources.moreMenuOptions
+import rsser.shared.generated.resources.openWebsite
+import rsser.shared.generated.resources.readingTimeEstimate
+import rsser.shared.generated.resources.share
+import rsser.shared.generated.resources.unBookmark
 
 @Composable
 internal fun PostActionBar(
@@ -321,7 +321,7 @@ internal fun PostActions(
         },
       ) {
         IconButton(
-          icon = TwineIcons.Comments,
+          icon = RsserIcons.Comments,
           contentDescription = commentsLabel,
           size = IconButtonSize.Small,
           onClick = onCommentsClick,
@@ -360,9 +360,9 @@ internal fun PostActions(
       IconButton(
         icon =
           if (postBookmarked) {
-            TwineIcons.Bookmarked
+            RsserIcons.Bookmarked
           } else {
-            TwineIcons.Bookmark
+            RsserIcons.Bookmark
           },
         contentDescription = bookmarkLabel,
         size = IconButtonSize.Small,
@@ -398,7 +398,7 @@ internal fun PostActions(
         },
       ) {
         IconButton(
-          icon = TwineIcons.MoreHorizFilled,
+          icon = RsserIcons.MoreHorizFilled,
           contentDescription = moreMenuOptionsLabel,
           size = IconButtonSize.Small,
         ) {
@@ -486,9 +486,9 @@ private fun PostActionsMenuItems(
       modifier = Modifier.fillMaxWidth(),
       leadingIcon =
         if (alwaysShowMarkAsUnread || postRead) {
-          TwineIcons.VisibilityOff
+          RsserIcons.VisibilityOff
         } else {
-          TwineIcons.Visibility
+          RsserIcons.Visibility
         },
       text = markAsReadLabel,
       contentDescription = markAsReadLabel,
@@ -506,7 +506,7 @@ private fun PostActionsMenuItems(
 
   DropdownMenuItem(
     modifier = Modifier.fillMaxWidth(),
-    leadingIcon = TwineIcons.Website,
+    leadingIcon = RsserIcons.Website,
     text = openWebsiteLabel,
     contentDescription = openWebsiteLabel,
     onClick = {
@@ -523,7 +523,7 @@ private fun PostActionsMenuItems(
 
   DropdownMenuItem(
     modifier = Modifier.fillMaxWidth(),
-    leadingIcon = TwineIcons.Share,
+    leadingIcon = RsserIcons.Share,
     text = shareLabel,
     contentDescription = shareLabel,
     onClick = {

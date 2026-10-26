@@ -19,7 +19,7 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.RadioUnselected: ImageVector
+val RsserIcons.RadioUnselected: ImageVector
   get() = rsserRadioUnselected
 private val rsserRadioUnselected by lazy {
   rsserIcon("RadioUnselected", "M21 12A9 9 0 1 1 3 12A9 9 0 1 1 21 12Z")

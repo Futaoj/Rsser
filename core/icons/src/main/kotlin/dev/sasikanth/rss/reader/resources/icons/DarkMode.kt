@@ -19,6 +19,6 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.DarkMode: ImageVector
+val RsserIcons.DarkMode: ImageVector
   get() = rsserDarkMode
 private val rsserDarkMode by lazy { rsserIcon("DarkMode", "M20 15A9 9 0 0 1 9 4A9 9 0 1 0 20 15Z") }

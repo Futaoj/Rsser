@@ -19,7 +19,7 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.ExpandContent: ImageVector
+val RsserIcons.ExpandContent: ImageVector
   get() = rsserExpandContent
 private val rsserExpandContent by lazy {
   rsserIcon("ExpandContent", "M4 9V4H9M15 4H20V9M20 15V20H15M9 20H4V15")

@@ -86,7 +86,7 @@ import kotlin.time.Instant
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class TwineUnreadMediumWidget : GlanceAppWidget() {
+class RsserUnreadMediumWidget : GlanceAppWidget() {
 
   override val sizeMode: SizeMode = SizeMode.Exact
 
@@ -448,10 +448,10 @@ class MediumNextPostAction : ActionCallback {
     parameters: ActionParameters,
   ) {
     updateAppWidgetState(context, glanceId) { prefs ->
-      val currentIndex = prefs[TwineUnreadMediumWidget.CurrentIndexKey] ?: 0
-      prefs[TwineUnreadMediumWidget.CurrentIndexKey] = (currentIndex + 1) % 5
+      val currentIndex = prefs[RsserUnreadMediumWidget.CurrentIndexKey] ?: 0
+      prefs[RsserUnreadMediumWidget.CurrentIndexKey] = (currentIndex + 1) % 5
     }
-    TwineUnreadMediumWidget().update(context, glanceId)
+    RsserUnreadMediumWidget().update(context, glanceId)
   }
 }
 
@@ -462,11 +462,11 @@ class MediumPreviousPostAction : ActionCallback {
     parameters: ActionParameters,
   ) {
     updateAppWidgetState(context, glanceId) { prefs ->
-      val currentIndex = prefs[TwineUnreadMediumWidget.CurrentIndexKey] ?: 0
+      val currentIndex = prefs[RsserUnreadMediumWidget.CurrentIndexKey] ?: 0
       if (currentIndex > 0) {
-        prefs[TwineUnreadMediumWidget.CurrentIndexKey] = currentIndex - 1
+        prefs[RsserUnreadMediumWidget.CurrentIndexKey] = currentIndex - 1
       }
     }
-    TwineUnreadMediumWidget().update(context, glanceId)
+    RsserUnreadMediumWidget().update(context, glanceId)
   }
 }

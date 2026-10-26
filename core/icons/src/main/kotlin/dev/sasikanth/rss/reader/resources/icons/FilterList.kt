@@ -19,7 +19,7 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.FilterList: ImageVector
+val RsserIcons.FilterList: ImageVector
   get() = rsserFilterList
 
 private val rsserFilterList by lazy { rsserIcon("FilterList", "M4 5H20L14 12V19L10 21V12Z") }

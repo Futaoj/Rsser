@@ -19,6 +19,6 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.DropdownIcon: ImageVector
+val RsserIcons.DropdownIcon: ImageVector
   get() = rsserDropdownIcon
 private val rsserDropdownIcon by lazy { rsserIcon("DropdownIcon", "M6 9L12 15L18 9") }

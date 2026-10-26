@@ -66,23 +66,23 @@ import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.char
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.month_apr
-import twine.shared.generated.resources.month_aug
-import twine.shared.generated.resources.month_dec
-import twine.shared.generated.resources.month_feb
-import twine.shared.generated.resources.month_jan
-import twine.shared.generated.resources.month_jul
-import twine.shared.generated.resources.month_jun
-import twine.shared.generated.resources.month_mar
-import twine.shared.generated.resources.month_may
-import twine.shared.generated.resources.month_nov
-import twine.shared.generated.resources.month_oct
-import twine.shared.generated.resources.month_sep
-import twine.shared.generated.resources.unit_days
-import twine.shared.generated.resources.unit_hours
-import twine.shared.generated.resources.unit_minutes
-import twine.shared.generated.resources.unit_seconds
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.month_apr
+import rsser.shared.generated.resources.month_aug
+import rsser.shared.generated.resources.month_dec
+import rsser.shared.generated.resources.month_feb
+import rsser.shared.generated.resources.month_jan
+import rsser.shared.generated.resources.month_jul
+import rsser.shared.generated.resources.month_jun
+import rsser.shared.generated.resources.month_mar
+import rsser.shared.generated.resources.month_may
+import rsser.shared.generated.resources.month_nov
+import rsser.shared.generated.resources.month_oct
+import rsser.shared.generated.resources.month_sep
+import rsser.shared.generated.resources.unit_days
+import rsser.shared.generated.resources.unit_hours
+import rsser.shared.generated.resources.unit_minutes
+import rsser.shared.generated.resources.unit_seconds
 
 /**
  * Fills the available space while capping the content width to [Constants.MAX_CONTENT_WIDTH] and

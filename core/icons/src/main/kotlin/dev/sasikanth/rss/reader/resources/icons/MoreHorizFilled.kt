@@ -19,7 +19,7 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.MoreHorizFilled: ImageVector
+val RsserIcons.MoreHorizFilled: ImageVector
   get() = rsserMoreHorizFilled
 private val rsserMoreHorizFilled by lazy {
   rsserIcon("MoreHorizFilled", "M5 12H5.1M12 12H12.1M19 12H19.1")

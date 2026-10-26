@@ -30,7 +30,7 @@ import com.materialkolor.scheme.SchemeMonochrome
 import com.materialkolor.scheme.SchemeTonalSpot
 import com.materialkolor.scheme.SchemeVibrant
 
-internal object TwineDynamicColors {
+internal object RsserDynamicColors {
 
   private val dynamicColors = MaterialDynamicColors()
 

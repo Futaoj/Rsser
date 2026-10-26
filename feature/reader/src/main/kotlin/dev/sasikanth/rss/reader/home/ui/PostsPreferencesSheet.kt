@@ -46,21 +46,21 @@ import dev.sasikanth.rss.reader.core.model.local.PostsType
 import dev.sasikanth.rss.reader.resources.icons.CalendarClock
 import dev.sasikanth.rss.reader.resources.icons.FilterList
 import dev.sasikanth.rss.reader.resources.icons.Sort
-import dev.sasikanth.rss.reader.resources.icons.TwineIcons
+import dev.sasikanth.rss.reader.resources.icons.RsserIcons
 import dev.sasikanth.rss.reader.ui.AppTheme
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.filter
-import twine.shared.generated.resources.postsAll
-import twine.shared.generated.resources.postsLast24Hours
-import twine.shared.generated.resources.postsSortBy
-import twine.shared.generated.resources.postsSortByPostAdded
-import twine.shared.generated.resources.postsSortByPostDate
-import twine.shared.generated.resources.postsSortLatest
-import twine.shared.generated.resources.postsSortOldest
-import twine.shared.generated.resources.postsToday
-import twine.shared.generated.resources.postsUnread
-import twine.shared.generated.resources.sort
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.filter
+import rsser.shared.generated.resources.postsAll
+import rsser.shared.generated.resources.postsLast24Hours
+import rsser.shared.generated.resources.postsSortBy
+import rsser.shared.generated.resources.postsSortByPostAdded
+import rsser.shared.generated.resources.postsSortByPostDate
+import rsser.shared.generated.resources.postsSortLatest
+import rsser.shared.generated.resources.postsSortOldest
+import rsser.shared.generated.resources.postsToday
+import rsser.shared.generated.resources.postsUnread
+import rsser.shared.generated.resources.sort
 
 @Composable
 internal fun PostsPreferencesSheet(
@@ -108,7 +108,7 @@ internal fun PostsPreferencesSheet(
           .padding(bottom = 32.dp)
           .navigationBarsPadding()
     ) {
-      SectionHeader(text = stringResource(Res.string.filter), icon = TwineIcons.FilterList)
+      SectionHeader(text = stringResource(Res.string.filter), icon = RsserIcons.FilterList)
 
       ToggleableButtonGroup(
         modifier = Modifier.fillMaxWidth(),
@@ -143,7 +143,7 @@ internal fun PostsPreferencesSheet(
         },
       )
 
-      SectionHeader(text = stringResource(Res.string.postsSortBy), icon = TwineIcons.CalendarClock)
+      SectionHeader(text = stringResource(Res.string.postsSortBy), icon = RsserIcons.CalendarClock)
 
       ToggleableButtonGroup(
         modifier = Modifier.fillMaxWidth(),
@@ -168,7 +168,7 @@ internal fun PostsPreferencesSheet(
         },
       )
 
-      SectionHeader(text = stringResource(Res.string.sort), icon = TwineIcons.Sort)
+      SectionHeader(text = stringResource(Res.string.sort), icon = RsserIcons.Sort)
 
       ToggleableButtonGroup(
         modifier = Modifier.fillMaxWidth(),

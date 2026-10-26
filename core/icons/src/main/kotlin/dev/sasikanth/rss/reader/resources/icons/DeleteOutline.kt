@@ -19,7 +19,7 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.DeleteOutline: ImageVector
+val RsserIcons.DeleteOutline: ImageVector
   get() = rsserDeleteOutline
 private val rsserDeleteOutline by lazy {
   rsserIcon("DeleteOutline", "M4 6H20M9 6V3H15V6M6 6L7 21H17L18 6M10 10V17M14 10V17", false)

@@ -60,16 +60,16 @@ import dev.sasikanth.rss.reader.feeds.ui.FeedGroupItem
 import dev.sasikanth.rss.reader.groupselection.GroupSelectionEvent
 import dev.sasikanth.rss.reader.groupselection.GroupSelectionViewModel
 import dev.sasikanth.rss.reader.resources.icons.Add
-import dev.sasikanth.rss.reader.resources.icons.TwineIcons
+import dev.sasikanth.rss.reader.resources.icons.RsserIcons
 import dev.sasikanth.rss.reader.ui.AppTheme
 import dev.sasikanth.rss.reader.ui.LocalTranslucentStyles
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.buttonCancel
-import twine.shared.generated.resources.buttonConfirm
-import twine.shared.generated.resources.groupAddNew
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.buttonCancel
+import rsser.shared.generated.resources.buttonConfirm
+import rsser.shared.generated.resources.groupAddNew
 
-val SELECTED_GROUPS_KEY = NavResultKey<Set<String>>("dev.sasikanth.twine.SELECTED_GROUPS")
+val SELECTED_GROUPS_KEY = NavResultKey<Set<String>>("dev.sasikanth.rsser.SELECTED_GROUPS")
 
 @Composable
 fun GroupSelectionSheet(
@@ -122,7 +122,7 @@ fun GroupSelectionSheet(
           ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
               Icon(
-                imageVector = TwineIcons.Add,
+                imageVector = RsserIcons.Add,
                 contentDescription = null,
                 tint = AppTheme.colorScheme.primary,
               )

@@ -41,7 +41,7 @@ sealed interface Screen : NavKey {
   data class Reader(val readerScreenArgs: ReaderScreenArgs) : Screen {
 
     companion object {
-      const val ROUTE = "twine://reader"
+      const val ROUTE = "rsser://reader"
     }
 
     fun toRoute(): String {
@@ -72,7 +72,7 @@ sealed interface Screen : NavKey {
   @Serializable
   data object AddFeed : Screen {
 
-    const val ROUTE = "twine://add"
+    const val ROUTE = "rsser://add"
   }
 
   @Serializable data class FeedGroup(val groupId: String) : Screen
@@ -90,6 +90,8 @@ sealed interface Screen : NavKey {
   @Serializable data object None : Screen
 
   @Serializable data object MainHome : Screen
+
+  @Serializable data object MainSubscriptions : Screen
 
   @Serializable data object MainSearch : Screen
 

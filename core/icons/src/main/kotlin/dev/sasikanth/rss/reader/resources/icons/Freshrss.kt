@@ -27,7 +27,7 @@ import androidx.compose.ui.graphics.vector.ImageVector.Builder
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
-public val TwineIcons.Freshrss: ImageVector
+public val RsserIcons.Freshrss: ImageVector
   get() {
     if (_freshrss != null) {
       return _freshrss!!

@@ -36,17 +36,17 @@ import dev.sasikanth.rss.reader.components.TranslucentButton
 import dev.sasikanth.rss.reader.data.repository.Period
 import dev.sasikanth.rss.reader.data.repository.Period.NEVER
 import dev.sasikanth.rss.reader.resources.icons.ArrowDown
-import dev.sasikanth.rss.reader.resources.icons.TwineIcons
+import dev.sasikanth.rss.reader.resources.icons.RsserIcons
 import dev.sasikanth.rss.reader.ui.AppTheme
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.settingsPostsDeletionPeriodNever
-import twine.shared.generated.resources.settingsPostsDeletionPeriodOneMonth
-import twine.shared.generated.resources.settingsPostsDeletionPeriodOneWeek
-import twine.shared.generated.resources.settingsPostsDeletionPeriodOneYear
-import twine.shared.generated.resources.settingsPostsDeletionPeriodSixMonths
-import twine.shared.generated.resources.settingsPostsDeletionPeriodThreeMonths
-import twine.shared.generated.resources.settingsPostsDeletionPeriodTitle
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.settingsPostsDeletionPeriodNever
+import rsser.shared.generated.resources.settingsPostsDeletionPeriodOneMonth
+import rsser.shared.generated.resources.settingsPostsDeletionPeriodOneWeek
+import rsser.shared.generated.resources.settingsPostsDeletionPeriodOneYear
+import rsser.shared.generated.resources.settingsPostsDeletionPeriodSixMonths
+import rsser.shared.generated.resources.settingsPostsDeletionPeriodThreeMonths
+import rsser.shared.generated.resources.settingsPostsDeletionPeriodTitle
 
 @Composable
 internal fun PostsDeletionPeriodSettingItem(
@@ -80,7 +80,7 @@ internal fun PostsDeletionPeriodSettingItem(
 
       TranslucentButton(
         text = period,
-        trailingIcon = TwineIcons.ArrowDown,
+        trailingIcon = RsserIcons.ArrowDown,
         onClick = { showDropdown = true },
       )
 

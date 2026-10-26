@@ -39,10 +39,10 @@ internal fun ThemeVariant.getOverriddenColorScheme(isDark: Boolean): AppColorSch
 
 internal fun parchmentColorScheme(isDark: Boolean): AppColorScheme {
   return AppColorScheme(
-    TwineDynamicColors.calculateColorScheme(
+    RsserDynamicColors.calculateColorScheme(
       seedColor = if (isDark) Color.White else Color.Black,
       useDarkTheme = isDark,
-      scheme = TwineDynamicColors.Scheme.Monochrome,
+      scheme = RsserDynamicColors.Scheme.Monochrome,
     )
   )
 }
@@ -109,50 +109,50 @@ internal fun solarizedColorScheme(isDark: Boolean): AppColorScheme {
 
 internal fun forestColorScheme(isDark: Boolean): AppColorScheme {
   return AppColorScheme(
-    TwineDynamicColors.calculateColorScheme(
+    RsserDynamicColors.calculateColorScheme(
       seedColor = Color(0xFF73D995),
       useDarkTheme = isDark,
-      scheme = TwineDynamicColors.Scheme.Vibrant,
+      scheme = RsserDynamicColors.Scheme.Vibrant,
     )
   )
 }
 
 internal fun amberColorScheme(isDark: Boolean): AppColorScheme {
   return AppColorScheme(
-    TwineDynamicColors.calculateColorScheme(
+    RsserDynamicColors.calculateColorScheme(
       seedColor = Color(0xFFF5B83D),
       useDarkTheme = isDark,
-      scheme = TwineDynamicColors.Scheme.Vibrant,
+      scheme = RsserDynamicColors.Scheme.Vibrant,
     )
   )
 }
 
 internal fun coralColorScheme(isDark: Boolean): AppColorScheme {
   return AppColorScheme(
-    TwineDynamicColors.calculateColorScheme(
+    RsserDynamicColors.calculateColorScheme(
       seedColor = Color(0xFFFF8C61),
       useDarkTheme = isDark,
-      scheme = TwineDynamicColors.Scheme.Vibrant,
+      scheme = RsserDynamicColors.Scheme.Vibrant,
     )
   )
 }
 
 internal fun raspberryColorScheme(isDark: Boolean): AppColorScheme {
   return AppColorScheme(
-    TwineDynamicColors.calculateColorScheme(
+    RsserDynamicColors.calculateColorScheme(
       seedColor = Color(0xFFE87DC8),
       useDarkTheme = isDark,
-      scheme = TwineDynamicColors.Scheme.Vibrant,
+      scheme = RsserDynamicColors.Scheme.Vibrant,
     )
   )
 }
 
 internal fun skylineColorScheme(isDark: Boolean): AppColorScheme {
   return AppColorScheme(
-    TwineDynamicColors.calculateColorScheme(
+    RsserDynamicColors.calculateColorScheme(
       seedColor = Color(0xFF45ABF2),
       useDarkTheme = isDark,
-      scheme = TwineDynamicColors.Scheme.Vibrant,
+      scheme = RsserDynamicColors.Scheme.Vibrant,
     )
   )
 }
@@ -279,10 +279,10 @@ internal fun slateColorScheme(isDark: Boolean): AppColorScheme {
 
 internal fun lavenderColorScheme(isDark: Boolean): AppColorScheme {
   return AppColorScheme(
-    TwineDynamicColors.calculateColorScheme(
+    RsserDynamicColors.calculateColorScheme(
       seedColor = Color(0xFF9C89E8),
       useDarkTheme = isDark,
-      scheme = TwineDynamicColors.Scheme.Vibrant,
+      scheme = RsserDynamicColors.Scheme.Vibrant,
     )
   )
 }

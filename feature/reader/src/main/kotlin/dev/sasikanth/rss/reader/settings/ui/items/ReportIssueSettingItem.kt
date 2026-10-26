@@ -20,9 +20,9 @@ package dev.sasikanth.rss.reader.settings.ui.items
 import androidx.compose.runtime.Composable
 import dev.sasikanth.rss.reader.app.AppInfo
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.settingsReportIssue
-import twine.shared.generated.resources.settingsVersion
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.settingsReportIssue
+import rsser.shared.generated.resources.settingsVersion
 
 @Composable
 internal fun ReportIssueSettingItem(appInfo: AppInfo, onClick: () -> Unit) {

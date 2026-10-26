@@ -19,7 +19,7 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.CheckCircle: ImageVector
+val RsserIcons.CheckCircle: ImageVector
   get() = rsserCheckCircle
 private val rsserCheckCircle by lazy {
   rsserIcon("CheckCircle", "M21 12A9 9 0 1 1 3 12A9 9 0 1 1 21 12ZM7 12L10 15L17 8")

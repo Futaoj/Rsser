@@ -60,16 +60,16 @@ import dev.sasikanth.rss.reader.settings.ui.items.PostsDeletionPeriodSettingItem
 import dev.sasikanth.rss.reader.ui.AppTheme
 import dev.sasikanth.rss.reader.utils.restrictContentWidth
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.settingsBrowserTypeSubtitle
-import twine.shared.generated.resources.settingsBrowserTypeTitle
-import twine.shared.generated.resources.settingsConfirmMarkAllAsReadSubtitle
-import twine.shared.generated.resources.settingsConfirmMarkAllAsReadTitle
-import twine.shared.generated.resources.settingsFeaturesAndBehaviors
-import twine.shared.generated.resources.settingsHeaderBehaviour
-import twine.shared.generated.resources.settingsHeaderReadingAndBrowsing
-import twine.shared.generated.resources.settingsShowReaderViewSubtitle
-import twine.shared.generated.resources.settingsShowReaderViewTitle
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.settingsBrowserTypeSubtitle
+import rsser.shared.generated.resources.settingsBrowserTypeTitle
+import rsser.shared.generated.resources.settingsConfirmMarkAllAsReadSubtitle
+import rsser.shared.generated.resources.settingsConfirmMarkAllAsReadTitle
+import rsser.shared.generated.resources.settingsFeaturesAndBehaviors
+import rsser.shared.generated.resources.settingsHeaderBehaviour
+import rsser.shared.generated.resources.settingsHeaderReadingAndBrowsing
+import rsser.shared.generated.resources.settingsShowReaderViewSubtitle
+import rsser.shared.generated.resources.settingsShowReaderViewTitle
 
 @Composable
 internal fun SettingsBehaviorScreen(

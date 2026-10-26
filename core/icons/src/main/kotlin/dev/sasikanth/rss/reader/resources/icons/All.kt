@@ -18,6 +18,6 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.All: ImageVector
+val RsserIcons.All: ImageVector
   get() = rsserAll
 private val rsserAll by lazy { rsserIcon("All", "M4 4H20V20H4ZM8 9H16M8 15H16") }

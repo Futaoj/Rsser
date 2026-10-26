@@ -31,13 +31,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.sasikanth.rss.reader.ui.AppTheme
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.buttonCancel
-import twine.shared.generated.resources.settingsDeleteAppDataButton
-import twine.shared.generated.resources.settingsDeleteAppDataDialogDesc
-import twine.shared.generated.resources.settingsDeleteAppDataDialogTitle
-import twine.shared.generated.resources.settingsDeleteAppDataSubtitle
-import twine.shared.generated.resources.settingsDeleteAppDataTitle
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.buttonCancel
+import rsser.shared.generated.resources.settingsDeleteAppDataButton
+import rsser.shared.generated.resources.settingsDeleteAppDataDialogDesc
+import rsser.shared.generated.resources.settingsDeleteAppDataDialogTitle
+import rsser.shared.generated.resources.settingsDeleteAppDataSubtitle
+import rsser.shared.generated.resources.settingsDeleteAppDataTitle
 
 @Composable
 internal fun DeleteAppDataSettingItem(modifier: Modifier = Modifier, onClick: () -> Unit) {

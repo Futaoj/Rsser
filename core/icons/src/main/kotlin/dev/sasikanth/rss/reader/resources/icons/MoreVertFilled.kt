@@ -19,6 +19,6 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.MoreVert: ImageVector
+val RsserIcons.MoreVert: ImageVector
   get() = rsserMoreVert
 private val rsserMoreVert by lazy { rsserIcon("MoreVert", "M12 5V5.1M12 12V12.1M12 19V19.1") }

@@ -19,6 +19,6 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.NewTag: ImageVector
+val RsserIcons.NewTag: ImageVector
   get() = rsserNewTag
 private val rsserNewTag by lazy { rsserIcon("NewTag", "M3 3H12L22 13L13 22L3 12ZM8 7H8.1") }

@@ -33,15 +33,15 @@ import dev.sasikanth.rss.reader.resources.icons.Edit
 import dev.sasikanth.rss.reader.resources.icons.MarkAllAsRead
 import dev.sasikanth.rss.reader.resources.icons.NewGroup
 import dev.sasikanth.rss.reader.resources.icons.RemoveFeed
-import dev.sasikanth.rss.reader.resources.icons.TwineIcons
+import dev.sasikanth.rss.reader.resources.icons.RsserIcons
 import dev.sasikanth.rss.reader.utils.bottomPaddingOfSourceItem
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.actionAddTo
-import twine.shared.generated.resources.actionSelect
-import twine.shared.generated.resources.edit
-import twine.shared.generated.resources.feedOptionRemove
-import twine.shared.generated.resources.markAllAsRead
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.actionAddTo
+import rsser.shared.generated.resources.actionSelect
+import rsser.shared.generated.resources.edit
+import rsser.shared.generated.resources.feedOptionRemove
+import rsser.shared.generated.resources.markAllAsRead
 
 internal fun LazyListScope.sourcesSearchResults(
   searchResults: LazyPagingItems<Feed>,
@@ -93,7 +93,7 @@ internal fun LazyListScope.sourcesSearchResults(
         dropdownMenuContent = { onDismiss ->
           DropdownMenuItem(
             text = stringResource(Res.string.markAllAsRead),
-            leadingIcon = TwineIcons.MarkAllAsRead,
+            leadingIcon = RsserIcons.MarkAllAsRead,
             enabled = feed.numberOfUnreadPosts > 0,
             onClick = {
               onMarkAsReadClick(feed)
@@ -103,7 +103,7 @@ internal fun LazyListScope.sourcesSearchResults(
 
           DropdownMenuItem(
             text = stringResource(Res.string.actionAddTo),
-            leadingIcon = TwineIcons.NewGroup,
+            leadingIcon = RsserIcons.NewGroup,
             onClick = {
               onAddToGroupClick(feed)
               onDismiss()
@@ -112,7 +112,7 @@ internal fun LazyListScope.sourcesSearchResults(
 
           DropdownMenuItem(
             text = stringResource(Res.string.edit),
-            leadingIcon = TwineIcons.Edit,
+            leadingIcon = RsserIcons.Edit,
             onClick = {
               onSourceEditClick(feed)
               onDismiss()
@@ -121,7 +121,7 @@ internal fun LazyListScope.sourcesSearchResults(
 
           DropdownMenuItem(
             text = stringResource(Res.string.actionSelect),
-            leadingIcon = TwineIcons.Check,
+            leadingIcon = RsserIcons.Check,
             onClick = {
               onToggleSourceSelection(feed)
               onDismiss()
@@ -132,7 +132,7 @@ internal fun LazyListScope.sourcesSearchResults(
 
           DropdownMenuItem(
             text = stringResource(Res.string.feedOptionRemove),
-            leadingIcon = TwineIcons.RemoveFeed,
+            leadingIcon = RsserIcons.RemoveFeed,
             onClick = {
               onRemoveSourceClick(feed)
               onDismiss()

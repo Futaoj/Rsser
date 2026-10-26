@@ -25,25 +25,25 @@ import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.Font
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.comic_neue_bold
-import twine.shared.generated.resources.comic_neue_regular
-import twine.shared.generated.resources.golos_bold
-import twine.shared.generated.resources.golos_medium
-import twine.shared.generated.resources.golos_regular
-import twine.shared.generated.resources.google_sans
-import twine.shared.generated.resources.lora_bold
-import twine.shared.generated.resources.lora_medium
-import twine.shared.generated.resources.lora_regular
-import twine.shared.generated.resources.merriweather_bold
-import twine.shared.generated.resources.merriweather_medium
-import twine.shared.generated.resources.merriweather_regular
-import twine.shared.generated.resources.outfit_bold
-import twine.shared.generated.resources.outfit_medium
-import twine.shared.generated.resources.outfit_regular
-import twine.shared.generated.resources.robot_serif_bold
-import twine.shared.generated.resources.roboto_serif_medium
-import twine.shared.generated.resources.roboto_serif_regular
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.comic_neue_bold
+import rsser.shared.generated.resources.comic_neue_regular
+import rsser.shared.generated.resources.golos_bold
+import rsser.shared.generated.resources.golos_medium
+import rsser.shared.generated.resources.golos_regular
+import rsser.shared.generated.resources.google_sans
+import rsser.shared.generated.resources.lora_bold
+import rsser.shared.generated.resources.lora_medium
+import rsser.shared.generated.resources.lora_regular
+import rsser.shared.generated.resources.merriweather_bold
+import rsser.shared.generated.resources.merriweather_medium
+import rsser.shared.generated.resources.merriweather_regular
+import rsser.shared.generated.resources.outfit_bold
+import rsser.shared.generated.resources.outfit_medium
+import rsser.shared.generated.resources.outfit_regular
+import rsser.shared.generated.resources.robot_serif_bold
+import rsser.shared.generated.resources.roboto_serif_medium
+import rsser.shared.generated.resources.roboto_serif_regular
 
 private val figmaLineHeightStyle =
   LineHeightStyle(alignment = LineHeightStyle.Alignment.Center, trim = LineHeightStyle.Trim.None)

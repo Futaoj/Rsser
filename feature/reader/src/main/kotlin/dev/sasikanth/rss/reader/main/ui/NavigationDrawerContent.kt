@@ -29,6 +29,7 @@ import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
@@ -108,25 +109,27 @@ import dev.sasikanth.rss.reader.resources.icons.Close
 import dev.sasikanth.rss.reader.resources.icons.Delete
 import dev.sasikanth.rss.reader.resources.icons.Edit
 import dev.sasikanth.rss.reader.resources.icons.NewGroup
+import dev.sasikanth.rss.reader.resources.icons.MarkAllAsRead
 import dev.sasikanth.rss.reader.resources.icons.Pin
 import dev.sasikanth.rss.reader.resources.icons.Tune
-import dev.sasikanth.rss.reader.resources.icons.TwineIcons
+import dev.sasikanth.rss.reader.resources.icons.RsserIcons
 import dev.sasikanth.rss.reader.ui.AppTheme
 import dev.sasikanth.rss.reader.ui.LocalTranslucentStyles
 import dev.sasikanth.rss.reader.utils.Constants
 import dev.sasikanth.rss.reader.utils.KeyboardState
 import dev.sasikanth.rss.reader.utils.keyboardVisibilityAsState
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.actionAddTo
-import twine.shared.generated.resources.actionDelete
-import twine.shared.generated.resources.actionGroupsTooltip
-import twine.shared.generated.resources.actionPin
-import twine.shared.generated.resources.actionUnpin
-import twine.shared.generated.resources.buttonGoBack
-import twine.shared.generated.resources.edit
-import twine.shared.generated.resources.feedsLetsStart
-import twine.shared.generated.resources.feedsSearchHint
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.actionAddTo
+import rsser.shared.generated.resources.actionDelete
+import rsser.shared.generated.resources.actionGroupsTooltip
+import rsser.shared.generated.resources.actionPin
+import rsser.shared.generated.resources.actionUnpin
+import rsser.shared.generated.resources.buttonGoBack
+import rsser.shared.generated.resources.edit
+import rsser.shared.generated.resources.feedsLetsStart
+import rsser.shared.generated.resources.feedsSearchHint
+import rsser.shared.generated.resources.moreMenuOptions
 
 @Composable
 internal fun NavigationDrawerContent(
@@ -142,6 +145,8 @@ internal fun NavigationDrawerContent(
   expanded: Boolean = true,
   showCloseIcon: Boolean = true,
   dismissOnSelection: Boolean = true,
+  managementPage: Boolean = false,
+  onSourceSelected: () -> Unit = {},
 ) {
   val state by feedsViewModel.state.collectAsStateWithLifecycle()
   val focusManager = LocalFocusManager.current
@@ -175,6 +180,8 @@ internal fun NavigationDrawerContent(
     expanded = expanded,
     showCloseIcon = showCloseIcon,
     dismissOnSelection = dismissOnSelection,
+    managementPage = managementPage,
+    onSourceSelected = onSourceSelected,
     scrollIndex = feedsViewModel.drawerListScrollIndex,
     scrollOffset = feedsViewModel.drawerListScrollOffset,
     onScrollPositionChanged = { index, offset ->
@@ -199,6 +206,8 @@ internal fun NavigationDrawerContent(
   expanded: Boolean = true,
   showCloseIcon: Boolean = true,
   dismissOnSelection: Boolean = true,
+  managementPage: Boolean = false,
+  onSourceSelected: () -> Unit = {},
   scrollIndex: Int = 0,
   scrollOffset: Int = 0,
   onScrollPositionChanged: (index: Int, offset: Int) -> Unit = { _, _ -> },
@@ -217,6 +226,8 @@ internal fun NavigationDrawerContent(
         closeDrawer = closeDrawer,
         showCloseIcon = showCloseIcon,
         dismissOnSelection = dismissOnSelection,
+        managementPage = managementPage,
+        onSourceSelected = onSourceSelected,
         scrollIndex = scrollIndex,
         scrollOffset = scrollOffset,
         onScrollPositionChanged = onScrollPositionChanged,
@@ -247,6 +258,8 @@ private fun ExpandedDrawerContent(
   closeDrawer: () -> Unit,
   showCloseIcon: Boolean,
   dismissOnSelection: Boolean,
+  managementPage: Boolean,
+  onSourceSelected: () -> Unit,
   scrollIndex: Int,
   scrollOffset: Int,
   onScrollPositionChanged: (index: Int, offset: Int) -> Unit,
@@ -306,7 +319,21 @@ private fun ExpandedDrawerContent(
         contentPadding = PaddingValues(bottom = 100.dp),
         overscrollEffect = null,
       ) {
-        if (showCloseIcon) {
+        if (managementPage) {
+          item {
+            Column(
+              Modifier.fillMaxWidth().padding(start = 24.dp, top = 20.dp, end = 24.dp, bottom = 12.dp)
+            ) {
+              Text("我的订阅", style = MaterialTheme.typography.headlineMedium, color = colorScheme.onSurface)
+              Spacer(Modifier.requiredHeight(4.dp))
+              Text(
+                "${state.numberOfFeeds} 个订阅源 · ${state.numberOfFeedGroups} 个文件夹",
+                style = MaterialTheme.typography.bodySmall,
+                color = colorScheme.onSurfaceVariant,
+              )
+            }
+          }
+        } else if (showCloseIcon) {
           item {
             Box(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
               Text(
@@ -317,7 +344,7 @@ private fun ExpandedDrawerContent(
               )
               CircularIconButton(
                 modifier = Modifier.align(Alignment.CenterStart),
-                icon = TwineIcons.Close,
+                icon = RsserIcons.Close,
                 label = stringResource(Res.string.buttonGoBack),
                 onClick = closeDrawer,
               )
@@ -329,7 +356,7 @@ private fun ExpandedDrawerContent(
           item { Spacer(Modifier.requiredHeight(16.dp)) }
         }
 
-        items(MainDestination.entries) { destination ->
+        if (!managementPage) items(MainDestination.entries) { destination ->
           val selected =
             if (destination == MainDestination.Home) {
               selectedDestination == destination && state.activeSource == null
@@ -396,14 +423,29 @@ private fun ExpandedDrawerContent(
           )
         }
 
-        item {
+        if (!managementPage) item {
           HorizontalDivider(
             modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp),
             color = colorScheme.outlineVariant,
           )
         }
 
-        item {
+        if (managementPage) {
+          item {
+            Row(
+              Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 12.dp),
+              verticalAlignment = Alignment.CenterVertically,
+            ) {
+              Text("文件夹与订阅源", Modifier.weight(1f), style = MaterialTheme.typography.titleSmall, color = colorScheme.onSurface)
+              Text(
+                "＋ 添加订阅",
+                Modifier.clip(RoundedCornerShape(8.dp)).clickable { dispatch(FeedsEvent.OnNewFeedClicked) }.padding(8.dp),
+                style = MaterialTheme.typography.labelMedium,
+                color = colorScheme.primary,
+              )
+            }
+          }
+        } else item {
           AllFeedsHeader(
             feedsCount = state.numberOfFeeds,
             feedsSortOrder = state.feedsSortOrder,
@@ -415,7 +457,10 @@ private fun ExpandedDrawerContent(
         pinnedSources(
           pinnedSources = state.pinnedSources,
           activeSource = state.activeSource,
-          onSourceClick = { dispatch(FeedsEvent.OnSourceClick(it)) },
+          onSourceClick = {
+            dispatch(FeedsEvent.OnSourceClick(it))
+            if (managementPage) onSourceSelected()
+          },
           onPinClick = { dispatch(FeedsEvent.OnSourcePinClicked(it)) },
           onPinnedSourceOrderChanged = { dispatch(FeedsEvent.OnPinnedSourcePositionChanged(it)) },
         )
@@ -453,6 +498,8 @@ private fun ExpandedDrawerContent(
                   dispatch(FeedsEvent.OnSourceClick(it))
                 }
 
+                if (managementPage) onSourceSelected()
+
                 if (dismissOnSelection) {
                   closeDrawer()
                 }
@@ -485,6 +532,8 @@ private fun ExpandedDrawerContent(
                   dispatch(FeedsEvent.OnSourceClick(it))
                 }
 
+                if (managementPage) onSourceSelected()
+
                 if (dismissOnSelection) {
                   closeDrawer()
                 }
@@ -503,6 +552,7 @@ private fun ExpandedDrawerContent(
             )
           }
         }
+
       }
 
       Box(modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter)) {
@@ -531,7 +581,7 @@ private fun ExpandedDrawerContent(
 
             ContextActionItem(
               modifier = Modifier.weight(1f),
-              icon = TwineIcons.Pin,
+              icon = RsserIcons.Pin,
               label = pinActionLabel,
               onClick = {
                 if (areSelectedFeedsPinned) {
@@ -544,7 +594,7 @@ private fun ExpandedDrawerContent(
 
             ContextActionItem(
               modifier = Modifier.weight(1f),
-              icon = TwineIcons.NewGroup,
+              icon = RsserIcons.NewGroup,
               label = stringResource(Res.string.actionAddTo),
               enabled = !areGroupsSelected,
               onClick = { openGroupSelectionSheet() },
@@ -552,7 +602,7 @@ private fun ExpandedDrawerContent(
 
             ContextActionItem(
               modifier = Modifier.weight(1f),
-              icon = TwineIcons.Delete,
+              icon = RsserIcons.Delete,
               label = stringResource(Res.string.actionDelete),
               onClick = { dispatch(FeedsEvent.DeleteSelectedSourcesClicked) },
             )
@@ -560,9 +610,9 @@ private fun ExpandedDrawerContent(
             if (state.selectedSources.size == 1) {
               val editIcon =
                 if (state.selectedSources.first().sourceType == SourceType.FeedGroup) {
-                  TwineIcons.Edit
+                  RsserIcons.Edit
                 } else {
-                  TwineIcons.Tune
+                  RsserIcons.Tune
                 }
               val editLabel = stringResource(Res.string.edit)
 
@@ -810,7 +860,7 @@ private fun PinnedSourceIcon(
       contentColor = colorScheme.inverseOnSurface,
     ) {
       Icon(
-        imageVector = TwineIcons.Pin,
+        imageVector = RsserIcons.Pin,
         contentDescription = null,
         modifier = Modifier.padding(2.dp),
       )
@@ -917,7 +967,7 @@ private fun SearchBar(
     },
     trailingIcon = {
       if (query.text.isNotBlank()) {
-        IconButton(icon = TwineIcons.Close, contentDescription = null, onClick = onClearClick)
+        IconButton(icon = RsserIcons.Close, contentDescription = null, onClick = onClearClick)
       }
     },
     shape = RoundedCornerShape(50),

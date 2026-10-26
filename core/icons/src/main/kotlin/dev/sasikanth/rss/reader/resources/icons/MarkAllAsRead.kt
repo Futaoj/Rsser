@@ -19,6 +19,6 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.MarkAllAsRead: ImageVector
+val RsserIcons.MarkAllAsRead: ImageVector
   get() = rsserMarkAllAsRead
 private val rsserMarkAllAsRead by lazy { rsserIcon("MarkAllAsRead", "M5 12L10 17L20 7", false) }

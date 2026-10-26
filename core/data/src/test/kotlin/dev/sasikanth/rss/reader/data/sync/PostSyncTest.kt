@@ -167,7 +167,7 @@ class PostSyncTest {
               isDeleted = false,
             )
           ),
-        postChunks = listOf("/twine_posts_chunk_0.json"),
+        postChunks = listOf("/rsser_posts_chunk_0.json"),
       )
 
     val serialized = json.encodeToString(syncData)

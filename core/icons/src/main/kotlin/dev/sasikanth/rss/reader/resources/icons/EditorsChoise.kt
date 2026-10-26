@@ -19,7 +19,7 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.EditorsChoice: ImageVector
+val RsserIcons.EditorsChoice: ImageVector
   get() = rsserEditorsChoice
 private val rsserEditorsChoice by lazy {
   rsserIcon("EditorsChoice", "M12 3L15 9L21 10L16.5 14.5L17.5 21L12 18L6.5 21L7.5 14.5L3 10L9 9Z")

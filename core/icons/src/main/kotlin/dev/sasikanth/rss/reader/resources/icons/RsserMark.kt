@@ -2,7 +2,7 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.RsserMark: ImageVector
+val RsserIcons.RsserMark: ImageVector
   get() = rsserRsserMark
 
 private val rsserRsserMark by lazy {

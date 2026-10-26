@@ -29,14 +29,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.sasikanth.rss.reader.components.TranslucentButton
 import dev.sasikanth.rss.reader.resources.icons.Edit
-import dev.sasikanth.rss.reader.resources.icons.TwineIcons
+import dev.sasikanth.rss.reader.resources.icons.RsserIcons
 import dev.sasikanth.rss.reader.ui.AppTheme
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.blockedWords
-import twine.shared.generated.resources.blockedWordsCount
-import twine.shared.generated.resources.edit
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.blockedWords
+import rsser.shared.generated.resources.blockedWordsCount
+import rsser.shared.generated.resources.edit
 
 @Composable
 internal fun BlockedWordsSettingItem(blockedWordsCount: Int, onClick: () -> Unit) {
@@ -61,7 +61,7 @@ internal fun BlockedWordsSettingItem(blockedWordsCount: Int, onClick: () -> Unit
 
     TranslucentButton(
       text = stringResource(Res.string.edit),
-      leadingIcon = TwineIcons.Edit,
+      leadingIcon = RsserIcons.Edit,
       onClick = onClick,
     )
   }

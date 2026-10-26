@@ -71,20 +71,20 @@ import dev.sasikanth.rss.reader.ui.AppTheme
 import dev.sasikanth.rss.reader.utils.Constants
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.bazQuxClearDataDesc
-import twine.shared.generated.resources.bazQuxClearDataPositive
-import twine.shared.generated.resources.bazQuxClearDataTitle
-import twine.shared.generated.resources.bazQuxErrorLoginFailed
-import twine.shared.generated.resources.bazQuxErrorUnknown
-import twine.shared.generated.resources.bazQuxLoginButton
-import twine.shared.generated.resources.bazQuxLoginTitle
-import twine.shared.generated.resources.bazQuxPassword
-import twine.shared.generated.resources.bazQuxPasswordHint
-import twine.shared.generated.resources.bazQuxUsername
-import twine.shared.generated.resources.buttonCancel
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.bazQuxClearDataDesc
+import rsser.shared.generated.resources.bazQuxClearDataPositive
+import rsser.shared.generated.resources.bazQuxClearDataTitle
+import rsser.shared.generated.resources.bazQuxErrorLoginFailed
+import rsser.shared.generated.resources.bazQuxErrorUnknown
+import rsser.shared.generated.resources.bazQuxLoginButton
+import rsser.shared.generated.resources.bazQuxLoginTitle
+import rsser.shared.generated.resources.bazQuxPassword
+import rsser.shared.generated.resources.bazQuxPasswordHint
+import rsser.shared.generated.resources.bazQuxUsername
+import rsser.shared.generated.resources.buttonCancel
 
-val BAZQUX_LOGIN_SUCCESS_KEY = NavResultKey<Boolean>("dev.sasikanth.twine.BAZQUX_LOGIN_SUCCESS")
+val BAZQUX_LOGIN_SUCCESS_KEY = NavResultKey<Boolean>("dev.sasikanth.rsser.BAZQUX_LOGIN_SUCCESS")
 
 @Composable
 fun BazQuxLoginScreen(

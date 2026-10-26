@@ -19,7 +19,7 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.Edit: ImageVector
+val RsserIcons.Edit: ImageVector
   get() = rsserEdit
 
 private val rsserEdit by lazy {

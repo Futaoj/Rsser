@@ -40,11 +40,11 @@ import com.skydoves.landscapist.zoomable.ZoomablePlugin
 import com.skydoves.landscapist.zoomable.rememberZoomableState
 import dev.sasikanth.rss.reader.components.CircularIconButton
 import dev.sasikanth.rss.reader.resources.icons.ArrowBack
-import dev.sasikanth.rss.reader.resources.icons.TwineIcons
+import dev.sasikanth.rss.reader.resources.icons.RsserIcons
 import dev.sasikanth.rss.reader.ui.AppTheme
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.buttonGoBack
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.buttonGoBack
 
 @Composable
 internal fun ImageViewerScreen(
@@ -77,7 +77,7 @@ private fun ImageViewerContent(
         title = {},
         navigationIcon = {
           CircularIconButton(
-            icon = TwineIcons.ArrowBack,
+            icon = RsserIcons.ArrowBack,
             label = stringResource(Res.string.buttonGoBack),
             backgroundColor = Color.Black.copy(alpha = 0.65f),
             contentColor = Color.White,

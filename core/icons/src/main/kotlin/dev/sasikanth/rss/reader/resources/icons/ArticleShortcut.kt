@@ -19,7 +19,7 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.ArticleShortcut: ImageVector
+val RsserIcons.ArticleShortcut: ImageVector
   get() = rsserArticleShortcut
 private val rsserArticleShortcut by lazy {
   rsserIcon("ArticleShortcut", "M5 3H19V10M5 3V21H12M8 7H15M8 11H12M14 17H22M18 13L22 17L18 21")

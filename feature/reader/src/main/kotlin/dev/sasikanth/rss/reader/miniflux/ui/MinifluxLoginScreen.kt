@@ -71,20 +71,20 @@ import dev.sasikanth.rss.reader.ui.AppTheme
 import dev.sasikanth.rss.reader.utils.Constants
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.buttonCancel
-import twine.shared.generated.resources.minifluxAPIKeyHint
-import twine.shared.generated.resources.minifluxApiKey
-import twine.shared.generated.resources.minifluxClearDataDesc
-import twine.shared.generated.resources.minifluxClearDataPositive
-import twine.shared.generated.resources.minifluxClearDataTitle
-import twine.shared.generated.resources.minifluxErrorLoginFailed
-import twine.shared.generated.resources.minifluxErrorUnknown
-import twine.shared.generated.resources.minifluxLoginButton
-import twine.shared.generated.resources.minifluxLoginTitle
-import twine.shared.generated.resources.minifluxServerUrl
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.buttonCancel
+import rsser.shared.generated.resources.minifluxAPIKeyHint
+import rsser.shared.generated.resources.minifluxApiKey
+import rsser.shared.generated.resources.minifluxClearDataDesc
+import rsser.shared.generated.resources.minifluxClearDataPositive
+import rsser.shared.generated.resources.minifluxClearDataTitle
+import rsser.shared.generated.resources.minifluxErrorLoginFailed
+import rsser.shared.generated.resources.minifluxErrorUnknown
+import rsser.shared.generated.resources.minifluxLoginButton
+import rsser.shared.generated.resources.minifluxLoginTitle
+import rsser.shared.generated.resources.minifluxServerUrl
 
-val MINIFLUX_LOGIN_SUCCESS_KEY = NavResultKey<Boolean>("dev.sasikanth.twine.MINIFLUX_LOGIN_SUCCESS")
+val MINIFLUX_LOGIN_SUCCESS_KEY = NavResultKey<Boolean>("dev.sasikanth.rsser.MINIFLUX_LOGIN_SUCCESS")
 
 @Composable
 fun MinifluxLoginScreen(

@@ -41,9 +41,9 @@ import coil3.compose.AsyncImage
 import dev.sasikanth.rss.reader.ui.AppTheme
 import dev.sasikanth.rss.reader.utils.Constants
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.settingsAboutSubtitle
-import twine.shared.generated.resources.settingsAboutTitle
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.settingsAboutSubtitle
+import rsser.shared.generated.resources.settingsAboutTitle
 
 @Composable
 internal fun AboutItem(onClick: () -> Unit) {

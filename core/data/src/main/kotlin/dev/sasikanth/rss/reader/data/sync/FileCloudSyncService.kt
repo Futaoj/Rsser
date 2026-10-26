@@ -56,9 +56,9 @@ class FileCloudSyncService(
       val config = appConfigQueries.getSyncConfig().executeAsOneOrNull()
       val currentSyncVersion = config?.syncFormatVersion?.toInt() ?: 1
 
-      val metadataFileName = "/twine_sync_metadata.json"
+      val metadataFileName = "/rsser_sync_metadata.json"
       val remoteDataString =
-        provider.download(metadataFileName) ?: provider.download("/twine_sync_data.json")
+        provider.download(metadataFileName) ?: provider.download("/rsser_sync_data.json")
 
       if (remoteDataString != null) {
         var remoteData = json.decodeFromString<SyncData>(remoteDataString)
@@ -132,7 +132,7 @@ class FileCloudSyncService(
       val chunkSize = 500
 
       bookmarkedPosts.chunked(chunkSize).forEachIndexed { index, postsChunk ->
-        val chunkFileName = "/twine_posts_chunk_$index.json"
+        val chunkFileName = "/rsser_posts_chunk_$index.json"
         val postsSyncEntities =
           postsChunk.map {
             val content = postContentRepository.postContent(it.id).firstOrNull()
@@ -179,10 +179,10 @@ class FileCloudSyncService(
         userRepository.updateLastSyncStatus("SUCCESS")
         refreshPolicy.updateLastSyncedAt()
 
-        val allFiles = provider.listFiles("/twine_")
+        val allFiles = provider.listFiles("/rsser_")
         val activeFiles = postChunks + metadataFileName
         allFiles.forEach { file ->
-          if (file !in activeFiles && file != "/twine_sync_data.json") {
+          if (file !in activeFiles && file != "/rsser_sync_data.json") {
             provider.deleteFile(file)
           }
         }

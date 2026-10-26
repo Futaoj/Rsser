@@ -397,4 +397,9 @@
 <string name="keyboardShortcutsOpenInBrowser">在浏览器中打开</string>
 <string name="keyboardShortcutsClose">关闭阅读器</string>
 <string name="keyboardShortcutsOpenPost">打开文章</string>
+  <string name="readerSave">收藏</string>
+  <string name="readerReadLater">稍后阅读</string>
+  <string name="readerShare">分享</string>
+  <string name="readerOpenWebsite">打开原网页</string>
+  <string name="readerLoadFullArticle">加载全文</string>
 </resources>

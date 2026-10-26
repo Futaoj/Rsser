@@ -94,7 +94,7 @@ import dev.sasikanth.rss.reader.resources.icons.Pause
 import dev.sasikanth.rss.reader.resources.icons.Play
 import dev.sasikanth.rss.reader.resources.icons.Replay30
 import dev.sasikanth.rss.reader.resources.icons.Timer
-import dev.sasikanth.rss.reader.resources.icons.TwineIcons
+import dev.sasikanth.rss.reader.resources.icons.RsserIcons
 import dev.sasikanth.rss.reader.ui.AppTheme
 import dev.sasikanth.rss.reader.ui.LocalTranslucentStyles
 import dev.sasikanth.rss.reader.utils.toClipEntry
@@ -102,19 +102,19 @@ import dev.sasikanth.rss.reader.utils.toShape
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.media_player_unavailable_copied
-import twine.shared.generated.resources.media_player_unavailable_message
-import twine.shared.generated.resources.media_player_unavailable_title
-import twine.shared.generated.resources.pause
-import twine.shared.generated.resources.play
-import twine.shared.generated.resources.playback_speed
-import twine.shared.generated.resources.seek_backward
-import twine.shared.generated.resources.seek_forward
-import twine.shared.generated.resources.sleep_timer
-import twine.shared.generated.resources.sleep_timer_end_of_track
-import twine.shared.generated.resources.sleep_timer_minutes
-import twine.shared.generated.resources.sleep_timer_off
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.media_player_unavailable_copied
+import rsser.shared.generated.resources.media_player_unavailable_message
+import rsser.shared.generated.resources.media_player_unavailable_title
+import rsser.shared.generated.resources.pause
+import rsser.shared.generated.resources.play
+import rsser.shared.generated.resources.playback_speed
+import rsser.shared.generated.resources.seek_backward
+import rsser.shared.generated.resources.seek_forward
+import rsser.shared.generated.resources.sleep_timer
+import rsser.shared.generated.resources.sleep_timer_end_of_track
+import rsser.shared.generated.resources.sleep_timer_minutes
+import rsser.shared.generated.resources.sleep_timer_off
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -281,7 +281,7 @@ internal fun MediaControls(
               ),
         ) {
           IconButton(
-            icon = TwineIcons.Replay30,
+            icon = RsserIcons.Replay30,
             contentDescription = stringResource(Res.string.seek_backward),
             onClick = {
               haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
@@ -351,7 +351,7 @@ internal fun MediaControls(
           } else {
             Icon(
               modifier = Modifier.size(32.dp),
-              imageVector = if (isPlaying) TwineIcons.Pause else TwineIcons.Play,
+              imageVector = if (isPlaying) RsserIcons.Pause else RsserIcons.Play,
               contentDescription =
                 if (isPlaying) stringResource(Res.string.pause)
                 else stringResource(Res.string.play),
@@ -384,7 +384,7 @@ internal fun MediaControls(
               ),
         ) {
           IconButton(
-            icon = TwineIcons.Forward30,
+            icon = RsserIcons.Forward30,
             contentDescription = stringResource(Res.string.seek_forward),
             onClick = {
               haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
@@ -421,7 +421,7 @@ internal fun MediaControls(
             }
 
           IconButton(
-            icon = TwineIcons.Timer,
+            icon = RsserIcons.Timer,
             contentDescription = text,
             onClick = {
               haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)

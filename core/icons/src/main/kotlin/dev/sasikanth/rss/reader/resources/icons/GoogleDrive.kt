@@ -27,7 +27,7 @@ import androidx.compose.ui.graphics.vector.ImageVector.Builder
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
-public val TwineIcons.GoogleDrive: ImageVector
+public val RsserIcons.GoogleDrive: ImageVector
   get() {
     if (_googleDrive != null) {
       return _googleDrive!!

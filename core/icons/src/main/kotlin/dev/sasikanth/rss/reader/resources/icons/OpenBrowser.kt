@@ -19,7 +19,7 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.OpenBrowser: ImageVector
+val RsserIcons.OpenBrowser: ImageVector
   get() = rsserOpenBrowser
 
 private val rsserOpenBrowser by lazy {

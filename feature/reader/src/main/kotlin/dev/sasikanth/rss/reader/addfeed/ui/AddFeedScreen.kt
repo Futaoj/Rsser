@@ -89,29 +89,29 @@ import dev.sasikanth.rss.reader.resources.icons.ArrowBack
 import dev.sasikanth.rss.reader.resources.icons.Close
 import dev.sasikanth.rss.reader.resources.icons.NewGroup
 import dev.sasikanth.rss.reader.resources.icons.Newsstand
-import dev.sasikanth.rss.reader.resources.icons.TwineIcons
+import dev.sasikanth.rss.reader.resources.icons.RsserIcons
 import dev.sasikanth.rss.reader.ui.AppTheme
 import dev.sasikanth.rss.reader.utils.Constants
 import dev.sasikanth.rss.reader.utils.LocalInAppRating
 import dev.sasikanth.rss.reader.utils.removeLineBreaks
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.addToGroup
-import twine.shared.generated.resources.buttonAddFeed
-import twine.shared.generated.resources.buttonGoBack
-import twine.shared.generated.resources.discoveryTitle
-import twine.shared.generated.resources.errorFeedNotFound
-import twine.shared.generated.resources.errorMalformedXml
-import twine.shared.generated.resources.errorRequestTimeout
-import twine.shared.generated.resources.errorServer
-import twine.shared.generated.resources.errorTooManyRedirects
-import twine.shared.generated.resources.errorUnAuthorized
-import twine.shared.generated.resources.errorUnknown
-import twine.shared.generated.resources.errorUnknownHttpStatus
-import twine.shared.generated.resources.errorUnsupportedFeed
-import twine.shared.generated.resources.feedEntryLinkHint
-import twine.shared.generated.resources.feedEntryTitleHint
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.addToGroup
+import rsser.shared.generated.resources.buttonAddFeed
+import rsser.shared.generated.resources.buttonGoBack
+import rsser.shared.generated.resources.discoveryTitle
+import rsser.shared.generated.resources.errorFeedNotFound
+import rsser.shared.generated.resources.errorMalformedXml
+import rsser.shared.generated.resources.errorRequestTimeout
+import rsser.shared.generated.resources.errorServer
+import rsser.shared.generated.resources.errorTooManyRedirects
+import rsser.shared.generated.resources.errorUnAuthorized
+import rsser.shared.generated.resources.errorUnknown
+import rsser.shared.generated.resources.errorUnknownHttpStatus
+import rsser.shared.generated.resources.errorUnsupportedFeed
+import rsser.shared.generated.resources.feedEntryLinkHint
+import rsser.shared.generated.resources.feedEntryTitleHint
 
 @Composable
 fun AddFeedScreen(
@@ -185,7 +185,7 @@ private fun AddFeedContent(
         navigationIcon = {
           CircularIconButton(
             modifier = Modifier.padding(start = 12.dp),
-            icon = TwineIcons.ArrowBack,
+            icon = RsserIcons.ArrowBack,
             label = stringResource(Res.string.buttonGoBack),
             onClick = { goBack() },
           )
@@ -193,7 +193,7 @@ private fun AddFeedContent(
         contentPadding = PaddingValues(end = 12.dp),
         actions = {
           TranslucentButton(
-            leadingIcon = TwineIcons.Newsstand,
+            leadingIcon = RsserIcons.Newsstand,
             text = stringResource(Res.string.discoveryTitle),
             onClick = openDiscovery,
           )
@@ -313,7 +313,7 @@ private fun AddFeedContent(
             if (selectedGroup == null) {
               TranslucentButton(
                 text = stringResource(Res.string.addToGroup),
-                leadingIcon = TwineIcons.NewGroup,
+                leadingIcon = RsserIcons.NewGroup,
                 onClick = { openGroupSelection(emptySet()) },
               )
             } else {
@@ -357,7 +357,7 @@ private fun GroupItem(group: FeedGroup, onChangeClick: () -> Unit, onRemoveClick
       ) {
         Icon(
           modifier = Modifier.requiredSize(12.dp),
-          imageVector = TwineIcons.Close,
+          imageVector = RsserIcons.Close,
           contentDescription = null,
           tint = AppTheme.colorScheme.backdrop,
         )

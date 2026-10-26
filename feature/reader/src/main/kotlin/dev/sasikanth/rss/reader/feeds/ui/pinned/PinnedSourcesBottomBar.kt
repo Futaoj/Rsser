@@ -64,8 +64,8 @@ import kotlinx.collections.immutable.ImmutableList
 import org.jetbrains.compose.resources.stringResource
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.noPinnedSources
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.noPinnedSources
 
 @Composable
 internal fun NowPlayingBottomBar(

@@ -28,12 +28,12 @@ import dev.sasikanth.rss.reader.components.DropdownMenuItem
 import dev.sasikanth.rss.reader.components.TranslucentButton
 import dev.sasikanth.rss.reader.data.repository.MarkAsReadOn
 import dev.sasikanth.rss.reader.resources.icons.ArrowDown
-import dev.sasikanth.rss.reader.resources.icons.TwineIcons
+import dev.sasikanth.rss.reader.resources.icons.RsserIcons
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.markArticleAsRead
-import twine.shared.generated.resources.markArticleAsReadOnOpen
-import twine.shared.generated.resources.markArticleAsReadOnScroll
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.markArticleAsRead
+import rsser.shared.generated.resources.markArticleAsReadOnOpen
+import rsser.shared.generated.resources.markArticleAsReadOnScroll
 
 @Composable
 internal fun MarkAsReadOnSettingItem(
@@ -55,7 +55,7 @@ internal fun MarkAsReadOnSettingItem(
 
         TranslucentButton(
           text = markAsReadOnLabel,
-          trailingIcon = TwineIcons.ArrowDown,
+          trailingIcon = RsserIcons.ArrowDown,
           onClick = { showDropdown = true },
         )
 

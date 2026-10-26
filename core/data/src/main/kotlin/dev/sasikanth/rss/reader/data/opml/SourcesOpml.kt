@@ -39,7 +39,7 @@ class SourcesOpml {
       val opml =
         Opml(
           version = "2.0",
-          head = Head("Twine RSS Feeds"),
+          head = Head("Rsser RSS Feeds"),
           body = Body(outlines = sources.map(::mapSourceToOutline)),
         )
 

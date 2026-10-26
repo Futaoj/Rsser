@@ -43,11 +43,11 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import dev.sasikanth.rss.reader.ui.AppTheme
 import dev.sasikanth.rss.reader.utils.removeLineBreaks
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.buttonAdd
-import twine.shared.generated.resources.buttonCancel
-import twine.shared.generated.resources.createGroup
-import twine.shared.generated.resources.groupNameHint
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.buttonAdd
+import rsser.shared.generated.resources.buttonCancel
+import rsser.shared.generated.resources.createGroup
+import rsser.shared.generated.resources.groupNameHint
 
 @Composable
 internal fun CreateGroupDialog(

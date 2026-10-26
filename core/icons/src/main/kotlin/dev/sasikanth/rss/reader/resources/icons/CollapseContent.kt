@@ -19,7 +19,7 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.CollapseContent: ImageVector
+val RsserIcons.CollapseContent: ImageVector
   get() = rsserCollapseContent
 private val rsserCollapseContent by lazy {
   rsserIcon("CollapseContent", "M9 4V9H4M15 4V9H20M20 15H15V20M4 15H9V20")

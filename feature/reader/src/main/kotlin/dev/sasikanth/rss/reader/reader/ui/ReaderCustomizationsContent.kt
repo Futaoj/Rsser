@@ -65,7 +65,7 @@ import dev.sasikanth.rss.reader.resources.icons.CustomTypography
 import dev.sasikanth.rss.reader.resources.icons.FormatLineSpacing
 import dev.sasikanth.rss.reader.resources.icons.FormatSize
 import dev.sasikanth.rss.reader.resources.icons.Palette
-import dev.sasikanth.rss.reader.resources.icons.TwineIcons
+import dev.sasikanth.rss.reader.resources.icons.RsserIcons
 import dev.sasikanth.rss.reader.ui.AppTheme
 import dev.sasikanth.rss.reader.ui.ComicNeueFontFamily
 import dev.sasikanth.rss.reader.ui.GolosFontFamily
@@ -77,9 +77,9 @@ import dev.sasikanth.rss.reader.ui.OutfitFontFamily
 import dev.sasikanth.rss.reader.ui.RobotoSerifFontFamily
 import kotlin.math.roundToInt
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.readerCustomisationsTypeface
-import twine.shared.generated.resources.themeVariantColorScheme
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.readerCustomisationsTypeface
+import rsser.shared.generated.resources.themeVariantColorScheme
 
 @Composable
 internal fun ReaderCustomizationsContent(
@@ -156,7 +156,7 @@ private fun FontLineHeightStepper(
   ) {
     Icon(
       modifier = Modifier.requiredSize(20.dp),
-      imageVector = TwineIcons.FormatLineSpacing,
+      imageVector = RsserIcons.FormatLineSpacing,
       contentDescription = null,
       tint = AppTheme.colorScheme.onSurface,
     )
@@ -210,7 +210,7 @@ private fun FontScaleStepper(
   ) {
     Icon(
       modifier = Modifier.requiredSize(20.dp),
-      imageVector = TwineIcons.FormatSize,
+      imageVector = RsserIcons.FormatSize,
       contentDescription = null,
       tint = AppTheme.colorScheme.onSurface,
     )
@@ -260,7 +260,7 @@ private fun CustomisationsTypefaceHeader() {
   ) {
     Icon(
       modifier = Modifier.requiredSize(20.dp),
-      imageVector = TwineIcons.CustomTypography,
+      imageVector = RsserIcons.CustomTypography,
       contentDescription = null,
       tint = AppTheme.colorScheme.onSurface,
     )
@@ -323,7 +323,7 @@ private fun ColorSchemeHeader() {
   ) {
     Icon(
       modifier = Modifier.requiredSize(20.dp),
-      imageVector = TwineIcons.Palette,
+      imageVector = RsserIcons.Palette,
       contentDescription = null,
       tint = AppTheme.colorScheme.onSurface,
     )

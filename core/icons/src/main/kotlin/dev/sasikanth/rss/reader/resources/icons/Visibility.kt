@@ -19,7 +19,7 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.Visibility: ImageVector
+val RsserIcons.Visibility: ImageVector
   get() = rsserVisibility
 private val rsserVisibility by lazy {
   rsserIcon(

@@ -33,11 +33,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.sasikanth.rss.reader.resources.icons.ArrowBack
-import dev.sasikanth.rss.reader.resources.icons.TwineIcons
+import dev.sasikanth.rss.reader.resources.icons.RsserIcons
 import dev.sasikanth.rss.reader.ui.AppTheme
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.buttonGoBack
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.buttonGoBack
 
 @Composable
 fun SimpleTopAppBar(
@@ -61,7 +61,7 @@ fun SimpleTopAppBar(
       navigationIcon = {
         CircularIconButton(
           modifier = Modifier.padding(start = 12.dp),
-          icon = TwineIcons.ArrowBack,
+          icon = RsserIcons.ArrowBack,
           label = stringResource(Res.string.buttonGoBack),
           onClick = onBackClick,
         )

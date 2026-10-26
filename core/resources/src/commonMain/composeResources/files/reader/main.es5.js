@@ -26,7 +26,7 @@ var JUNK_SELECTORS = [
 // created any other way (e.g. Readability's own iframe handling), since the
 // window stays null for the document's whole lifetime. Renaming the tag
 // before parsing keeps HtmlUnit from ever recognizing it as a frame element.
-var IFRAME_TAG = "twine-iframe";
+var IFRAME_TAG = "rsser-iframe";
 
 function neutralizeIframeTags(html) {
   return html.replace(/<(\/?)i?frame\b/gi, "<$1" + IFRAME_TAG);

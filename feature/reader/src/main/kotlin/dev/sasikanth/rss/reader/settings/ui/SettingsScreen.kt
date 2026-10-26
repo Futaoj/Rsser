@@ -39,23 +39,23 @@ import dev.sasikanth.rss.reader.resources.icons.Appearance
 import dev.sasikanth.rss.reader.resources.icons.Behaviors
 import dev.sasikanth.rss.reader.resources.icons.Changelog
 import dev.sasikanth.rss.reader.resources.icons.Sync
-import dev.sasikanth.rss.reader.resources.icons.TwineIcons
+import dev.sasikanth.rss.reader.resources.icons.RsserIcons
 import dev.sasikanth.rss.reader.settings.SettingsState
 import dev.sasikanth.rss.reader.settings.SettingsViewModel
 import dev.sasikanth.rss.reader.settings.ui.items.SettingsNavigationItem
 import dev.sasikanth.rss.reader.ui.AppTheme
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.settings
-import twine.shared.generated.resources.settingsAppInfoAndFeedback
-import twine.shared.generated.resources.settingsAppearanceAndLayout
-import twine.shared.generated.resources.settingsAppearanceAndLayoutSubtitle
-import twine.shared.generated.resources.settingsFeaturesAndBehaviors
-import twine.shared.generated.resources.settingsFeaturesAndBehaviorsSubtitle
-import twine.shared.generated.resources.settingsServicesAndSync
-import twine.shared.generated.resources.settingsServicesAndSyncSubtitle
-import twine.shared.generated.resources.settingsYourInsights
-import twine.shared.generated.resources.settingsYourInsightsSubtitle
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.settings
+import rsser.shared.generated.resources.settingsAppInfoAndFeedback
+import rsser.shared.generated.resources.settingsAppearanceAndLayout
+import rsser.shared.generated.resources.settingsAppearanceAndLayoutSubtitle
+import rsser.shared.generated.resources.settingsFeaturesAndBehaviors
+import rsser.shared.generated.resources.settingsFeaturesAndBehaviorsSubtitle
+import rsser.shared.generated.resources.settingsServicesAndSync
+import rsser.shared.generated.resources.settingsServicesAndSyncSubtitle
+import rsser.shared.generated.resources.settingsYourInsights
+import rsser.shared.generated.resources.settingsYourInsightsSubtitle
 
 @Composable
 internal fun SettingsScreen(
@@ -112,7 +112,7 @@ private fun SettingsContent(
           SettingsNavigationItem(
             title = stringResource(Res.string.settingsAppearanceAndLayout),
             subtitle = stringResource(Res.string.settingsAppearanceAndLayoutSubtitle),
-            icon = TwineIcons.Appearance,
+            icon = RsserIcons.Appearance,
             onClick = openAppearanceSettings,
           )
         }
@@ -121,7 +121,7 @@ private fun SettingsContent(
           SettingsNavigationItem(
             title = stringResource(Res.string.settingsFeaturesAndBehaviors),
             subtitle = stringResource(Res.string.settingsFeaturesAndBehaviorsSubtitle),
-            icon = TwineIcons.Behaviors,
+            icon = RsserIcons.Behaviors,
             onClick = openBehaviorSettings,
           )
         }
@@ -130,7 +130,7 @@ private fun SettingsContent(
           SettingsNavigationItem(
             title = stringResource(Res.string.settingsServicesAndSync),
             subtitle = stringResource(Res.string.settingsServicesAndSyncSubtitle),
-            icon = TwineIcons.Sync,
+            icon = RsserIcons.Sync,
             onClick = openServicesSettings,
           )
         }
@@ -139,7 +139,7 @@ private fun SettingsContent(
           SettingsNavigationItem(
             title = stringResource(Res.string.settingsYourInsights),
             subtitle = stringResource(Res.string.settingsYourInsightsSubtitle),
-            icon = TwineIcons.Account,
+            icon = RsserIcons.Account,
             onClick = openDataSettings,
           )
         }
@@ -148,7 +148,7 @@ private fun SettingsContent(
           SettingsNavigationItem(
             title = stringResource(Res.string.settingsAppInfoAndFeedback),
             subtitle = null,
-            icon = TwineIcons.Changelog,
+            icon = RsserIcons.Changelog,
             onClick = openAppInfoSettings,
           )
         }

@@ -85,7 +85,7 @@ import dev.sasikanth.rss.reader.reader.ReaderScreenArgs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class TwineUnreadSmallWidget : GlanceAppWidget() {
+class RsserUnreadSmallWidget : GlanceAppWidget() {
 
   override val sizeMode: SizeMode = SizeMode.Exact
 
@@ -396,10 +396,10 @@ class NextPostAction : ActionCallback {
     parameters: ActionParameters,
   ) {
     updateAppWidgetState(context, glanceId) { prefs ->
-      val currentIndex = prefs[TwineUnreadSmallWidget.CurrentIndexKey] ?: 0
-      prefs[TwineUnreadSmallWidget.CurrentIndexKey] = (currentIndex + 1) % 5
+      val currentIndex = prefs[RsserUnreadSmallWidget.CurrentIndexKey] ?: 0
+      prefs[RsserUnreadSmallWidget.CurrentIndexKey] = (currentIndex + 1) % 5
     }
-    TwineUnreadSmallWidget().update(context, glanceId)
+    RsserUnreadSmallWidget().update(context, glanceId)
   }
 }
 
@@ -410,11 +410,11 @@ class PreviousPostAction : ActionCallback {
     parameters: ActionParameters,
   ) {
     updateAppWidgetState(context, glanceId) { prefs ->
-      val currentIndex = prefs[TwineUnreadSmallWidget.CurrentIndexKey] ?: 0
+      val currentIndex = prefs[RsserUnreadSmallWidget.CurrentIndexKey] ?: 0
       if (currentIndex > 0) {
-        prefs[TwineUnreadSmallWidget.CurrentIndexKey] = currentIndex - 1
+        prefs[RsserUnreadSmallWidget.CurrentIndexKey] = currentIndex - 1
       }
     }
-    TwineUnreadSmallWidget().update(context, glanceId)
+    RsserUnreadSmallWidget().update(context, glanceId)
   }
 }

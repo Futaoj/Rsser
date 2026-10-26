@@ -25,11 +25,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import dev.sasikanth.rss.reader.ui.AppTheme
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.buttonCancel
-import twine.shared.generated.resources.delete
-import twine.shared.generated.resources.removeFeed
-import twine.shared.generated.resources.removeFeedDesc
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.buttonCancel
+import rsser.shared.generated.resources.delete
+import rsser.shared.generated.resources.removeFeed
+import rsser.shared.generated.resources.removeFeedDesc
 
 @Composable
 internal fun ConfirmFeedDeleteDialog(

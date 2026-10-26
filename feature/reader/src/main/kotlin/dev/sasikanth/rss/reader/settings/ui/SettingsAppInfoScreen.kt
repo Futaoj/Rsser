@@ -52,11 +52,11 @@ import dev.sasikanth.rss.reader.utils.Constants
 import dev.sasikanth.rss.reader.utils.restrictContentWidth
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.changelogTitle
-import twine.shared.generated.resources.settingsAppInfoAndFeedback
-import twine.shared.generated.resources.settingsDangerZone
-import twine.shared.generated.resources.settingsVersion
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.changelogTitle
+import rsser.shared.generated.resources.settingsAppInfoAndFeedback
+import rsser.shared.generated.resources.settingsDangerZone
+import rsser.shared.generated.resources.settingsVersion
 
 @Composable
 internal fun SettingsAppInfoScreen(

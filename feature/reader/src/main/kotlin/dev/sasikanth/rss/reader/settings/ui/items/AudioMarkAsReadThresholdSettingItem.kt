@@ -29,15 +29,15 @@ import dev.sasikanth.rss.reader.components.DropdownMenuItem
 import dev.sasikanth.rss.reader.components.TranslucentButton
 import dev.sasikanth.rss.reader.data.repository.AudioMarkAsReadThreshold
 import dev.sasikanth.rss.reader.resources.icons.ArrowDown
-import dev.sasikanth.rss.reader.resources.icons.TwineIcons
+import dev.sasikanth.rss.reader.resources.icons.RsserIcons
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.audioMarkAsReadThreshold100
-import twine.shared.generated.resources.audioMarkAsReadThreshold25
-import twine.shared.generated.resources.audioMarkAsReadThreshold50
-import twine.shared.generated.resources.audioMarkAsReadThreshold75
-import twine.shared.generated.resources.audioMarkAsReadThreshold90
-import twine.shared.generated.resources.audioMarkAsReadThresholdTitle
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.audioMarkAsReadThreshold100
+import rsser.shared.generated.resources.audioMarkAsReadThreshold25
+import rsser.shared.generated.resources.audioMarkAsReadThreshold50
+import rsser.shared.generated.resources.audioMarkAsReadThreshold75
+import rsser.shared.generated.resources.audioMarkAsReadThreshold90
+import rsser.shared.generated.resources.audioMarkAsReadThresholdTitle
 
 @Composable
 internal fun AudioMarkAsReadThresholdSettingItem(
@@ -55,7 +55,7 @@ internal fun AudioMarkAsReadThresholdSettingItem(
       Box {
         TranslucentButton(
           text = threshold.label(),
-          trailingIcon = TwineIcons.ArrowDown,
+          trailingIcon = RsserIcons.ArrowDown,
           onClick = { showDropdown = true },
         )
 

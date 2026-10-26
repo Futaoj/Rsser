@@ -42,8 +42,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import dev.sasikanth.rss.reader.ui.AppTheme
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.buttonCancel
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.buttonCancel
 
 @Composable
 internal fun ContextActionsBottomBar(

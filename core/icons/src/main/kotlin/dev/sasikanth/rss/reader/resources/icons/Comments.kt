@@ -18,7 +18,7 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.Comments: ImageVector
+val RsserIcons.Comments: ImageVector
   get() = rsserComments
 
 private val rsserComments by lazy { rsserIcon("Comments", "M4 4H20V17H9L4 21Z") }

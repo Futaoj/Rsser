@@ -43,7 +43,7 @@ class NewArticleNotifier(
 ) {
 
   private companion object {
-    private const val NOTIFICATION_GROUP_ID = "twine_new_articles"
+    private const val NOTIFICATION_GROUP_ID = "rsser_new_articles"
   }
 
   suspend fun notifyIfNewArticles(

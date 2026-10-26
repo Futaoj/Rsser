@@ -18,7 +18,7 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.PinFilled: ImageVector
+val RsserIcons.PinFilled: ImageVector
   get() = rsserPinFilled
 private val rsserPinFilled by lazy {
   rsserIcon("PinFilled", "M8 3H16L15 9L19 13V15H5V13L9 9ZM12 15V22")

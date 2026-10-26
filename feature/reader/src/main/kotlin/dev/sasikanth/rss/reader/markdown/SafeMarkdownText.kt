@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Twine Contributors
+ * Copyright 2025 Rsser Contributors
  *
  * This file is based on multiplatform-markdown-renderer's MarkdownText implementation.
  * The local copy guards LayoutCoordinates access during lazy/pager deactivation on iOS.

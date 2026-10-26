@@ -19,6 +19,6 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.Pause: ImageVector
+val RsserIcons.Pause: ImageVector
   get() = rsserPause
 private val rsserPause by lazy { rsserIcon("Pause", "M8 5V19M16 5V19") }

@@ -67,7 +67,7 @@ class DeepSeekKeyStore(private val context: Context) {
   }
 
   private companion object {
-    const val KEY_ALIAS = "twine_deepseek_api_key"
+    const val KEY_ALIAS = "rsser_deepseek_api_key"
     const val KEYSTORE = "AndroidKeyStore"
     const val PREFERENCES_NAME = "deepseek_secure_settings"
     const val KEY_VALUE = "encrypted_api_key"

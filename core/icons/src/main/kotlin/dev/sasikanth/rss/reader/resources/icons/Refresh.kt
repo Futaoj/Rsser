@@ -19,7 +19,7 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.Refresh: ImageVector
+val RsserIcons.Refresh: ImageVector
   get() = rsserRefresh
 
 private val rsserRefresh by lazy { rsserIcon("Refresh", "M20 7V3M20 7H16M20 7A9 9 0 1 0 21 14") }

@@ -61,16 +61,16 @@ internal fun AiChatScreen(
             )
           }
         },
-        navigationIcon = { IconButton(onClick = onBack) { Icon(TwineIcons.ArrowBack, "返回") } },
+        navigationIcon = { IconButton(onClick = onBack) { Icon(RsserIcons.ArrowBack, "返回") } },
         actions = {
           IconButton(onClick = viewModel::openApiKeyDialog) {
-            Icon(TwineIcons.Settings, "设置 DeepSeek API Key")
+            Icon(RsserIcons.Settings, "设置 DeepSeek API Key")
           }
           IconButton(
             onClick = viewModel::clearConversation,
             enabled = !state.isSending && state.messages.isNotEmpty(),
           ) {
-            Icon(TwineIcons.Edit, "开始新对话")
+            Icon(RsserIcons.Edit, "开始新对话")
           }
         },
         colors = TopAppBarDefaults.topAppBarColors(containerColor = colors.background),
@@ -127,7 +127,7 @@ internal fun AiChatScreen(
               ) {
                 if (state.isSending)
                   CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
-                else Icon(TwineIcons.ArrowUp, "发送消息")
+                else Icon(RsserIcons.ArrowUp, "发送消息")
               }
             }
           }
@@ -181,7 +181,7 @@ internal fun AiChatScreen(
               Modifier.fillMaxWidth().padding(top = 24.dp),
               verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-              Icon(TwineIcons.RsserMark, null, Modifier.size(38.dp), tint = colors.primary)
+              Icon(RsserIcons.RsserMark, null, Modifier.size(38.dp), tint = colors.primary)
               Text("从阅读，开始对话。", style = MaterialTheme.typography.headlineMedium)
               Text(
                 "让想法在订阅中生长。\n一起梳理重点，发现新的联系。",
@@ -203,7 +203,7 @@ internal fun AiChatScreen(
                     color = colors.onSurface,
                     style = MaterialTheme.typography.bodyMedium,
                   )
-                  Icon(TwineIcons.Add, null, Modifier.size(16.dp), tint = colors.onSurfaceVariant)
+                  Icon(RsserIcons.Add, null, Modifier.size(16.dp), tint = colors.onSurfaceVariant)
                 }
               }
             }
@@ -251,7 +251,7 @@ private fun ChatBubble(message: AiChatMessage) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
       ) {
-        Icon(TwineIcons.RsserMark, null, Modifier.size(20.dp), tint = colors.primary)
+        Icon(RsserIcons.RsserMark, null, Modifier.size(20.dp), tint = colors.primary)
         Text("Rsser", style = MaterialTheme.typography.labelMedium, color = colors.onSurfaceVariant)
       }
       Spacer(Modifier.height(12.dp))

@@ -37,7 +37,7 @@ import okio.ByteString.Companion.encodeUtf8
 
 internal const val DROPBOX_CLIENT_ID = "qtxdwxyzi69tuxp"
 
-internal const val TWINE_REDIRECT_URI = "twine://oauth"
+internal const val Rsser_REDIRECT_URI = "rsser://oauth"
 
 // Google only accepts the reversed-client-ID custom scheme as the redirect for
 // native app clients, unlike Dropbox which allows arbitrary schemes.
@@ -74,7 +74,7 @@ class RealOAuthManager(
       ServiceType.DROPBOX -> {
         codeVerifier = generateCodeVerifier()
         val codeChallenge = generateCodeChallenge(codeVerifier!!)
-        val redirectUri = loopbackRedirectUri ?: TWINE_REDIRECT_URI
+        val redirectUri = loopbackRedirectUri ?: Rsser_REDIRECT_URI
         activeRedirectUri = redirectUri
         URLBuilder("https://www.dropbox.com/oauth2/authorize")
           .apply {
@@ -150,7 +150,7 @@ class RealOAuthManager(
                         append("code", code)
                         append("grant_type", "authorization_code")
                         append("client_id", DROPBOX_CLIENT_ID)
-                        append("redirect_uri", activeRedirectUri ?: TWINE_REDIRECT_URI)
+                        append("redirect_uri", activeRedirectUri ?: Rsser_REDIRECT_URI)
                         append("code_verifier", verifier)
                       },
                   )

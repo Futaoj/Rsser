@@ -14,20 +14,6 @@
  * limitations under the License.
  *
  */
+package dev.sasikanth.rss.reader.resources.icons
 
-package dev.sasikanth.rss.reader.widget
-
-import androidx.glance.appwidget.GlanceAppWidget
-import androidx.glance.appwidget.GlanceAppWidgetReceiver
-
-class TwineUnreadSmallWidgetReceiver : GlanceAppWidgetReceiver() {
-  override val glanceAppWidget: GlanceAppWidget = TwineUnreadSmallWidget()
-}
-
-class TwineUnreadMediumWidgetReceiver : GlanceAppWidgetReceiver() {
-  override val glanceAppWidget: GlanceAppWidget = TwineUnreadMediumWidget()
-}
-
-class TwineUnreadLargeWidgetReceiver : GlanceAppWidgetReceiver() {
-  override val glanceAppWidget: GlanceAppWidget = TwineUnreadLargeWidget()
-}
+object RsserIcons

@@ -19,7 +19,7 @@ package dev.sasikanth.rss.reader.resources.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TwineIcons.CopyLink: ImageVector
+val RsserIcons.CopyLink: ImageVector
   get() = rsserCopyLink
 
 private val rsserCopyLink by lazy {

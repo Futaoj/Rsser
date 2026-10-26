@@ -58,15 +58,15 @@ import dev.sasikanth.rss.reader.core.model.local.FeedGroup
 import dev.sasikanth.rss.reader.resources.icons.MoreVert
 import dev.sasikanth.rss.reader.resources.icons.Pin
 import dev.sasikanth.rss.reader.resources.icons.PinFilled
-import dev.sasikanth.rss.reader.resources.icons.TwineIcons
+import dev.sasikanth.rss.reader.resources.icons.RsserIcons
 import dev.sasikanth.rss.reader.ui.AppTheme
 import dev.sasikanth.rss.reader.ui.LocalTranslucentStyles
 import kotlin.math.roundToInt
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
-import twine.shared.generated.resources.Res
-import twine.shared.generated.resources.feedGroupFeeds
-import twine.shared.generated.resources.feedGroupNoFeeds
+import rsser.shared.generated.resources.Res
+import rsser.shared.generated.resources.feedGroupFeeds
+import rsser.shared.generated.resources.feedGroupNoFeeds
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -183,7 +183,7 @@ internal fun FeedGroupItem(
 
       if (!isInMultiSelectMode) {
         if (onPinClick != null) {
-          val pinIcon = if (feedGroup.pinnedAt != null) TwineIcons.PinFilled else TwineIcons.Pin
+          val pinIcon = if (feedGroup.pinnedAt != null) RsserIcons.PinFilled else RsserIcons.Pin
           IconButton(icon = pinIcon, contentDescription = null) { onPinClick(feedGroup) }
         }
       }
@@ -191,7 +191,7 @@ internal fun FeedGroupItem(
       if (!isInMultiSelectMode && dropdownMenuContent != null) {
         Box {
           IconButton(
-            icon = TwineIcons.MoreVert,
+            icon = RsserIcons.MoreVert,
             contentDescription = null,
             onClick = {
               contextMenuOffset = null
