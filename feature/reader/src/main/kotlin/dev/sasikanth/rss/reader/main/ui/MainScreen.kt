@@ -68,14 +68,10 @@ import androidx.savedstate.serialization.SavedStateConfiguration
 import androidx.window.core.layout.WindowSizeClass
 import dev.sasikanth.rss.reader.app.AppNavigator
 import dev.sasikanth.rss.reader.app.Screen
+import dev.sasikanth.rss.reader.core.model.local.HomeNavigationItem
 import dev.sasikanth.rss.reader.feeds.FeedsEvent
 import dev.sasikanth.rss.reader.feeds.FeedsViewModel
 import dev.sasikanth.rss.reader.ui.AppTheme
-import dev.sasikanth.rss.reader.resources.icons.RsserIcons
-import dev.sasikanth.rss.reader.resources.icons.Bookmark
-import dev.sasikanth.rss.reader.resources.icons.Home
-import dev.sasikanth.rss.reader.resources.icons.Newsstand
-import dev.sasikanth.rss.reader.resources.icons.RSS
 import dev.sasikanth.rss.reader.utils.LocalRootWindowSizeClass
 import dev.sasikanth.rss.reader.utils.ShortcutHandler
 import kotlinx.coroutines.launch
@@ -83,11 +79,14 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclassesOfSealed
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalSerializationApi::class)
 @Composable
 internal fun MainScreen(
   feedsViewModel: FeedsViewModel,
+  homeNavigationItems: List<HomeNavigationItem>,
+  openAiChat: () -> Unit,
   homeContent: @Composable (openDrawer: () -> Unit) -> Unit,
   searchContent: @Composable (openDrawer: () -> Unit) -> Unit,
   bookmarksContent: @Composable (openDrawer: () -> Unit) -> Unit,
@@ -206,20 +205,25 @@ internal fun MainScreen(
   }
 
   val navigateToDestination = { destination: MainDestination ->
-    phoneDestinationOverride = destination
-    if (selectedDestination != destination) {
-      navigator.popUpTo(Screen.MainHome::class, inclusive = false)
-      val route =
-        when (destination) {
-          MainDestination.Home -> null
-          MainDestination.Subscriptions -> Screen.MainSubscriptions
-          MainDestination.Search -> Screen.MainSearch
-          MainDestination.Bookmarks -> Screen.MainBookmarks
-          MainDestination.Settings -> Screen.MainSettings
-          MainDestination.Discovery -> Screen.MainDiscovery
+    if (destination == MainDestination.AiChat) {
+      openAiChat()
+    } else {
+      phoneDestinationOverride = destination
+      if (selectedDestination != destination) {
+        navigator.popUpTo(Screen.MainHome::class, inclusive = false)
+        val route =
+          when (destination) {
+            MainDestination.Home -> null
+            MainDestination.Subscriptions -> Screen.MainSubscriptions
+            MainDestination.Search -> Screen.MainSearch
+            MainDestination.Bookmarks -> Screen.MainBookmarks
+            MainDestination.Settings -> Screen.MainSettings
+            MainDestination.Discovery -> Screen.MainDiscovery
+            MainDestination.AiChat -> null
+          }
+        if (route != null) {
+          navigator.navigate(route)
         }
-      if (route != null) {
-        navigator.navigate(route)
       }
     }
     Unit
@@ -276,10 +280,13 @@ internal fun MainScreen(
         feedsViewModel = feedsViewModel,
         selectedDestination = selectedDestination,
         onDestinationSelected = {
-          phoneDestinationOverride = it
-          if (it == MainDestination.Home && selectedDestination == MainDestination.Home) {
+          if (it == MainDestination.AiChat) {
+            openAiChat()
+          } else if (it == MainDestination.Home && selectedDestination == MainDestination.Home) {
+            phoneDestinationOverride = it
             feedsViewModel.dispatch(FeedsEvent.OnHomeSelected)
           } else {
+            phoneDestinationOverride = it
             val route =
               when (it) {
                 MainDestination.Home -> Screen.MainHome
@@ -288,6 +295,7 @@ internal fun MainScreen(
                 MainDestination.Bookmarks -> Screen.MainBookmarks
                 MainDestination.Settings -> Screen.MainSettings
                 MainDestination.Discovery -> Screen.MainDiscovery
+                MainDestination.AiChat -> Screen.MainHome
               }
 
             // pop up to start destination, launch single top, restore state
@@ -334,6 +342,8 @@ internal fun MainScreen(
         Box(modifier = Modifier.weight(1f)) {
           MainScreenContent(
             navigator = navigator,
+            homeNavigationItems = homeNavigationItems,
+            openAiChat = openAiChat,
             homeContent = { homeContent(openDrawer) },
             searchContent = { searchContent(goBackToHome) },
             bookmarksContent = { bookmarksContent(goBackToHome) },
@@ -367,6 +377,8 @@ internal fun MainScreen(
       ) {
         MainScreenContent(
           navigator = navigator,
+          homeNavigationItems = homeNavigationItems,
+          openAiChat = openAiChat,
           homeContent = { homeContent(openDrawer) },
           searchContent = { searchContent(goBackToHome) },
           bookmarksContent = { bookmarksContent(goBackToHome) },
@@ -389,6 +401,8 @@ internal fun MainScreen(
 @Composable
 private fun MainScreenContent(
   navigator: AppNavigator,
+  homeNavigationItems: List<HomeNavigationItem>,
+  openAiChat: () -> Unit,
   homeContent: @Composable () -> Unit,
   searchContent: @Composable () -> Unit,
   bookmarksContent: @Composable () -> Unit,
@@ -415,21 +429,21 @@ private fun MainScreenContent(
     bottomBar = {
       if (showPhoneNavigation) {
         val destinations =
-          listOf(
-            Triple(MainDestination.Home, RsserIcons.Home, "阅读"),
-            Triple(MainDestination.Subscriptions, RsserIcons.RSS, "订阅"),
-            Triple(MainDestination.Discovery, RsserIcons.Newsstand, "发现"),
-            Triple(MainDestination.Bookmarks, RsserIcons.Bookmark, "收藏"),
-          )
+          homeNavigationItems.map { item ->
+            MainDestination.entries.first { it.navigationItem == item }
+          }
         NavigationBar(
           containerColor = AppTheme.colorScheme.backdrop,
           contentColor = AppTheme.colorScheme.onSurface,
         ) {
-          destinations.forEach { (destination, icon, label) ->
+          destinations.forEach { destination ->
             val selected = selectedDestination == destination
             NavigationBarItem(
               selected = selected,
-              onClick = { onDestinationSelected(destination) },
+              onClick = {
+                if (destination == MainDestination.AiChat) openAiChat()
+                else onDestinationSelected(destination)
+              },
               icon = {
                 Box(
                   modifier =
@@ -441,10 +455,13 @@ private fun MainScreenContent(
                       ),
                   contentAlignment = androidx.compose.ui.Alignment.Center,
                 ) {
-                  Icon(imageVector = icon, contentDescription = null)
+                  Icon(
+                    imageVector = if (selected) destination.selectedIcon else destination.icon,
+                    contentDescription = null,
+                  )
                 }
               },
-              label = { Text(label) },
+              label = { Text(stringResource(destination.bottomBarLabel)) },
               colors =
                 NavigationBarItemDefaults.colors(
                   selectedIconColor = AppTheme.colorScheme.primary,

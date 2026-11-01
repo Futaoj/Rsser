@@ -53,6 +53,17 @@
   <string name="bookmarks">书签</string>
   <string name="bookmarksPlaceholder">已添加书签的文章会出现在这里 🔖</string>
   <string name="settings">设置</string>
+  <string name="aiChatTitle">AI 对话</string>
+  <string name="mainTabReading">阅读</string>
+  <string name="mainTabSubscriptions">订阅</string>
+  <string name="mainTabBookmarks">收藏</string>
+  <string name="settingsBottomNavigationTitle">首页底部导航</string>
+  <string name="settingsBottomNavigationSubtitle">选择要固定显示的四个入口及顺序</string>
+  <string name="settingsBottomNavigationHint">从七个入口中选择四个。可以替换入口，也可以调整顺序。</string>
+  <string name="settingsBottomNavigationSlot">第 %1$d 个入口</string>
+  <string name="settingsBottomNavigationSelect">选择入口</string>
+  <string name="settingsBottomNavigationMoveUp">上移</string>
+  <string name="settingsBottomNavigationMoveDown">下移</string>
   <string name="settingsAppearanceAndLayout">外观 &amp; 布局</string>
   <string name="settingsAppearanceAndLayoutSubtitle">自定义 Rsser 的外观</string>
   <string name="settingsFeaturesAndBehaviors">功能 &amp; 行为</string>

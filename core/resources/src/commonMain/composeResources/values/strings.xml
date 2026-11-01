@@ -59,6 +59,17 @@
   <string name="readerExpandScreen">Expand reader</string>
   <string name="readerCollapseScreen">Collapse reader</string>
   <string name="settings">Settings</string>
+  <string name="aiChatTitle">AI chat</string>
+  <string name="mainTabReading">Read</string>
+  <string name="mainTabSubscriptions">Subscriptions</string>
+  <string name="mainTabBookmarks">Bookmarks</string>
+  <string name="settingsBottomNavigationTitle">Home navigation bar</string>
+  <string name="settingsBottomNavigationSubtitle">Choose four pinned destinations and their order</string>
+  <string name="settingsBottomNavigationHint">Choose four of the seven destinations. Replace an item or adjust its position.</string>
+  <string name="settingsBottomNavigationSlot">Position %1$d</string>
+  <string name="settingsBottomNavigationSelect">Select destination</string>
+  <string name="settingsBottomNavigationMoveUp">Move up</string>
+  <string name="settingsBottomNavigationMoveDown">Move down</string>
   <string name="settingsAppearanceAndLayout">Appearance &amp; layout</string>
   <string name="settingsAppearanceAndLayoutSubtitle">Customize how Rsser looks</string>
   <string name="settingsFeaturesAndBehaviors">Features &amp; behaviors</string>

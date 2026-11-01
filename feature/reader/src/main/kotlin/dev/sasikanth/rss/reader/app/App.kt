@@ -343,6 +343,7 @@ fun App(
           },
           screenModifier = screenModifier,
           isSideNavigationExpanded = isSideNavigationExpanded,
+          homeNavigationItems = appState.homeNavigationItems,
         )
 
         aiChatScreen(
@@ -416,6 +417,12 @@ fun App(
         )
 
         settingsAppearanceScreen(
+          modifier = screenModifier,
+          settingsViewModel = settingsViewModel,
+          navigator = navigator,
+        )
+
+        settingsBottomNavigationScreen(
           modifier = screenModifier,
           settingsViewModel = settingsViewModel,
           navigator = navigator,

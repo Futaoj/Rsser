@@ -21,6 +21,7 @@ import androidx.compose.runtime.Stable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.paging.Pager
+import androidx.paging.PagingData
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import dev.sasikanth.rss.reader.core.model.local.ResolvedPost
@@ -39,6 +40,7 @@ import dev.sasikanth.rss.reader.media.PlaybackState
 import dev.sasikanth.rss.reader.media.SleepTimerOption
 import dev.sasikanth.rss.reader.posts.AllPostsPager
 import dev.sasikanth.rss.reader.reader.ReaderScreenArgs.FromScreen.AudioPlayer
+import dev.sasikanth.rss.reader.reader.ReaderScreenArgs.FromScreen.AiChat
 import dev.sasikanth.rss.reader.reader.ReaderScreenArgs.FromScreen.Bookmarks
 import dev.sasikanth.rss.reader.reader.ReaderScreenArgs.FromScreen.Home
 import dev.sasikanth.rss.reader.reader.ReaderScreenArgs.FromScreen.Search
@@ -56,6 +58,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -293,7 +296,10 @@ class ReaderViewModel(
 
   private fun init() {
     coroutineScope.launch {
-      if (readerScreenArgs.fromScreen == Home || readerScreenArgs.fromScreen == AudioPlayer) {
+      if (readerScreenArgs.fromScreen == AiChat) {
+        val citedPost = postRepository.resolvedPostById(readerScreenArgs.postId)
+        _state.update { it.copy(posts = flowOf(PagingData.from(listOfNotNull(citedPost)))) }
+      } else if (readerScreenArgs.fromScreen == Home || readerScreenArgs.fromScreen == AudioPlayer) {
         val allPostsPagingData =
           allPostsPager
             .allPostsPagingData(

@@ -44,8 +44,15 @@ class PostRepository(
   suspend fun recentAiContext(limit: Int = 20): List<AiArticleContext> {
     return withContext(dispatchersProvider.databaseRead) {
       postQueries
-        .aiRecentPosts(limit = limit.coerceIn(1, 20).toLong()) { feedName, title, summary, date, link ->
-          AiArticleContext(feedName, title, summary, date, link)
+        .aiRecentPosts(limit = limit.coerceIn(1, 20).toLong()) {
+            id,
+            feedName,
+            title,
+            summary,
+            date,
+            link,
+            imageUrl ->
+          AiArticleContext(id, feedName, title, summary, date, link, imageUrl)
         }
         .executeAsList()
     }

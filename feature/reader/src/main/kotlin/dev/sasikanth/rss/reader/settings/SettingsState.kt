@@ -21,6 +21,7 @@ import dev.sasikanth.rss.reader.app.AppIcon
 import dev.sasikanth.rss.reader.app.AppInfo
 import dev.sasikanth.rss.reader.core.model.local.ServiceType
 import dev.sasikanth.rss.reader.core.model.local.ThemeVariant
+import dev.sasikanth.rss.reader.core.model.local.HomeNavigationItem
 import dev.sasikanth.rss.reader.data.opml.OpmlFeed
 import dev.sasikanth.rss.reader.data.opml.OpmlResult
 import dev.sasikanth.rss.reader.data.repository.AppThemeMode
@@ -60,6 +61,7 @@ data class SettingsState(
   val signedInService: ServiceType?,
   val authUrlToOpen: String?,
   val appIcon: AppIcon,
+  val homeNavigationItems: List<HomeNavigationItem>,
   val opmlFeedsToSelect: List<OpmlFeed>?,
   val opmlFeedSelectionLimit: Int,
   val blockedWordsCount: Int,
@@ -106,6 +108,7 @@ data class SettingsState(
         signedInService = null,
         authUrlToOpen = null,
         appIcon = AppIcon.Default,
+        homeNavigationItems = HomeNavigationItem.DEFAULT,
         opmlFeedsToSelect = null,
         opmlFeedSelectionLimit = 0,
         blockedWordsCount = 0,

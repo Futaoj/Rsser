@@ -25,6 +25,7 @@ import dev.sasikanth.rss.reader.app.AppIconManager
 import dev.sasikanth.rss.reader.app.AppInfo
 import dev.sasikanth.rss.reader.core.model.local.ServiceType
 import dev.sasikanth.rss.reader.core.model.local.ThemeVariant
+import dev.sasikanth.rss.reader.core.model.local.HomeNavigationItem
 import dev.sasikanth.rss.reader.core.model.local.User
 import dev.sasikanth.rss.reader.data.opml.OpmlFeed
 import dev.sasikanth.rss.reader.data.opml.OpmlManager
@@ -178,6 +179,10 @@ class SettingsViewModel(
       }
       .launchIn(viewModelScope)
 
+    settingsRepository.homeNavigationItems
+      .onEach { items -> _state.update { it.copy(homeNavigationItems = items) } }
+      .launchIn(viewModelScope)
+
     syncCoordinator.syncState
       .onEach { syncState ->
         _state.update {
@@ -239,6 +244,7 @@ class SettingsViewModel(
       is SettingsEvent.SignOutClicked -> signOutClicked()
       SettingsEvent.ClearAuthUrl -> _state.update { it.copy(authUrlToOpen = null) }
       is SettingsEvent.OnAppIconChanged -> onAppIconChanged(event.appIcon)
+      is SettingsEvent.UpdateHomeNavigationItems -> updateHomeNavigationItems(event.items)
       SettingsEvent.DeleteAppData -> deleteAppData()
       is SettingsEvent.OnOpmlFeedsSelected -> onOpmlFeedsSelected(event.feeds)
       SettingsEvent.ClearOpmlFeedsToSelect -> {
@@ -392,6 +398,10 @@ class SettingsViewModel(
       settingsRepository.updateAppIcon(appIcon)
       appIconManager.setIcon(appIcon)
     }
+  }
+
+  private fun updateHomeNavigationItems(items: List<HomeNavigationItem>) {
+    viewModelScope.launch { settingsRepository.updateHomeNavigationItems(items) }
   }
 
   private fun updateBrowserType(browserType: BrowserType) {

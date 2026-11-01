@@ -18,6 +18,8 @@
 package dev.sasikanth.rss.reader.main.ui
 
 import androidx.compose.ui.graphics.vector.ImageVector
+import dev.sasikanth.rss.reader.core.model.local.HomeNavigationItem
+import dev.sasikanth.rss.reader.resources.icons.AiChat
 import dev.sasikanth.rss.reader.resources.icons.Bookmark
 import dev.sasikanth.rss.reader.resources.icons.BookmarkFilled
 import dev.sasikanth.rss.reader.resources.icons.Home
@@ -31,41 +33,70 @@ import dev.sasikanth.rss.reader.resources.icons.RsserIcons
 import org.jetbrains.compose.resources.StringResource
 import rsser.shared.generated.resources.Res
 import rsser.shared.generated.resources.bookmarks
+import rsser.shared.generated.resources.aiChatTitle
 import rsser.shared.generated.resources.discoveryTitle
 import rsser.shared.generated.resources.feeds
+import rsser.shared.generated.resources.mainTabBookmarks
+import rsser.shared.generated.resources.mainTabReading
+import rsser.shared.generated.resources.mainTabSubscriptions
 import rsser.shared.generated.resources.postsSearchHint
 import rsser.shared.generated.resources.screenHome
 import rsser.shared.generated.resources.settings
 
 internal enum class MainDestination(
+  val navigationItem: HomeNavigationItem,
   val icon: ImageVector,
   val selectedIcon: ImageVector,
   val label: StringResource,
+  val bottomBarLabel: StringResource,
 ) {
-  Home(icon = RsserIcons.Home, selectedIcon = RsserIcons.HomeFilled, label = Res.string.screenHome),
+  Home(
+    navigationItem = HomeNavigationItem.Home,
+    icon = RsserIcons.Home,
+    selectedIcon = RsserIcons.HomeFilled,
+    label = Res.string.screenHome,
+    bottomBarLabel = Res.string.mainTabReading,
+  ),
   Subscriptions(
+    navigationItem = HomeNavigationItem.Subscriptions,
     icon = RsserIcons.RSS,
     selectedIcon = RsserIcons.RSS,
     label = Res.string.feeds,
+    bottomBarLabel = Res.string.mainTabSubscriptions,
   ),
   Search(
+    navigationItem = HomeNavigationItem.Search,
     icon = RsserIcons.Search,
     selectedIcon = RsserIcons.Search,
     label = Res.string.postsSearchHint,
+    bottomBarLabel = Res.string.postsSearchHint,
   ),
   Discovery(
+    navigationItem = HomeNavigationItem.Discovery,
     icon = RsserIcons.Newsstand,
     selectedIcon = RsserIcons.Newsstand,
     label = Res.string.discoveryTitle,
+    bottomBarLabel = Res.string.discoveryTitle,
+  ),
+  AiChat(
+    navigationItem = HomeNavigationItem.AiChat,
+    icon = RsserIcons.AiChat,
+    selectedIcon = RsserIcons.AiChat,
+    label = Res.string.aiChatTitle,
+    bottomBarLabel = Res.string.aiChatTitle,
   ),
   Bookmarks(
+    navigationItem = HomeNavigationItem.Bookmarks,
     icon = RsserIcons.Bookmark,
     selectedIcon = RsserIcons.BookmarkFilled,
     label = Res.string.bookmarks,
+    bottomBarLabel = Res.string.mainTabBookmarks,
   ),
   Settings(
+    navigationItem = HomeNavigationItem.Settings,
     icon = RsserIcons.Settings,
     selectedIcon = RsserIcons.SettingsFilled,
     label = Res.string.settings,
+    bottomBarLabel = Res.string.settings,
   ),
 }

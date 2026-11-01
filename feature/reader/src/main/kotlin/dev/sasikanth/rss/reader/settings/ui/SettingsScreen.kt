@@ -39,6 +39,7 @@ import dev.sasikanth.rss.reader.resources.icons.Appearance
 import dev.sasikanth.rss.reader.resources.icons.Behaviors
 import dev.sasikanth.rss.reader.resources.icons.Changelog
 import dev.sasikanth.rss.reader.resources.icons.Sync
+import dev.sasikanth.rss.reader.resources.icons.Tune
 import dev.sasikanth.rss.reader.resources.icons.RsserIcons
 import dev.sasikanth.rss.reader.settings.SettingsState
 import dev.sasikanth.rss.reader.settings.SettingsViewModel
@@ -48,6 +49,8 @@ import org.jetbrains.compose.resources.stringResource
 import rsser.shared.generated.resources.Res
 import rsser.shared.generated.resources.settings
 import rsser.shared.generated.resources.settingsAppInfoAndFeedback
+import rsser.shared.generated.resources.settingsBottomNavigationSubtitle
+import rsser.shared.generated.resources.settingsBottomNavigationTitle
 import rsser.shared.generated.resources.settingsAppearanceAndLayout
 import rsser.shared.generated.resources.settingsAppearanceAndLayoutSubtitle
 import rsser.shared.generated.resources.settingsFeaturesAndBehaviors
@@ -66,6 +69,7 @@ internal fun SettingsScreen(
   openServicesSettings: () -> Unit,
   openDataSettings: () -> Unit,
   openAppInfoSettings: () -> Unit,
+  openBottomNavigationSettings: () -> Unit,
   modifier: Modifier = Modifier,
 ) {
   val state by viewModel.state.collectAsStateWithLifecycle()
@@ -78,6 +82,7 @@ internal fun SettingsScreen(
     openServicesSettings = openServicesSettings,
     openDataSettings = openDataSettings,
     openAppInfoSettings = openAppInfoSettings,
+    openBottomNavigationSettings = openBottomNavigationSettings,
     modifier = modifier,
   )
 }
@@ -91,6 +96,7 @@ private fun SettingsContent(
   openServicesSettings: () -> Unit,
   openDataSettings: () -> Unit,
   openAppInfoSettings: () -> Unit,
+  openBottomNavigationSettings: () -> Unit,
   modifier: Modifier = Modifier,
 ) {
   val layoutDirection = LocalLayoutDirection.current
@@ -108,6 +114,15 @@ private fun SettingsContent(
             bottom = padding.calculateBottomPadding() + 80.dp,
           ),
       ) {
+        item {
+          SettingsNavigationItem(
+            title = stringResource(Res.string.settingsBottomNavigationTitle),
+            subtitle = stringResource(Res.string.settingsBottomNavigationSubtitle),
+            icon = RsserIcons.Tune,
+            onClick = openBottomNavigationSettings,
+          )
+        }
+
         item {
           SettingsNavigationItem(
             title = stringResource(Res.string.settingsAppearanceAndLayout),
@@ -183,6 +198,7 @@ private fun SettingsPreview() {
       openServicesSettings = {},
       openDataSettings = {},
       openAppInfoSettings = {},
+      openBottomNavigationSettings = {},
     )
   }
 }

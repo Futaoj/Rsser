@@ -57,6 +57,8 @@ sealed interface Screen : NavKey {
 
   @Serializable data object SettingsAppearance : Screen
 
+  @Serializable data object SettingsBottomNavigation : Screen
+
   @Serializable data object SettingsBehavior : Screen
 
   @Serializable data object SettingsServices : Screen

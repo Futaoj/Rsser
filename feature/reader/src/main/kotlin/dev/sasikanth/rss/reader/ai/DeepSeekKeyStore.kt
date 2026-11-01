@@ -40,6 +40,19 @@ class DeepSeekKeyStore(private val context: Context) {
     preferences.edit().putString(KEY_VALUE, Base64.encodeToString(combined, Base64.NO_WRAP)).apply()
   }
 
+  fun baseUrl(): String = preferences.getString(KEY_BASE_URL, null) ?: DEFAULT_BASE_URL
+
+  fun modelName(): String = preferences.getString(KEY_MODEL_NAME, null) ?: DeepSeekClient.DEFAULT_MODEL
+
+  fun saveConfiguration(baseUrl: String, apiKey: String, modelName: String) {
+    preferences
+      .edit()
+      .putString(KEY_BASE_URL, baseUrl.trim().trimEnd('/'))
+      .putString(KEY_MODEL_NAME, modelName.trim())
+      .apply()
+    if (apiKey.isNotBlank()) write(apiKey)
+  }
+
   fun clear() {
     preferences.edit().remove(KEY_VALUE).apply()
   }
@@ -71,6 +84,9 @@ class DeepSeekKeyStore(private val context: Context) {
     const val KEYSTORE = "AndroidKeyStore"
     const val PREFERENCES_NAME = "deepseek_secure_settings"
     const val KEY_VALUE = "encrypted_api_key"
+    const val KEY_BASE_URL = "ai_base_url"
+    const val KEY_MODEL_NAME = "ai_model_name"
+    const val DEFAULT_BASE_URL = "https://api.deepseek.com"
     const val TRANSFORMATION = "AES/GCM/NoPadding"
     const val IV_SIZE = 12
     const val TAG_SIZE = 128

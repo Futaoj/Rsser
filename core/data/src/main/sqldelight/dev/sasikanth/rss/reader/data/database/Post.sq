@@ -54,11 +54,13 @@ CREATE INDEX post_with_image_index ON post(postDate DESC) WHERE imageUrl IS NOT 
 
 aiRecentPosts:
 SELECT
+  post.id AS id,
   feed.name AS feedName,
   post.title AS title,
   post.description AS summary,
   post.postDate AS date,
-  post.link AS link
+  post.link AS link,
+  post.imageUrl AS imageUrl
 FROM post
 INNER JOIN feed ON post.sourceId = feed.id
 WHERE feed.isDeleted = 0 AND (post.flags & 4) = 0

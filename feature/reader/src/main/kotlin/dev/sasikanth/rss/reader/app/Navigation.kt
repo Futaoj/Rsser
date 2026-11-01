@@ -53,6 +53,7 @@ import dev.sasikanth.rss.reader.blockedwords.BlockedWordsViewModel
 import dev.sasikanth.rss.reader.bookmarks.BookmarksViewModel
 import dev.sasikanth.rss.reader.bookmarks.ui.BookmarksScreen
 import dev.sasikanth.rss.reader.core.model.local.ResolvedPost
+import dev.sasikanth.rss.reader.core.model.local.HomeNavigationItem
 import dev.sasikanth.rss.reader.discovery.DiscoveryViewModel
 import dev.sasikanth.rss.reader.discovery.ui.DiscoveryScreen
 import dev.sasikanth.rss.reader.feed.FeedViewModel
@@ -92,6 +93,7 @@ import dev.sasikanth.rss.reader.settings.SettingsViewModel
 import dev.sasikanth.rss.reader.settings.ui.SettingsAppInfoScreen
 import dev.sasikanth.rss.reader.settings.ui.SettingsAppearanceScreen
 import dev.sasikanth.rss.reader.settings.ui.SettingsBehaviorScreen
+import dev.sasikanth.rss.reader.settings.ui.SettingsBottomNavigationScreen
 import dev.sasikanth.rss.reader.settings.ui.SettingsDataScreen
 import dev.sasikanth.rss.reader.settings.ui.SettingsScreen
 import dev.sasikanth.rss.reader.settings.ui.SettingsServicesScreen
@@ -133,7 +135,22 @@ fun EntryProviderScope<NavKey>.aiChatScreen(
 ) {
   entry<Screen.AiChat> {
     val viewModel = viewModel { aiChatViewModel() }
-    AiChatScreen(viewModel = viewModel, onBack = { navigator.goBack() }, modifier = modifier)
+    AiChatScreen(
+      viewModel = viewModel,
+      onBack = { navigator.goBack() },
+      onArticleClick = { citation ->
+        navigator.navigate(
+          Screen.Reader(
+            dev.sasikanth.rss.reader.reader.ReaderScreenArgs(
+              postIndex = 0,
+              postId = citation.postId,
+              fromScreen = FromScreen.AiChat,
+            )
+          )
+        )
+      },
+      modifier = modifier,
+    )
   }
 }
 
@@ -169,6 +186,7 @@ fun EntryProviderScope<NavKey>.mainScreen(
   openCurrentlyPlaying: () -> Unit,
   screenModifier: Modifier,
   isSideNavigationExpanded: MutableState<Boolean>,
+  homeNavigationItems: List<HomeNavigationItem>,
 ) {
   entry<Screen.Main>(
     metadata = ListDetailSceneStrategy.listPane(detailPlaceholder = { ReaderPanePlaceholder() })
@@ -190,6 +208,8 @@ fun EntryProviderScope<NavKey>.mainScreen(
     PaneSizeClassProvider {
       MainScreen(
         feedsViewModel = feedsViewModel,
+        homeNavigationItems = homeNavigationItems,
+        openAiChat = { navigator.navigate(Screen.AiChat) },
         startTab = startTab,
         homeContent = { openDrawer ->
           val viewModel = viewModel { homeViewModel() }
@@ -304,6 +324,9 @@ fun EntryProviderScope<NavKey>.mainScreen(
             openServicesSettings = { navigator.navigate(Screen.SettingsServices) },
             openDataSettings = { navigator.navigate(Screen.SettingsData) },
             openAppInfoSettings = { navigator.navigate(Screen.SettingsAppInfo) },
+            openBottomNavigationSettings = {
+              navigator.navigate(Screen.SettingsBottomNavigation)
+            },
             modifier = screenModifier,
           )
         },
@@ -367,6 +390,21 @@ fun EntryProviderScope<NavKey>.settingsAppearanceScreen(
   entry<Screen.SettingsAppearance> {
     val viewModel = viewModel { settingsViewModel() }
     SettingsAppearanceScreen(
+      modifier = modifier,
+      viewModel = viewModel,
+      goBack = { navigator.goBack() },
+    )
+  }
+}
+
+fun EntryProviderScope<NavKey>.settingsBottomNavigationScreen(
+  settingsViewModel: () -> SettingsViewModel,
+  navigator: AppNavigator,
+  modifier: Modifier = Modifier,
+) {
+  entry<Screen.SettingsBottomNavigation> {
+    val viewModel = viewModel { settingsViewModel() }
+    SettingsBottomNavigationScreen(
       modifier = modifier,
       viewModel = viewModel,
       goBack = { navigator.goBack() },

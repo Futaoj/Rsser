@@ -29,6 +29,7 @@ import dev.sasikanth.rss.reader.app.AppInfo
 import dev.sasikanth.rss.reader.app.LegacyAppIcon
 import dev.sasikanth.rss.reader.core.model.local.PostsSortOrder
 import dev.sasikanth.rss.reader.core.model.local.PostsType
+import dev.sasikanth.rss.reader.core.model.local.HomeNavigationItem
 import dev.sasikanth.rss.reader.core.model.local.ThemeVariant
 import dev.sasikanth.rss.reader.di.scopes.AppScope
 import kotlin.time.Instant
@@ -74,6 +75,7 @@ class SettingsRepository(
   private val isOnboardingDoneKey = booleanPreferencesKey("is_onboarding_done_v2")
   private val showFeaturedSectionKey = booleanPreferencesKey("show_featured_section")
   private val lastSeenChangelogVersionKey = stringPreferencesKey("last_seen_changelog_version")
+  private val homeNavigationItemsKey = stringPreferencesKey("home_navigation_items")
 
   val browserType: Flow<BrowserType> =
     dataStore.data.map { preferences ->
@@ -123,6 +125,11 @@ class SettingsRepository(
 
   val showFeaturedSection: Flow<Boolean> =
     dataStore.data.map { preferences -> preferences[showFeaturedSectionKey] ?: true }
+
+  val homeNavigationItems: Flow<List<HomeNavigationItem>> =
+    dataStore.data.map { preferences ->
+      HomeNavigationItem.fromPreference(preferences[homeNavigationItemsKey])
+    }
 
   val markAsReadOn: Flow<MarkAsReadOn> =
     dataStore.data.map { preferences -> mapToMarkAsReadOnType(preferences[markPostsAsReadOnKey]) }
@@ -246,6 +253,13 @@ class SettingsRepository(
 
   suspend fun toggleShowFeaturedSection(value: Boolean) {
     dataStore.edit { preferences -> preferences[showFeaturedSectionKey] = value }
+  }
+
+  suspend fun updateHomeNavigationItems(items: List<HomeNavigationItem>) {
+    if (items.size != HomeNavigationItem.SLOT_COUNT || items.distinct().size != items.size) return
+    dataStore.edit { preferences ->
+      preferences[homeNavigationItemsKey] = items.joinToString(",") { it.name }
+    }
   }
 
   suspend fun updateMarkAsReadOn(value: MarkAsReadOn) {

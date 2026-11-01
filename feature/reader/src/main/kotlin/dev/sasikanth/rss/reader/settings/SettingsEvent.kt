@@ -18,6 +18,7 @@ package dev.sasikanth.rss.reader.settings
 
 import dev.sasikanth.rss.reader.app.AppIcon
 import dev.sasikanth.rss.reader.core.model.local.ThemeVariant
+import dev.sasikanth.rss.reader.core.model.local.HomeNavigationItem
 import dev.sasikanth.rss.reader.data.opml.OpmlFeed
 import dev.sasikanth.rss.reader.data.repository.AppThemeMode
 import dev.sasikanth.rss.reader.data.repository.AudioMarkAsReadThreshold
@@ -81,6 +82,8 @@ sealed interface SettingsEvent {
   data object ClearAuthUrl : SettingsEvent
 
   data class OnAppIconChanged(val appIcon: AppIcon) : SettingsEvent
+
+  data class UpdateHomeNavigationItems(val items: List<HomeNavigationItem>) : SettingsEvent
 
   data object DeleteAppData : SettingsEvent
 

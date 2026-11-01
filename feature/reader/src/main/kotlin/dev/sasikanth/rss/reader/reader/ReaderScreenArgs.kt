@@ -36,5 +36,8 @@ data class ReaderScreenArgs(val postIndex: Int, val postId: String, val fromScre
     @Serializable data object UnreadWidget : FromScreen
 
     @Serializable data object AudioPlayer : FromScreen
+
+    /** Reader opened directly from an AI article citation. */
+    @Serializable data object AiChat : FromScreen
   }
 }

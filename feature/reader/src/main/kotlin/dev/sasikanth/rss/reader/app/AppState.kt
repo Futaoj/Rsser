@@ -21,6 +21,7 @@ import dev.sasikanth.rss.reader.core.model.local.PostsSortOrder
 import dev.sasikanth.rss.reader.core.model.local.PostsType
 import dev.sasikanth.rss.reader.core.model.local.Source
 import dev.sasikanth.rss.reader.core.model.local.ThemeVariant
+import dev.sasikanth.rss.reader.core.model.local.HomeNavigationItem
 import dev.sasikanth.rss.reader.data.repository.AppThemeMode
 import dev.sasikanth.rss.reader.data.repository.HomeViewMode
 
@@ -35,6 +36,7 @@ data class AppState(
   val activeSource: Source?,
   val postsType: PostsType,
   val postsSortOrder: PostsSortOrder,
+  val homeNavigationItems: List<HomeNavigationItem>,
   val showChangelog: Boolean,
   val versionName: String,
 ) {
@@ -52,6 +54,7 @@ data class AppState(
         activeSource = null,
         postsType = PostsType.ALL,
         postsSortOrder = PostsSortOrder.Latest,
+        homeNavigationItems = HomeNavigationItem.DEFAULT,
         showChangelog = false,
         versionName = "",
       )

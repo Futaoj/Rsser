@@ -84,6 +84,7 @@ dependencies {
   "fullImplementation"(libs.googlePlayReview)
   debugImplementation(libs.compose.ui.tooling)
   testImplementation(libs.kotlin.test)
+  testImplementation(kotlin("test-junit"))
   testImplementation(libs.kotlinx.coroutines.test)
   testImplementation(libs.ktor.client.mock)
   add("kspFull", libs.kotlininject.compiler)
